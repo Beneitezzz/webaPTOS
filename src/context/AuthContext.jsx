@@ -18,9 +18,9 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      let cancelled = false
+    let cancelled = false
 
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
       const resolve = async () => {
         if (user) {
           try {
@@ -43,11 +43,13 @@ export function AuthProvider({ children }) {
         }
         if (!cancelled) setLoading(false)
       }
-
       resolve()
-      return () => { cancelled = true }
     })
-    return unsubscribe
+
+    return () => {
+      cancelled = true
+      unsubscribe()
+    }
   }, [])
 
   const signInWithEmail = (email, password) =>
