@@ -18,16 +18,34 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        setCurrentUser(user)
-        const snap = await getDoc(doc(db, 'users', user.uid))
-        setUserRole(snap.exists() ? snap.data().role : 'user')
-      } else {
-        setCurrentUser(null)
-        setUserRole(null)
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      let cancelled = false
+
+      const resolve = async () => {
+        if (user) {
+          try {
+            const snap = await getDoc(doc(db, 'users', user.uid))
+            if (!cancelled) {
+              setCurrentUser(user)
+              setUserRole(snap.exists() ? snap.data().role : 'user')
+            }
+          } catch {
+            if (!cancelled) {
+              setCurrentUser(user)
+              setUserRole('user')
+            }
+          }
+        } else {
+          if (!cancelled) {
+            setCurrentUser(null)
+            setUserRole(null)
+          }
+        }
+        if (!cancelled) setLoading(false)
       }
-      setLoading(false)
+
+      resolve()
+      return () => { cancelled = true }
     })
     return unsubscribe
   }, [])
@@ -38,30 +56,39 @@ export function AuthProvider({ children }) {
   const registerWithEmail = async (email, password, displayName) => {
     const credential = await createUserWithEmailAndPassword(auth, email, password)
     await updateProfile(credential.user, { displayName })
-    await setDoc(doc(db, 'users', credential.user.uid), {
-      email,
-      displayName,
-      role: 'user',
-      createdAt: serverTimestamp(),
-      lastLogin: serverTimestamp(),
-    })
+    try {
+      await setDoc(doc(db, 'users', credential.user.uid), {
+        email,
+        displayName,
+        role: 'user',
+        createdAt: serverTimestamp(),
+        lastLogin: serverTimestamp(),
+      })
+    } catch (err) {
+      await credential.user.delete()
+      throw err
+    }
     return credential
   }
 
   const signInWithProvider = async (provider) => {
     const credential = await signInWithPopup(auth, provider)
     const userRef = doc(db, 'users', credential.user.uid)
-    const snap = await getDoc(userRef)
-    if (!snap.exists()) {
-      await setDoc(userRef, {
-        email: credential.user.email,
-        displayName: credential.user.displayName,
-        role: 'user',
-        createdAt: serverTimestamp(),
-        lastLogin: serverTimestamp(),
-      })
-    } else {
-      await updateDoc(userRef, { lastLogin: serverTimestamp() })
+    try {
+      const snap = await getDoc(userRef)
+      if (!snap.exists()) {
+        await setDoc(userRef, {
+          email: credential.user.email,
+          displayName: credential.user.displayName,
+          role: 'user',
+          createdAt: serverTimestamp(),
+          lastLogin: serverTimestamp(),
+        })
+      } else {
+        await updateDoc(userRef, { lastLogin: serverTimestamp() })
+      }
+    } catch {
+      // Firestore write failed but auth succeeded — user is logged in
     }
     return credential
   }
@@ -77,4 +104,8 @@ export function AuthProvider({ children }) {
   )
 }
 
-export const useAuth = () => useContext(AuthContext)
+export const useAuth = () => {
+  const ctx = useContext(AuthContext)
+  if (!ctx) throw new Error('useAuth debe usarse dentro de AuthProvider')
+  return ctx
+}
