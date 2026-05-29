@@ -188,7 +188,7 @@ export default function RegistroComercio() {
           </p>
           <button
             className="btn btn-primary"
-            onClick={() => { setForm(initialForm); setCoords(null); setGeocodeError(''); setSubmitted(false) }}
+            onClick={() => { setForm(initialForm); setCoords(null); setGeocodeError(''); setGeocoding(false); setSubmitted(false) }}
           >
             Registrar otro comercio
           </button>
@@ -399,8 +399,8 @@ export default function RegistroComercio() {
           </div>
 
           {errors.submit && <div className="auth-error">{errors.submit}</div>}
-          <button type="submit" className="btn btn-primary btn-full">
-            Enviar para verificación
+          <button type="submit" className="btn btn-primary btn-full" disabled={geocoding}>
+            {geocoding ? 'Verificando ubicación...' : 'Enviar para verificación'}
           </button>
 
           <p className="form-footer-note">
