@@ -36,8 +36,10 @@ export function AppProvider({ children }) {
 
   useEffect(() => {
     if (!currentUser) {
+      /* eslint-disable react-hooks/set-state-in-effect */
       setUserProfile({ profileName: '', restrictions: [] })
       setProfileLoading(false)
+      /* eslint-enable react-hooks/set-state-in-effect */
       return
     }
     let cancelled = false

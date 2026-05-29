@@ -16,8 +16,10 @@ export default function Mapa() {
 
   useEffect(() => {
     if (!profileLoading && !filtersInitialized) {
+      /* eslint-disable react-hooks/set-state-in-effect */
       setSelectedRestrictions(userProfile.restrictions)
       setFiltersInitialized(true)
+      /* eslint-enable react-hooks/set-state-in-effect */
     }
   }, [profileLoading, filtersInitialized, userProfile.restrictions])
 
