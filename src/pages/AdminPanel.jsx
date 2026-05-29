@@ -7,6 +7,7 @@ import { BUSINESS_TYPE_MAP, CERTIFICATIONS } from '../data/mockData'
 export default function AdminPanel() {
   const { businesses, approveBusiness, rejectBusiness } = useApp()
   const [expanded, setExpanded] = useState(null)
+  const [actionError, setActionError] = useState(null)
 
   const pending = useMemo(
     () => businesses.filter((b) => b.pending && !b.verified),
@@ -39,6 +40,7 @@ export default function AdminPanel() {
           </div>
         </div>
 
+        {actionError && <div className="auth-error" style={{ marginBottom: '16px' }}>{actionError}</div>}
         {pending.length === 0 ? (
           <div className="empty-state card">
             <ShieldCheck size={48} className="empty-icon" />
@@ -74,13 +76,27 @@ export default function AdminPanel() {
                       </button>
                       <button
                         className="btn btn-success btn-sm"
-                        onClick={() => approveBusiness(b.id)}
+                        onClick={async () => {
+                          setActionError(null)
+                          try {
+                            await approveBusiness(b.id)
+                          } catch {
+                            setActionError('Error al aprobar. Intentá de nuevo.')
+                          }
+                        }}
                       >
                         <ShieldCheck size={14} /> Aprobar
                       </button>
                       <button
                         className="btn btn-danger btn-sm"
-                        onClick={() => rejectBusiness(b.id)}
+                        onClick={async () => {
+                          setActionError(null)
+                          try {
+                            await rejectBusiness(b.id)
+                          } catch {
+                            setActionError('Error al rechazar. Intentá de nuevo.')
+                          }
+                        }}
                       >
                         <ShieldX size={14} /> Rechazar
                       </button>
