@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { CheckCircle, Store } from 'lucide-react'
+import { MapContainer, TileLayer, Marker } from 'react-leaflet'
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage'
 import { doc, updateDoc } from 'firebase/firestore'
 import { storage, db } from '../firebase'
@@ -21,12 +22,67 @@ const initialForm = {
 
 const availableCerts = ['RNPA', 'ALG', 'RME', 'POES', 'ACA']
 
+function DraggableMarker({ coords, onMove }) {
+  return (
+    <Marker
+      position={[coords.lat, coords.lng]}
+      draggable
+      eventHandlers={{
+        dragend: (e) => {
+          const { lat, lng } = e.target.getLatLng()
+          onMove(lat, lng)
+        },
+      }}
+    />
+  )
+}
+
 export default function RegistroComercio() {
   const { addBusiness } = useApp()
   const [form, setForm] = useState(initialForm)
   const [certFiles, setCertFiles] = useState({})
   const [submitted, setSubmitted] = useState(false)
   const [errors, setErrors] = useState({})
+  const [coords, setCoords] = useState(null)
+  const [geocoding, setGeocoding] = useState(false)
+  const [geocodeError, setGeocodeError] = useState('')
+  const [geocodeId, setGeocodeId] = useState(0)
+  const debounceRef = useRef(null)
+
+  useEffect(() => {
+    const addr = form.address.trim()
+    if (addr.length < 5) {
+      setCoords(null)
+      setGeocodeError('')
+      setGeocoding(false)
+      return
+    }
+    clearTimeout(debounceRef.current)
+    debounceRef.current = setTimeout(async () => {
+      setGeocoding(true)
+      setGeocodeError('')
+      try {
+        const res = await fetch(
+          `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(addr + ' Córdoba Argentina')}&format=json&limit=1`,
+          { headers: { 'Accept-Language': 'es' } }
+        )
+        const data = await res.json()
+        if (data.length > 0) {
+          setCoords({ lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) })
+          setGeocodeId((n) => n + 1)
+        } else {
+          setCoords(null)
+          setGeocodeError('No se encontró la dirección. Intentá con más detalle.')
+        }
+      } catch {
+        setCoords(null)
+        setGeocodeError('Error al buscar la dirección. Verificá tu conexión.')
+      } finally {
+        setGeocoding(false)
+      }
+    }, 800)
+    return () => clearTimeout(debounceRef.current)
+  }, [form.address]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleChange = (field, value) => {
     setForm((prev) => ({ ...prev, [field]: value }))
@@ -179,6 +235,30 @@ export default function RegistroComercio() {
               value={form.address}
               onChange={(e) => handleChange('address', e.target.value)}
             />
+            {geocoding && (
+              <p className="geocode-status"><span className="spinner-sm" /> Buscando ubicación...</p>
+            )}
+            {geocodeError && !geocoding && (
+              <p className="geocode-error">{geocodeError}</p>
+            )}
+            {coords && !geocoding && (
+              <div className="mini-map">
+                <MapContainer
+                  key={geocodeId}
+                  center={[coords.lat, coords.lng]}
+                  zoom={15}
+                  zoomControl={false}
+                  scrollWheelZoom={false}
+                  style={{ height: '220px' }}
+                >
+                  <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+                  <DraggableMarker
+                    coords={coords}
+                    onMove={(lat, lng) => setCoords({ lat, lng })}
+                  />
+                </MapContainer>
+              </div>
+            )}
             {errors.address && <span className="form-error">{errors.address}</span>}
           </div>
 

@@ -440,6 +440,18 @@ img { display: block; max-width: 100%; }
 .empty-state h3 { margin-bottom: 0.5rem; }
 .empty-state p { color: var(--text-muted); }
 
+.geocode-status {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 0.82rem; color: var(--text-muted); margin-top: 6px;
+}
+.geocode-error { font-size: 0.82rem; color: #dc3545; margin-top: 6px; }
+.mini-map { margin-top: 8px; border-radius: var(--radius); overflow: hidden; }
+.spinner-sm {
+  display: inline-block; width: 14px; height: 14px; flex-shrink: 0;
+  border: 2px solid #e0e0e0; border-top-color: #1a6b3c;
+  border-radius: 50%; animation: spin 0.7s linear infinite;
+}
+
 /* ── Spinner ── */
 .spinner {
   width: 40px;
