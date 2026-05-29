@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { SlidersHorizontal, X } from 'lucide-react'
 import MapView from '../components/MapView'
 import BusinessCard from '../components/BusinessCard'
@@ -7,11 +7,19 @@ import { useApp } from '../context/AppContext'
 import { toggleItem } from '../utils/array'
 
 export default function Mapa() {
-  const { userProfile, businesses } = useApp()
+  const { userProfile, businesses, businessesLoading, businessesError, profileLoading } = useApp()
 
-  const [selectedRestrictions, setSelectedRestrictions] = useState(userProfile.restrictions)
+  const [selectedRestrictions, setSelectedRestrictions] = useState([])
   const [selectedTypes, setSelectedTypes] = useState([])
   const [sidebarOpen, setSidebarOpen] = useState(true)
+  const [filtersInitialized, setFiltersInitialized] = useState(false)
+
+  useEffect(() => {
+    if (!profileLoading && !filtersInitialized) {
+      setSelectedRestrictions(userProfile.restrictions)
+      setFiltersInitialized(true)
+    }
+  }, [profileLoading, filtersInitialized, userProfile.restrictions])
 
   const verifiedBusinesses = useMemo(
     () => businesses.filter((b) => b.verified && !b.pending),
@@ -41,7 +49,6 @@ export default function Mapa() {
 
   return (
     <div className="map-page">
-      {/* Sidebar */}
       <aside className={`map-sidebar ${sidebarOpen ? 'open' : 'closed'}`}>
         <div className="sidebar-header">
           <h2>Filtros</h2>
@@ -112,7 +119,6 @@ export default function Mapa() {
         )}
       </aside>
 
-      {/* Map */}
       <div className="map-container">
         {!sidebarOpen && (
           <button
@@ -123,7 +129,17 @@ export default function Mapa() {
             <SlidersHorizontal size={20} />
           </button>
         )}
-        <MapView businesses={filtered} />
+        {businessesLoading ? (
+          <div className="page page-centered">
+            <div className="spinner" />
+          </div>
+        ) : businessesError ? (
+          <div className="page page-centered">
+            <p className="text-muted">{businessesError}</p>
+          </div>
+        ) : (
+          <MapView businesses={filtered} />
+        )}
       </div>
     </div>
   )
