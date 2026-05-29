@@ -6,20 +6,30 @@ import { CheckCircle, User } from 'lucide-react'
 
 export default function Perfil() {
   const { userProfile, updateProfile } = useApp()
-  const [name, setName] = useState(userProfile.name)
+  const [name, setName] = useState(userProfile.profileName)
   const [restrictions, setRestrictions] = useState(userProfile.restrictions)
   const [saved, setSaved] = useState(false)
+  const [saving, setSaving] = useState(false)
+  const [saveError, setSaveError] = useState('')
 
   const toggleRestriction = (id) => {
     setRestrictions((prev) => toggleItem(prev, id))
     setSaved(false)
   }
 
-  const handleSave = (e) => {
+  const handleSave = async (e) => {
     e.preventDefault()
-    updateProfile({ name, restrictions })
-    setSaved(true)
-    setTimeout(() => setSaved(false), 3000)
+    setSaving(true)
+    setSaveError('')
+    try {
+      await updateProfile({ profileName: name, restrictions })
+      setSaved(true)
+      setTimeout(() => setSaved(false), 3000)
+    } catch {
+      setSaveError('No se pudo guardar el perfil. Intentá de nuevo.')
+    } finally {
+      setSaving(false)
+    }
   }
 
   return (
@@ -97,8 +107,10 @@ export default function Perfil() {
             </div>
           )}
 
-          <button type="submit" className="btn btn-primary btn-full">
-            Guardar perfil
+          {saveError && <div className="auth-error">{saveError}</div>}
+
+          <button type="submit" className="btn btn-primary btn-full" disabled={saving}>
+            {saving ? 'Guardando...' : 'Guardar perfil'}
           </button>
 
           {saved && (
