@@ -8,8 +8,14 @@ const MENU_TYPES = new Set(['restaurante', 'cafe'])
 
 export default function DetalleComercio() {
   const { id } = useParams()
-  const { businesses } = useApp()
+  const { businesses, businessesLoading } = useApp()
   const business = businesses.find((b) => String(b.id) === id)
+
+  if (businessesLoading) return (
+    <div className="page page-centered">
+      <div className="spinner" />
+    </div>
+  )
 
   if (!business) {
     return (
