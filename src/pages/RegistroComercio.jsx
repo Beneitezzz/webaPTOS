@@ -132,6 +132,7 @@ export default function RegistroComercio() {
     if (!form.name.trim()) errs.name = 'El nombre es requerido'
     if (!form.type) errs.type = 'Seleccioná un tipo de establecimiento'
     if (!form.address.trim()) errs.address = 'La dirección es requerida'
+    else if (!coords) errs.address = 'No se pudo verificar la ubicación. Ajustá la dirección.'
     if (!form.phone.trim()) errs.phone = 'El teléfono es requerido'
     if (form.tags.length === 0) errs.tags = 'Seleccioná al menos una restricción alimentaria'
     if (form.certifications.length === 0) errs.certifications = 'Seleccioná al menos una certificación'
@@ -148,8 +149,8 @@ export default function RegistroComercio() {
     try {
       const docRef = await addBusiness({
         ...form,
-        lat: -31.4201 + (Math.random() - 0.5) * 0.04,
-        lng: -64.1888 + (Math.random() - 0.5) * 0.04,
+        lat: coords.lat,
+        lng: coords.lng,
         whatsapp: form.phone.replace(/\D/g, ''),
         menu: form.menu
           .filter((m) => m.name.trim())
@@ -185,7 +186,10 @@ export default function RegistroComercio() {
             ¿Sos administrador?{' '}
             <a href="/admin" className="link">Ir al panel de administración</a> para aprobar el comercio.
           </p>
-          <button className="btn btn-primary" onClick={() => { setForm(initialForm); setSubmitted(false) }}>
+          <button
+            className="btn btn-primary"
+            onClick={() => { setForm(initialForm); setCoords(null); setGeocodeError(''); setSubmitted(false) }}
+          >
             Registrar otro comercio
           </button>
         </div>
