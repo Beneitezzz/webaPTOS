@@ -59,23 +59,27 @@ export default function RegistroComercio() {
     return errs
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     const errs = validate()
     if (Object.keys(errs).length > 0) {
       setErrors(errs)
       return
     }
-    addBusiness({
-      ...form,
-      lat: -31.4201 + (Math.random() - 0.5) * 0.04,
-      lng: -64.1888 + (Math.random() - 0.5) * 0.04,
-      whatsapp: form.phone.replace(/\D/g, ''),
-      menu: form.menu
-        .filter((m) => m.name.trim())
-        .map((m) => ({ name: m.name, price: m.price ? Number(m.price) : null })),
-    })
-    setSubmitted(true)
+    try {
+      await addBusiness({
+        ...form,
+        lat: -31.4201 + (Math.random() - 0.5) * 0.04,
+        lng: -64.1888 + (Math.random() - 0.5) * 0.04,
+        whatsapp: form.phone.replace(/\D/g, ''),
+        menu: form.menu
+          .filter((m) => m.name.trim())
+          .map((m) => ({ name: m.name, price: m.price ? Number(m.price) : null })),
+      })
+      setSubmitted(true)
+    } catch {
+      setErrors({ submit: 'Error al enviar el comercio. Intentá de nuevo.' })
+    }
   }
 
   if (submitted) {
@@ -258,6 +262,7 @@ export default function RegistroComercio() {
             </button>
           </div>
 
+          {errors.submit && <div className="auth-error">{errors.submit}</div>}
           <button type="submit" className="btn btn-primary btn-full">
             Enviar para verificación
           </button>
