@@ -136,9 +136,28 @@ export default function AdminPanel() {
                         </div>
                       </div>
 
+                      {b.certDocuments && Object.keys(b.certDocuments).length > 0 && (
+                        <div className="pending-section">
+                          <strong>Documentos adjuntos:</strong>
+                          <div className="cert-docs-list">
+                            {Object.entries(b.certDocuments).map(([cert, url]) => (
+                              <a
+                                key={cert}
+                                href={url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="cert-doc-link"
+                              >
+                                <ShieldCheck size={13} /> Ver {cert}
+                              </a>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
                       <div className="verify-note">
                         <AlertCircle size={14} />
-                        Verificar los certificados físicos o digitales antes de aprobar.
+                        Verificar los certificados antes de aprobar.
                       </div>
                     </div>
                   )}

@@ -28,3 +28,4 @@ dist-ssr
 
 # Firebase Admin service account (contiene credenciales privadas)
 scripts/serviceAccount.json
+*firebase-adminsdk*.json

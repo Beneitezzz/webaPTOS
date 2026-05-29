@@ -414,6 +414,22 @@ img { display: block; max-width: 100%; }
 .pending-section { margin-bottom: 0.75rem; font-size: 0.875rem; }
 .certs-declared { display: flex; flex-direction: column; gap: 6px; margin-top: 6px; }
 .cert-declared-item { display: flex; align-items: center; gap: 6px; font-size: 0.82rem; color: #198754; }
+.cert-docs-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
+.cert-doc-link {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 0.8rem; color: var(--primary); text-decoration: none;
+  border: 1px solid var(--primary); border-radius: var(--radius-sm);
+  padding: 3px 8px;
+}
+.cert-doc-link:hover { background: var(--primary-lighter); }
+.cert-files-section { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
+.cert-file-row { display: flex; flex-direction: column; gap: 3px; }
+.cert-file-label {
+  display: flex; flex-direction: column; gap: 4px;
+  font-size: 0.82rem; color: var(--text-muted);
+}
+.cert-file-label input[type="file"] { font-size: 0.8rem; }
+.cert-file-name { font-size: 0.78rem; color: #198754; }
 .verify-note {
   display: flex; align-items: center; gap: 6px; font-size: 0.78rem;
   color: #856404; background: #fff3cd; border-radius: var(--radius-sm);

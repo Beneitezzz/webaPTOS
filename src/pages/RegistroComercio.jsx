@@ -1,7 +1,10 @@
 import { useState } from 'react'
 import { CheckCircle, Store } from 'lucide-react'
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage'
+import { doc, updateDoc } from 'firebase/firestore'
+import { storage, db } from '../firebase'
 import { useApp } from '../context/AppContext'
-import { RESTRICTIONS, BUSINESS_TYPES } from '../data/mockData'
+import { RESTRICTIONS, BUSINESS_TYPES, CERTIFICATIONS } from '../data/mockData'
 import { toggleItem } from '../utils/array'
 
 const initialForm = {
@@ -21,6 +24,7 @@ const availableCerts = ['RNPA', 'ALG', 'RME', 'POES', 'ACA']
 export default function RegistroComercio() {
   const { addBusiness } = useApp()
   const [form, setForm] = useState(initialForm)
+  const [certFiles, setCertFiles] = useState({})
   const [submitted, setSubmitted] = useState(false)
   const [errors, setErrors] = useState({})
 
@@ -30,7 +34,18 @@ export default function RegistroComercio() {
   }
 
   const toggleTag = (id) => setForm((prev) => ({ ...prev, tags: toggleItem(prev.tags, id) }))
-  const toggleCert = (cert) => setForm((prev) => ({ ...prev, certifications: toggleItem(prev.certifications, cert) }))
+  const toggleCert = (cert) => {
+    setForm((prev) => ({ ...prev, certifications: toggleItem(prev.certifications, cert) }))
+    setCertFiles((prev) => { const next = { ...prev }; delete next[cert]; return next })
+  }
+
+  const handleCertFile = (cert, file) => {
+    if (file) {
+      setCertFiles((prev) => ({ ...prev, [cert]: file }))
+    } else {
+      setCertFiles((prev) => { const next = { ...prev }; delete next[cert]; return next })
+    }
+  }
 
   const addMenuItem = () => {
     setForm((prev) => ({ ...prev, menu: [...prev.menu, { name: '', price: '' }] }))
@@ -67,7 +82,7 @@ export default function RegistroComercio() {
       return
     }
     try {
-      await addBusiness({
+      const docRef = await addBusiness({
         ...form,
         lat: -31.4201 + (Math.random() - 0.5) * 0.04,
         lng: -64.1888 + (Math.random() - 0.5) * 0.04,
@@ -76,6 +91,16 @@ export default function RegistroComercio() {
           .filter((m) => m.name.trim())
           .map((m) => ({ name: m.name, price: m.price ? Number(m.price) : null })),
       })
+      const certUrls = {}
+      for (const [certCode, file] of Object.entries(certFiles)) {
+        const ext = file.name.split('.').pop().toLowerCase()
+        const fileRef = ref(storage, `certificados/${docRef.id}/${certCode}.${ext}`)
+        await uploadBytes(fileRef, file)
+        certUrls[certCode] = await getDownloadURL(fileRef)
+      }
+      if (Object.keys(certUrls).length > 0) {
+        await updateDoc(doc(db, 'businesses', docRef.id), { certDocuments: certUrls })
+      }
       setSubmitted(true)
     } catch {
       setErrors({ submit: 'Error al enviar el comercio. Intentá de nuevo.' })
@@ -231,8 +256,27 @@ export default function RegistroComercio() {
               })}
             </div>
             <p className="form-hint">
-              Deberás presentar los certificados físicos o digitales durante el proceso de verificación.
+              Podés adjuntar los archivos ahora o presentarlos durante la verificación.
             </p>
+            {form.certifications.length > 0 && (
+              <div className="cert-files-section">
+                {form.certifications.map((cert) => (
+                  <div key={cert} className="cert-file-row">
+                    <label className="cert-file-label">
+                      <span>{cert} — {CERTIFICATIONS[cert]}</span>
+                      <input
+                        type="file"
+                        accept=".pdf,.jpg,.jpeg,.png"
+                        onChange={(e) => handleCertFile(cert, e.target.files[0] ?? null)}
+                      />
+                    </label>
+                    {certFiles[cert] && (
+                      <span className="cert-file-name">{certFiles[cert].name}</span>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
           <div className="form-group">
