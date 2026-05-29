@@ -1,7 +1,7 @@
 import { createContext, useContext, useState, useEffect } from 'react'
 import {
   collection, onSnapshot, addDoc, updateDoc, deleteDoc,
-  doc, getDoc, serverTimestamp,
+  doc, getDoc, setDoc, serverTimestamp,
 } from 'firebase/firestore'
 import { db } from '../firebase'
 import { useAuth } from './AuthContext'
@@ -59,7 +59,7 @@ export function AppProvider({ children }) {
   }, [currentUser])
 
   const updateProfile = async (updates) => {
-    await updateDoc(doc(db, 'users', currentUser.uid), updates)
+    await setDoc(doc(db, 'users', currentUser.uid), updates, { merge: true })
     setUserProfile((prev) => ({ ...prev, ...updates }))
   }
 
