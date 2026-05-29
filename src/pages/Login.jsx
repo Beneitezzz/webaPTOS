@@ -82,15 +82,15 @@ export default function Login() {
 
         <div className="card form-card">
           <div className="oauth-buttons">
-            <button className="oauth-btn" onClick={() => handleProvider(googleProvider)}>
+            <button type="button" className="oauth-btn" onClick={() => handleProvider(googleProvider)}>
               <span className="oauth-icon">G</span>
               Continuar con Google
             </button>
-            <button className="oauth-btn" onClick={() => handleProvider(appleProvider)}>
+            <button type="button" className="oauth-btn" onClick={() => handleProvider(appleProvider)}>
               <span className="oauth-icon"></span>
               Continuar con Apple
             </button>
-            <button className="oauth-btn" onClick={() => handleProvider(facebookProvider)}>
+            <button type="button" className="oauth-btn" onClick={() => handleProvider(facebookProvider)}>
               <span className="oauth-icon">f</span>
               Continuar con Facebook
             </button>
