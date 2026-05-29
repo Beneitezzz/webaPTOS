@@ -52,9 +52,11 @@ export default function RegistroComercio() {
   useEffect(() => {
     const addr = form.address.trim()
     if (addr.length < 5) {
+      /* eslint-disable react-hooks/set-state-in-effect */
       setCoords(null)
       setGeocodeError('')
       setGeocoding(false)
+      /* eslint-enable react-hooks/set-state-in-effect */
       return
     }
     clearTimeout(debounceRef.current)
@@ -75,13 +77,13 @@ export default function RegistroComercio() {
           setCoords(null)
           setGeocodeError('No se encontró la dirección. Intentá con más detalle.')
         }
+        setGeocoding(false)
       } catch (err) {
         if (err.name !== 'AbortError') {
           setCoords(null)
           setGeocodeError('Error al buscar la dirección. Verificá tu conexión.')
+          setGeocoding(false)
         }
-      } finally {
-        setGeocoding(false)
       }
     }, 800)
     return () => {
