@@ -1,3 +1,4 @@
+/* global process */
 import { readFileSync } from 'fs'
 import { fileURLToPath } from 'url'
 import { dirname, join } from 'path'
@@ -24,7 +25,7 @@ async function seed() {
   }
 
   const batch = db.batch()
-  for (const { id, ...business } of mockBusinesses) {
+  for (const { id: _id, ...business } of mockBusinesses) {
     const ref = col.doc()
     batch.set(ref, {
       ...business,
