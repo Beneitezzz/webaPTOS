@@ -1,0 +1,44 @@
+import { readFileSync } from 'fs'
+import { fileURLToPath } from 'url'
+import { dirname, join } from 'path'
+import { initializeApp, cert } from 'firebase-admin/app'
+import { getFirestore, Timestamp } from 'firebase-admin/firestore'
+import { mockBusinesses } from '../src/data/mockData.js'
+
+const __dirname = dirname(fileURLToPath(import.meta.url))
+const serviceAccount = JSON.parse(
+  readFileSync(join(__dirname, 'serviceAccount.json'), 'utf8')
+)
+
+initializeApp({ credential: cert(serviceAccount) })
+
+const db = getFirestore()
+
+async function seed() {
+  const col = db.collection('businesses')
+  const snapshot = await col.limit(1).get()
+
+  if (!snapshot.empty) {
+    console.log('Ya existen comercios en Firestore. Seed omitido.')
+    process.exit(0)
+  }
+
+  const batch = db.batch()
+  for (const { id, ...business } of mockBusinesses) {
+    const ref = col.doc()
+    batch.set(ref, {
+      ...business,
+      ownerId: null,
+      createdAt: Timestamp.now(),
+    })
+  }
+
+  await batch.commit()
+  console.log(`Seed completado: ${mockBusinesses.length} comercios creados.`)
+  process.exit(0)
+}
+
+seed().catch((err) => {
+  console.error('Error en seed:', err.message)
+  process.exit(1)
+})
