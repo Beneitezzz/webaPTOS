@@ -1,65 +1,102 @@
-import { createContext, useContext, useState, useEffect, useRef } from 'react'
-import { mockBusinesses } from '../data/mockData'
+import { createContext, useContext, useState, useEffect } from 'react'
+import {
+  collection, onSnapshot, addDoc, updateDoc, deleteDoc,
+  doc, getDoc, serverTimestamp,
+} from 'firebase/firestore'
+import { db } from '../firebase'
+import { useAuth } from './AuthContext'
 
 const AppContext = createContext()
 
 export function AppProvider({ children }) {
-  const [userProfile, setUserProfile] = useState(() => {
-    try {
-      const saved = localStorage.getItem('mapaApto_profile')
-      return saved ? JSON.parse(saved) : { name: '', restrictions: [] }
-    } catch {
-      return { name: '', restrictions: [] }
-    }
-  })
+  const { currentUser } = useAuth()
 
-  const [businesses, setBusinesses] = useState(() => {
-    try {
-      const saved = localStorage.getItem('mapaApto_businesses')
-      return saved ? JSON.parse(saved) : mockBusinesses
-    } catch {
-      return mockBusinesses
-    }
-  })
-
-  const isMounted = useRef(false)
-  useEffect(() => {
-    if (!isMounted.current) { isMounted.current = true; return }
-    localStorage.setItem('mapaApto_profile', JSON.stringify(userProfile))
-  }, [userProfile])
+  const [businesses, setBusinesses] = useState([])
+  const [businessesLoading, setBusinessesLoading] = useState(true)
+  const [businessesError, setBusinessesError] = useState(null)
+  const [userProfile, setUserProfile] = useState({ profileName: '', restrictions: [] })
+  const [profileLoading, setProfileLoading] = useState(false)
 
   useEffect(() => {
-    localStorage.setItem('mapaApto_businesses', JSON.stringify(businesses))
-  }, [businesses])
+    const unsubscribe = onSnapshot(
+      collection(db, 'businesses'),
+      (snapshot) => {
+        setBusinesses(snapshot.docs.map((d) => ({ id: d.id, ...d.data() })))
+        setBusinessesLoading(false)
+        setBusinessesError(null)
+      },
+      (err) => {
+        console.error('businesses snapshot error:', err)
+        setBusinessesLoading(false)
+        setBusinessesError('No se pudieron cargar los comercios')
+      }
+    )
+    return unsubscribe
+  }, [])
 
-  const updateProfile = (updates) => {
+  useEffect(() => {
+    if (!currentUser) {
+      setUserProfile({ profileName: '', restrictions: [] })
+      setProfileLoading(false)
+      return
+    }
+    let cancelled = false
+    setProfileLoading(true)
+    getDoc(doc(db, 'users', currentUser.uid))
+      .then((snap) => {
+        if (cancelled) return
+        if (snap.exists()) {
+          const data = snap.data()
+          setUserProfile({
+            profileName: data.profileName ?? '',
+            restrictions: data.restrictions ?? [],
+          })
+        }
+      })
+      .catch((err) => console.error('profile load error:', err))
+      .finally(() => { if (!cancelled) setProfileLoading(false) })
+    return () => { cancelled = true }
+  }, [currentUser])
+
+  const updateProfile = async (updates) => {
+    await updateDoc(doc(db, 'users', currentUser.uid), updates)
     setUserProfile((prev) => ({ ...prev, ...updates }))
   }
 
-  const approveBusiness = (id) => {
-    setBusinesses((prev) =>
-      prev.map((b) => (b.id === id ? { ...b, verified: true, pending: false } : b))
-    )
-  }
+  const addBusiness = (data) =>
+    addDoc(collection(db, 'businesses'), {
+      ...data,
+      verified: false,
+      pending: true,
+      rating: null,
+      ownerId: currentUser?.uid ?? null,
+      createdAt: serverTimestamp(),
+    })
 
-  const rejectBusiness = (id) => {
-    setBusinesses((prev) => prev.filter((b) => b.id !== id))
-  }
+  const approveBusiness = (id) =>
+    updateDoc(doc(db, 'businesses', id), { verified: true, pending: false })
 
-  const addBusiness = (newBusiness) => {
-    setBusinesses((prev) => [
-      ...prev,
-      { ...newBusiness, id: crypto.randomUUID(), verified: false, pending: true, rating: null },
-    ])
-  }
+  const rejectBusiness = (id) =>
+    deleteDoc(doc(db, 'businesses', id))
 
   return (
     <AppContext.Provider
-      value={{ userProfile, updateProfile, businesses, approveBusiness, rejectBusiness, addBusiness }}
+      value={{
+        businesses,
+        businessesLoading,
+        businessesError,
+        userProfile,
+        profileLoading,
+        updateProfile,
+        addBusiness,
+        approveBusiness,
+        rejectBusiness,
+      }}
     >
       {children}
     </AppContext.Provider>
   )
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useApp = () => useContext(AppContext)
