@@ -4,58 +4,14 @@ import { useApp } from '../context/AppContext'
 import RestrictionBadge from '../components/RestrictionBadge'
 import { BUSINESS_TYPE_MAP, CERTIFICATIONS } from '../data/mockData'
 
-const ADMIN_PASSWORD = import.meta.env.VITE_ADMIN_PASSWORD ?? 'admin123'
-
 export default function AdminPanel() {
   const { businesses, approveBusiness, rejectBusiness } = useApp()
-  const [authed, setAuthed] = useState(false)
-  const [password, setPassword] = useState('')
-  const [pwError, setPwError] = useState(false)
   const [expanded, setExpanded] = useState(null)
 
-  const pending = useMemo(() => businesses.filter((b) => b.pending && !b.verified), [businesses])
-
-  const handleLogin = (e) => {
-    e.preventDefault()
-    if (password === ADMIN_PASSWORD) {
-      setAuthed(true)
-    } else {
-      setPwError(true)
-    }
-  }
-
-  if (!authed) {
-    return (
-      <div className="page page-centered">
-        <div className="container container-sm">
-          <div className="page-header">
-            <div className="page-icon"><ShieldCheck size={28} /></div>
-            <div>
-              <h1>Panel de Administración</h1>
-              <p className="text-muted">Acceso restringido</p>
-            </div>
-          </div>
-          <form onSubmit={handleLogin} className="card form-card">
-            <div className="form-group">
-              <label className="form-label">Contraseña de administrador</label>
-              <input
-                type="password"
-                className={`form-input ${pwError ? 'error' : ''}`}
-                placeholder="Ingresá la contraseña"
-                value={password}
-                onChange={(e) => { setPassword(e.target.value); setPwError(false) }}
-              />
-              {pwError && <span className="form-error">Contraseña incorrecta</span>}
-              <p className="form-hint">Contraseña de demo: <strong>admin123</strong></p>
-            </div>
-            <button type="submit" className="btn btn-primary btn-full">
-              Ingresar
-            </button>
-          </form>
-        </div>
-      </div>
-    )
-  }
+  const pending = useMemo(
+    () => businesses.filter((b) => b.pending && !b.verified),
+    [businesses]
+  )
 
   return (
     <div className="page">
@@ -134,15 +90,9 @@ export default function AdminPanel() {
                   {isOpen && (
                     <div className="pending-detail">
                       <div className="pending-info-grid">
-                        <div>
-                          <strong>Dirección:</strong> {b.address}
-                        </div>
-                        <div>
-                          <strong>Teléfono:</strong> {b.phone}
-                        </div>
-                        <div>
-                          <strong>Horario:</strong> {b.hours || '—'}
-                        </div>
+                        <div><strong>Dirección:</strong> {b.address}</div>
+                        <div><strong>Teléfono:</strong> {b.phone}</div>
+                        <div><strong>Horario:</strong> {b.hours || '—'}</div>
                       </div>
 
                       {b.description && (
