@@ -95,6 +95,7 @@ export default function RegistroComercio() {
   const handleChange = (field, value) => {
     setForm((prev) => ({ ...prev, [field]: value }))
     setErrors((prev) => ({ ...prev, [field]: '' }))
+    if (field === 'address') setCoords(null)
   }
 
   const toggleTag = (id) => setForm((prev) => ({ ...prev, tags: toggleItem(prev.tags, id) }))
@@ -263,7 +264,10 @@ export default function RegistroComercio() {
                   scrollWheelZoom={false}
                   style={{ height: '220px' }}
                 >
-                  <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+                  <TileLayer
+                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+                />
                   <DraggableMarker
                     coords={coords}
                     onMove={(lat, lng) => setCoords({ lat, lng })}
