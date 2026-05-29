@@ -58,13 +58,14 @@ export default function RegistroComercio() {
       return
     }
     clearTimeout(debounceRef.current)
+    let controller = new AbortController()
     debounceRef.current = setTimeout(async () => {
       setGeocoding(true)
       setGeocodeError('')
       try {
         const res = await fetch(
           `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(addr + ' Córdoba Argentina')}&format=json&limit=1`,
-          { headers: { 'Accept-Language': 'es' } }
+          { headers: { 'Accept-Language': 'es' }, signal: controller.signal }
         )
         const data = await res.json()
         if (data.length > 0) {
@@ -74,15 +75,20 @@ export default function RegistroComercio() {
           setCoords(null)
           setGeocodeError('No se encontró la dirección. Intentá con más detalle.')
         }
-      } catch {
-        setCoords(null)
-        setGeocodeError('Error al buscar la dirección. Verificá tu conexión.')
+      } catch (err) {
+        if (err.name !== 'AbortError') {
+          setCoords(null)
+          setGeocodeError('Error al buscar la dirección. Verificá tu conexión.')
+        }
       } finally {
         setGeocoding(false)
       }
     }, 800)
-    return () => clearTimeout(debounceRef.current)
-  }, [form.address]) // eslint-disable-line react-hooks/exhaustive-deps
+    return () => {
+      clearTimeout(debounceRef.current)
+      controller.abort()
+    }
+  }, [form.address])
 
   const handleChange = (field, value) => {
     setForm((prev) => ({ ...prev, [field]: value }))
