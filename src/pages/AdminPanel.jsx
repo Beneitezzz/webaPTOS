@@ -1,16 +1,25 @@
 import { useState, useMemo } from 'react'
-import { ShieldCheck, ShieldX, Eye, AlertCircle } from 'lucide-react'
+import { ShieldCheck, ShieldX, Eye, AlertCircle, PauseCircle } from 'lucide-react'
 import { useApp } from '../context/AppContext'
 import RestrictionBadge from '../components/RestrictionBadge'
 import { BUSINESS_TYPE_MAP, CERTIFICATIONS } from '../data/mockData'
+import { sendApprovalEmail, sendRejectionEmail } from '../utils/emailService'
 
 export default function AdminPanel() {
-  const { businesses, approveBusiness, rejectBusiness } = useApp()
+  const { businesses, approveBusiness, rejectBusiness, suspendBusiness } = useApp()
   const [expanded, setExpanded] = useState(null)
   const [actionError, setActionError] = useState(null)
+  const [rejectingId, setRejectingId] = useState(null)
+  const [rejectReason, setRejectReason] = useState('')
+  const [suspendingId, setSuspendingId] = useState(null)
 
   const pending = useMemo(
     () => businesses.filter((b) => b.pending && !b.verified),
+    [businesses]
+  )
+
+  const approved = useMemo(
+    () => businesses.filter((b) => b.verified && !b.pending),
     [businesses]
   )
 
@@ -80,6 +89,7 @@ export default function AdminPanel() {
                           setActionError(null)
                           try {
                             await approveBusiness(b.id)
+                            await sendApprovalEmail({ businessName: b.name, ownerEmail: b.ownerEmail ?? null })
                           } catch {
                             setActionError('Error al aprobar. Intentá de nuevo.')
                           }
@@ -89,16 +99,18 @@ export default function AdminPanel() {
                       </button>
                       <button
                         className="btn btn-danger btn-sm"
-                        onClick={async () => {
-                          setActionError(null)
-                          try {
-                            await rejectBusiness(b.id)
-                          } catch {
-                            setActionError('Error al rechazar. Intentá de nuevo.')
+                        onClick={() => {
+                          if (rejectingId === b.id) {
+                            setRejectingId(null)
+                            setRejectReason('')
+                          } else {
+                            setRejectingId(b.id)
+                            setRejectReason('')
+                            setExpanded(b.id)
                           }
                         }}
                       >
-                        <ShieldX size={14} /> Rechazar
+                        <ShieldX size={14} /> {rejectingId === b.id ? 'Cancelar' : 'Rechazar'}
                       </button>
                     </div>
                   </div>
@@ -159,11 +171,106 @@ export default function AdminPanel() {
                         <AlertCircle size={14} />
                         Verificar los certificados antes de aprobar.
                       </div>
+
+                      {rejectingId === b.id && (
+                        <div className="reject-reason-form">
+                          <label className="form-label">Motivo del rechazo *</label>
+                          <textarea
+                            className="form-textarea"
+                            rows={3}
+                            placeholder="Explicá por qué se rechaza este comercio (mínimo 10 caracteres)..."
+                            value={rejectReason}
+                            onChange={(e) => setRejectReason(e.target.value)}
+                          />
+                          <div className="reject-reason-actions">
+                            <button
+                              className="btn btn-danger btn-sm"
+                              disabled={rejectReason.trim().length < 10}
+                              onClick={async () => {
+                                setActionError(null)
+                                try {
+                                  await rejectBusiness(b.id, rejectReason.trim())
+                                  await sendRejectionEmail({
+                                    businessName: b.name,
+                                    ownerEmail: b.ownerEmail ?? null,
+                                    reason: rejectReason.trim(),
+                                  })
+                                  setRejectingId(null)
+                                  setRejectReason('')
+                                } catch {
+                                  setActionError('Error al rechazar. Intentá de nuevo.')
+                                }
+                              }}
+                            >
+                              Confirmar rechazo
+                            </button>
+                            <button
+                              className="btn btn-outline btn-sm"
+                              onClick={() => { setRejectingId(null); setRejectReason('') }}
+                            >
+                              Cancelar
+                            </button>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
               )
             })}
+          </div>
+        )}
+        {approved.length > 0 && (
+          <div className="admin-section">
+            <h2>Comercios aprobados ({approved.length})</h2>
+            <div className="approved-list">
+              {approved.map((b) => {
+                const typeInfo = BUSINESS_TYPE_MAP[b.type]
+                return (
+                  <div key={b.id} className="approved-card card">
+                    <div className="approved-card-header">
+                      <div>
+                        <h3>{b.name}</h3>
+                        <span
+                          className="business-type-chip"
+                          style={{ borderColor: typeInfo?.color, color: typeInfo?.color }}
+                        >
+                          {typeInfo?.label}
+                        </span>
+                      </div>
+                      <button
+                        className="btn btn-outline btn-sm"
+                        onClick={() => setSuspendingId(suspendingId === b.id ? null : b.id)}
+                      >
+                        <PauseCircle size={14} /> {suspendingId === b.id ? 'Cancelar' : 'Suspender'}
+                      </button>
+                    </div>
+                    {suspendingId === b.id && (
+                      <div className="suspend-confirm">
+                        <p>
+                          ¿Confirmás la suspensión de <strong>{b.name}</strong>?
+                          El comercio dejará de aparecer en el mapa inmediatamente.
+                        </p>
+                        <button
+                          className="btn btn-danger btn-sm"
+                          onClick={async () => {
+                            setActionError(null)
+                            try {
+                              await suspendBusiness(b.id)
+                              setSuspendingId(null)
+                            } catch {
+                              setActionError('Error al suspender. Intentá de nuevo.')
+                            }
+                          }}
+                        >
+                          Confirmar suspensión
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                )
+              })}
+            </div>
           </div>
         )}
       </div>
