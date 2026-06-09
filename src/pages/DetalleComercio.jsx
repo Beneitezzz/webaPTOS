@@ -1,8 +1,9 @@
 import { useParams, Link } from 'react-router-dom'
-import { MapPin, Clock, Phone, MessageCircle, Star, ArrowLeft, ShieldCheck } from 'lucide-react'
+import { MapPin, Clock, Phone, MessageCircle, Star, ArrowLeft, ShieldCheck, Globe, Instagram } from 'lucide-react'
 import { useApp } from '../context/AppContext'
 import RestrictionBadge from '../components/RestrictionBadge'
 import { BUSINESS_TYPE_MAP, CERTIFICATIONS } from '../data/mockData'
+import { isOpenNow, formatOpeningHours } from '../utils/hours'
 
 const MENU_TYPES = new Set(['restaurante', 'cafe'])
 
@@ -29,6 +30,10 @@ export default function DetalleComercio() {
   }
 
   const typeInfo = BUSINESS_TYPE_MAP[business.type]
+  const openStatus = business.openingHours ? isOpenNow(business.openingHours) : null
+  const hoursDisplay = business.openingHours
+    ? formatOpeningHours(business.openingHours)
+    : business.hours ?? null
 
   return (
     <div className="page">
@@ -47,6 +52,11 @@ export default function DetalleComercio() {
                 {typeInfo?.label}
               </span>
               <h1 className="detail-name">{business.name}</h1>
+              {openStatus !== null && (
+                <span className={openStatus ? 'open-chip' : 'closed-chip'} style={{ marginTop: '4px', display: 'inline-flex' }}>
+                  {openStatus ? 'Abierto ahora' : 'Cerrado'}
+                </span>
+              )}
               {business.rating && (
                 <div className="business-rating">
                   <Star size={16} fill="#ffc107" color="#ffc107" />
@@ -70,7 +80,7 @@ export default function DetalleComercio() {
             <h2>Información</h2>
             <ul className="info-list">
               <li><MapPin size={16} /> {business.address}</li>
-              <li><Clock size={16} /> {business.hours}</li>
+              {hoursDisplay && <li><Clock size={16} /> {hoursDisplay}</li>}
               <li><Phone size={16} /> {business.phone}</li>
             </ul>
             <div className="contact-buttons">
@@ -85,6 +95,26 @@ export default function DetalleComercio() {
               <a href={`tel:${business.phone}`} className="btn btn-outline">
                 <Phone size={16} /> Llamar
               </a>
+              {business.instagramUrl && (
+                <a
+                  href={business.instagramUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn btn-instagram"
+                >
+                  <Instagram size={16} /> Instagram
+                </a>
+              )}
+              {business.websiteUrl && (
+                <a
+                  href={business.websiteUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn btn-outline"
+                >
+                  <Globe size={16} /> Sitio web
+                </a>
+              )}
             </div>
           </div>
 
