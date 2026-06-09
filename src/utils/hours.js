@@ -11,6 +11,7 @@ export function isOpenNow(openingHours) {
   const now = new Date()
   const today = openingHours[jsDayToIndex(now.getDay())]
   if (!today || today.closed) return false
+  if (!today.open || !today.close) return null
   const [oh, om] = today.open.split(':').map(Number)
   const [ch, cm] = today.close.split(':').map(Number)
   const cur = now.getHours() * 60 + now.getMinutes()
