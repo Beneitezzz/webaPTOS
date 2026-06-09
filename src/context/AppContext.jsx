@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react'
 import {
-  collection, onSnapshot, addDoc, updateDoc, deleteDoc,
+  collection, onSnapshot, addDoc, updateDoc,
   doc, getDoc, setDoc, serverTimestamp,
 } from 'firebase/firestore'
 import { db } from '../firebase'
@@ -70,16 +70,30 @@ export function AppProvider({ children }) {
       ...data,
       verified: false,
       pending: true,
+      status: 'pendiente',
       rating: null,
       ownerId: currentUser?.uid ?? null,
+      ownerEmail: currentUser?.email ?? null,
       createdAt: serverTimestamp(),
     })
 
   const approveBusiness = (id) =>
-    updateDoc(doc(db, 'businesses', id), { verified: true, pending: false })
+    updateDoc(doc(db, 'businesses', id), { verified: true, pending: false, status: 'aprobado' })
 
-  const rejectBusiness = (id) =>
-    deleteDoc(doc(db, 'businesses', id))
+  const rejectBusiness = (id, reason) =>
+    updateDoc(doc(db, 'businesses', id), {
+      verified: false,
+      pending: false,
+      status: 'rechazado',
+      rejectionReason: reason,
+    })
+
+  const suspendBusiness = (id) =>
+    updateDoc(doc(db, 'businesses', id), {
+      verified: false,
+      pending: false,
+      status: 'suspendido',
+    })
 
   return (
     <AppContext.Provider
@@ -93,6 +107,7 @@ export function AppProvider({ children }) {
         addBusiness,
         approveBusiness,
         rejectBusiness,
+        suspendBusiness,
       }}
     >
       {children}
