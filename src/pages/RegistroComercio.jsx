@@ -8,15 +8,27 @@ import { useApp } from '../context/AppContext'
 import { RESTRICTIONS, BUSINESS_TYPES, CERTIFICATIONS } from '../data/mockData'
 import { toggleItem } from '../utils/array'
 
+const DEFAULT_OPENING_HOURS = [
+  { day: 'lunes',     open: '09:00', close: '20:00', closed: false },
+  { day: 'martes',    open: '09:00', close: '20:00', closed: false },
+  { day: 'miércoles', open: '09:00', close: '20:00', closed: false },
+  { day: 'jueves',    open: '09:00', close: '20:00', closed: false },
+  { day: 'viernes',   open: '09:00', close: '20:00', closed: false },
+  { day: 'sábado',    open: '09:00', close: '13:00', closed: false },
+  { day: 'domingo',   open: '00:00', close: '00:00', closed: true  },
+]
+
 const initialForm = {
   name: '',
   type: '',
   address: '',
   phone: '',
-  hours: '',
+  openingHours: DEFAULT_OPENING_HOURS,
   description: '',
   tags: [],
   certifications: [],
+  instagramUrl: '',
+  websiteUrl: '',
   menu: [{ name: '', price: '' }],
 }
 
@@ -128,6 +140,23 @@ export default function RegistroComercio() {
     setForm((prev) => ({ ...prev, menu: prev.menu.filter((_, idx) => idx !== i) }))
   }
 
+  const isValidUrl = (url) => {
+    try {
+      const u = new URL(url)
+      return u.protocol === 'https:' || u.protocol === 'http:'
+    } catch {
+      return false
+    }
+  }
+
+  const updateHourField = (i, field, value) => {
+    setForm((prev) => {
+      const openingHours = [...prev.openingHours]
+      openingHours[i] = { ...openingHours[i], [field]: value }
+      return { ...prev, openingHours }
+    })
+  }
+
   const validate = () => {
     const errs = {}
     if (!form.name.trim()) errs.name = 'El nombre es requerido'
@@ -137,6 +166,10 @@ export default function RegistroComercio() {
     if (!form.phone.trim()) errs.phone = 'El teléfono es requerido'
     if (form.tags.length === 0) errs.tags = 'Seleccioná al menos una restricción alimentaria'
     if (form.certifications.length === 0) errs.certifications = 'Seleccioná al menos una certificación'
+    if (form.websiteUrl.trim() && !isValidUrl(form.websiteUrl.trim()))
+      errs.websiteUrl = 'Ingresá una URL válida (ej: https://micomercio.com)'
+    if (form.instagramUrl.trim() && (!isValidUrl(form.instagramUrl.trim()) || !form.instagramUrl.includes('instagram.com/')))
+      errs.instagramUrl = 'Ingresá una URL de Instagram válida (ej: https://instagram.com/milocal)'
     return errs
   }
 
@@ -153,6 +186,8 @@ export default function RegistroComercio() {
         lat: coords.lat,
         lng: coords.lng,
         whatsapp: form.phone.replace(/\D/g, ''),
+        instagramUrl: form.instagramUrl.trim() || null,
+        websiteUrl: form.websiteUrl.trim() || null,
         menu: form.menu
           .filter((m) => m.name.trim())
           .map((m) => ({ name: m.name, price: m.price ? Number(m.price) : null })),
@@ -289,14 +324,39 @@ export default function RegistroComercio() {
               />
               {errors.phone && <span className="form-error">{errors.phone}</span>}
             </div>
-            <div className="form-group">
-              <label className="form-label">Horario de atención</label>
-              <input
-                className="form-input"
-                placeholder="Lun-Vie: 9:00-20:00"
-                value={form.hours}
-                onChange={(e) => handleChange('hours', e.target.value)}
-              />
+          </div>
+
+          <div className="form-group">
+            <label className="form-label">Horarios de atención</label>
+            <div className="hours-grid">
+              {form.openingHours.map((h, i) => (
+                <div key={h.day} className="hours-row">
+                  <span className="hours-day">{h.day.charAt(0).toUpperCase() + h.day.slice(1)}</span>
+                  <label className="hours-closed-label">
+                    <input
+                      type="checkbox"
+                      checked={h.closed}
+                      onChange={(e) => updateHourField(i, 'closed', e.target.checked)}
+                    />
+                    Cerrado
+                  </label>
+                  <input
+                    type="time"
+                    className="form-input time-input"
+                    value={h.open}
+                    disabled={h.closed}
+                    onChange={(e) => updateHourField(i, 'open', e.target.value)}
+                  />
+                  <span className="hours-separator">–</span>
+                  <input
+                    type="time"
+                    className="form-input time-input"
+                    value={h.close}
+                    disabled={h.closed}
+                    onChange={(e) => updateHourField(i, 'close', e.target.value)}
+                  />
+                </div>
+              ))}
             </div>
           </div>
 
@@ -309,6 +369,29 @@ export default function RegistroComercio() {
               value={form.description}
               onChange={(e) => handleChange('description', e.target.value)}
             />
+          </div>
+
+          <div className="form-row">
+            <div className="form-group">
+              <label className="form-label">Sitio web (opcional)</label>
+              <input
+                className={`form-input ${errors.websiteUrl ? 'error' : ''}`}
+                placeholder="https://micomercio.com"
+                value={form.websiteUrl}
+                onChange={(e) => handleChange('websiteUrl', e.target.value)}
+              />
+              {errors.websiteUrl && <span className="form-error">{errors.websiteUrl}</span>}
+            </div>
+            <div className="form-group">
+              <label className="form-label">Instagram (opcional)</label>
+              <input
+                className={`form-input ${errors.instagramUrl ? 'error' : ''}`}
+                placeholder="https://instagram.com/milocal"
+                value={form.instagramUrl}
+                onChange={(e) => handleChange('instagramUrl', e.target.value)}
+              />
+              {errors.instagramUrl && <span className="form-error">{errors.instagramUrl}</span>}
+            </div>
           </div>
 
           <div className="form-group">
