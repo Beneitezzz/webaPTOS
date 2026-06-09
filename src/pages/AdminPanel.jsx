@@ -4,6 +4,7 @@ import { useApp } from '../context/AppContext'
 import RestrictionBadge from '../components/RestrictionBadge'
 import { BUSINESS_TYPE_MAP, CERTIFICATIONS } from '../data/mockData'
 import { sendApprovalEmail, sendRejectionEmail } from '../utils/emailService'
+import { formatOpeningHours } from '../utils/hours'
 
 export default function AdminPanel() {
   const { businesses, approveBusiness, rejectBusiness, suspendBusiness } = useApp()
@@ -120,7 +121,7 @@ export default function AdminPanel() {
                       <div className="pending-info-grid">
                         <div><strong>Dirección:</strong> {b.address}</div>
                         <div><strong>Teléfono:</strong> {b.phone}</div>
-                        <div><strong>Horario:</strong> {b.hours || '—'}</div>
+                        <div><strong>Horario:</strong> {b.openingHours ? (formatOpeningHours(b.openingHours) || '—') : (b.hours || '—')}</div>
                       </div>
 
                       {b.description && (
