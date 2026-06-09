@@ -2,7 +2,7 @@ import { useState, useMemo, useEffect } from 'react'
 import { SlidersHorizontal, X } from 'lucide-react'
 import MapView from '../components/MapView'
 import BusinessCard from '../components/BusinessCard'
-import { RESTRICTIONS, BUSINESS_TYPES } from '../data/mockData'
+import { RESTRICTIONS, BUSINESS_TYPES, BUSINESS_TYPE_MAP } from '../data/mockData'
 import { useApp } from '../context/AppContext'
 import { toggleItem } from '../utils/array'
 
@@ -13,6 +13,7 @@ export default function Mapa() {
   const [selectedTypes, setSelectedTypes] = useState([])
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const [filtersInitialized, setFiltersInitialized] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
 
   useEffect(() => {
     if (!profileLoading && !filtersInitialized) {
@@ -29,15 +30,21 @@ export default function Mapa() {
   )
 
   const filtered = useMemo(() => {
+    const q = searchQuery.trim().normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase()
     return verifiedBusinesses.filter((b) => {
       const matchesRestrictions =
         selectedRestrictions.length === 0 ||
         selectedRestrictions.every((r) => b.tags.includes(r))
       const matchesType =
         selectedTypes.length === 0 || selectedTypes.includes(b.type)
-      return matchesRestrictions && matchesType
+      const matchesSearch =
+        !q ||
+        b.name.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().includes(q) ||
+        (b.address ?? '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().includes(q) ||
+        (BUSINESS_TYPE_MAP[b.type]?.label ?? '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().includes(q)
+      return matchesRestrictions && matchesType && matchesSearch
     })
-  }, [verifiedBusinesses, selectedRestrictions, selectedTypes])
+  }, [verifiedBusinesses, selectedRestrictions, selectedTypes, searchQuery])
 
   const toggleRestriction = (id) => setSelectedRestrictions((prev) => toggleItem(prev, id))
   const toggleType = (id) => setSelectedTypes((prev) => toggleItem(prev, id))
@@ -45,9 +52,10 @@ export default function Mapa() {
   const clearFilters = () => {
     setSelectedRestrictions([])
     setSelectedTypes([])
+    setSearchQuery('')
   }
 
-  const hasFilters = selectedRestrictions.length > 0 || selectedTypes.length > 0
+  const hasFilters = selectedRestrictions.length > 0 || selectedTypes.length > 0 || searchQuery.length > 0
 
   return (
     <div className="map-page">
@@ -68,6 +76,16 @@ export default function Mapa() {
 
         {sidebarOpen && (
           <>
+            <div className="search-bar-wrapper">
+              <input
+                className="form-input search-input"
+                type="search"
+                placeholder="Buscar comercio, dirección..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
+
             {userProfile.restrictions.length > 0 && (
               <div className="sidebar-profile-hint">
                 <span>Filtros de tu perfil aplicados</span>
