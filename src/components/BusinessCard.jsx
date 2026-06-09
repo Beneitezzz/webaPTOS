@@ -1,11 +1,13 @@
 import { memo } from 'react'
 import { Link } from 'react-router-dom'
-import { MapPin, Star, Clock, CheckCircle } from 'lucide-react'
+import { MapPin, Star, CheckCircle } from 'lucide-react'
 import RestrictionBadge from './RestrictionBadge'
 import { BUSINESS_TYPE_MAP } from '../data/mockData'
+import { isOpenNow } from '../utils/hours'
 
 export default memo(function BusinessCard({ business }) {
   const typeInfo = BUSINESS_TYPE_MAP[business.type]
+  const openStatus = business.openingHours ? isOpenNow(business.openingHours) : null
 
   return (
     <div className="business-card">
@@ -26,7 +28,11 @@ export default memo(function BusinessCard({ business }) {
 
       <div className="business-card-info">
         <span><MapPin size={13} /> {business.address}</span>
-        <span><Clock size={13} /> {business.hours}</span>
+        {openStatus !== null && (
+          <span className={openStatus ? 'open-chip' : 'closed-chip'}>
+            {openStatus ? 'Abierto ahora' : 'Cerrado'}
+          </span>
+        )}
       </div>
 
       <div className="business-card-tags">
