@@ -16,12 +16,21 @@ initializeApp({ credential: cert(serviceAccount) })
 const db = getFirestore()
 
 async function seed() {
+  const force = process.argv.includes('--force')
   const col = db.collection('businesses')
   const snapshot = await col.limit(1).get()
 
   if (!snapshot.empty) {
-    console.log('Ya existen comercios en Firestore. Seed omitido.')
-    process.exit(0)
+    if (!force) {
+      console.log('Ya existen comercios en Firestore. Seed omitido.')
+      console.log('Usá --force para borrar los datos existentes y re-seedear.')
+      process.exit(0)
+    }
+    const allDocs = await col.get()
+    const deleteBatch = db.batch()
+    allDocs.docs.forEach((d) => deleteBatch.delete(d.ref))
+    await deleteBatch.commit()
+    console.log(`Borrados ${allDocs.size} comercios existentes.`)
   }
 
   const batch = db.batch()
