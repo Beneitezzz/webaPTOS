@@ -90,12 +90,12 @@ export default function DetalleComercio() {
               <a href={`tel:${business.phone}`} className="btn btn-outline">
                 <Phone size={16} /> Llamar
               </a>
-              {(business.socialLinks ?? []).map((url) => {
+              {(business.socialLinks ?? []).map((url, i) => {
                 let label = url
                 try { label = new URL(url).hostname.replace('www.', '') } catch { /* mantener url */ }
                 return (
                   <a
-                    key={url}
+                    key={i}
                     href={url}
                     target="_blank"
                     rel="noopener noreferrer"

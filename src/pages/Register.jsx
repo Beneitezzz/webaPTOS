@@ -19,7 +19,8 @@ export default function Register() {
   const [submitting, setSubmitting] = useState(false)
 
   const redirect = searchParams.get('redirect') || '/'
-  const rol = searchParams.get('rol') || 'user'
+  const ALLOWED_ROLES = ['user', 'comercio']
+  const rol = ALLOWED_ROLES.includes(searchParams.get('rol')) ? searchParams.get('rol') : 'user'
 
   if (loading) return null
   if (currentUser) return <Navigate to={redirect} replace />

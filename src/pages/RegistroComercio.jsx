@@ -142,15 +142,19 @@ export default function RegistroComercio() {
   const addSocialLink = () =>
     setForm((prev) => ({ ...prev, socialLinks: [...prev.socialLinks, ''] }))
 
-  const updateSocialLink = (i, value) =>
+  const updateSocialLink = (i, value) => {
     setForm((prev) => {
       const socialLinks = [...prev.socialLinks]
       socialLinks[i] = value
       return { ...prev, socialLinks }
     })
+    setErrors((prev) => { const next = { ...prev }; delete next[`socialLink_${i}`]; return next })
+  }
 
-  const removeSocialLink = (i) =>
+  const removeSocialLink = (i) => {
     setForm((prev) => ({ ...prev, socialLinks: prev.socialLinks.filter((_, idx) => idx !== i) }))
+    setErrors((prev) => { const next = { ...prev }; delete next[`socialLink_${i}`]; return next })
+  }
 
   const isValidUrl = (url) => {
     try {

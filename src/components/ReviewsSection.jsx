@@ -65,10 +65,8 @@ export default function ReviewsSection({ businessId }) {
     : null
 
   useEffect(() => {
-    if (myReview) {
-      setRating(myReview.rating)
-      setComment(myReview.comment ?? '')
-    }
+    setRating(myReview?.rating ?? 0)
+    setComment(myReview?.comment ?? '')
   }, [myReview])
 
   const average = reviews.length
@@ -91,8 +89,8 @@ export default function ReviewsSection({ businessId }) {
         userName: currentUser.displayName || currentUser.email?.split('@')[0] || 'Usuario',
         rating,
         comment: comment.trim() || null,
-        createdAt: serverTimestamp(),
-      })
+        ...(myReview ? { updatedAt: serverTimestamp() } : { createdAt: serverTimestamp() }),
+      }, { merge: true })
     } catch {
       setSubmitError('No se pudo publicar la reseña. Intentá de nuevo.')
     } finally {
