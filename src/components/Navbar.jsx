@@ -6,7 +6,6 @@ import { useAuth } from '../context/AuthContext'
 const PUBLIC_LINKS = [
   { to: '/', label: 'Inicio' },
   { to: '/mapa', label: 'Explorar Mapa' },
-  { to: '/registro-comercio', label: 'Soy Comercio' },
 ]
 
 export default function Navbar() {
@@ -54,6 +53,16 @@ export default function Navbar() {
             onClick={() => setMenuOpen(false)}
           >
             Mi Perfil
+          </Link>
+        )}
+
+        {(userRole === 'comercio' || userRole === 'admin') && (
+          <Link
+            to="/registro-comercio"
+            className={`nav-link ${pathname === '/registro-comercio' ? 'active' : ''}`}
+            onClick={() => setMenuOpen(false)}
+          >
+            Mi Comercio
           </Link>
         )}
 
