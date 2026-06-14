@@ -42,7 +42,7 @@ export default function ReviewsSection({ businessId }) {
   const [hover, setHover] = useState(0)
   const [comment, setComment] = useState('')
   const [submitting, setSubmitting] = useState(false)
-  const [myReview, setMyReview] = useState(null)
+  const [submitError, setSubmitError] = useState('')
 
   useEffect(() => {
     const q = query(
@@ -52,20 +52,24 @@ export default function ReviewsSection({ businessId }) {
     const unsub = onSnapshot(q, (snap) => {
       const data = snap.docs.map((d) => ({ id: d.id, ...d.data() }))
       setReviews(data)
-      if (currentUser) {
-        const mine = data.find((r) => r.id === currentUser.uid)
-        if (mine) {
-          setMyReview(mine)
-          setRating(mine.rating)
-          setComment(mine.comment ?? '')
-        } else {
-          setMyReview(null)
-        }
-      }
+      setLoading(false)
+    }, (err) => {
+      console.error('reviews snapshot error:', err)
       setLoading(false)
     })
     return unsub
-  }, [businessId, currentUser])
+  }, [businessId])
+
+  const myReview = currentUser
+    ? reviews.find((r) => r.id === currentUser.uid) ?? null
+    : null
+
+  useEffect(() => {
+    if (myReview) {
+      setRating(myReview.rating)
+      setComment(myReview.comment ?? '')
+    }
+  }, [myReview])
 
   const average = reviews.length
     ? (reviews.reduce((acc, r) => acc + r.rating, 0) / reviews.length).toFixed(1)
@@ -80,14 +84,17 @@ export default function ReviewsSection({ businessId }) {
     e.preventDefault()
     if (!rating) return
     setSubmitting(true)
+    setSubmitError('')
     try {
       await setDoc(doc(db, 'businesses', businessId, 'reviews', currentUser.uid), {
         userId: currentUser.uid,
-        userName: currentUser.displayName || currentUser.email.split('@')[0],
+        userName: currentUser.displayName || currentUser.email?.split('@')[0] || 'Usuario',
         rating,
         comment: comment.trim() || null,
         createdAt: serverTimestamp(),
       })
+    } catch {
+      setSubmitError('No se pudo publicar la reseña. Intentá de nuevo.')
     } finally {
       setSubmitting(false)
     }
@@ -103,7 +110,7 @@ export default function ReviewsSection({ businessId }) {
         <div className="reviews-summary">
           <div className="reviews-average">
             <span className="reviews-score">{average}</span>
-            <StarDisplay rating={Math.round(average)} size={18} />
+            <StarDisplay rating={Math.round(parseFloat(average))} size={18} />
             <span className="reviews-count">
               {reviews.length} reseña{reviews.length !== 1 ? 's' : ''}
             </span>
@@ -156,6 +163,7 @@ export default function ReviewsSection({ businessId }) {
             value={comment}
             onChange={(e) => setComment(e.target.value)}
           />
+          {submitError && <p style={{ color: '#c62828', fontSize: '0.85rem', margin: 0 }}>{submitError}</p>}
           <button
             type="submit"
             className="btn btn-primary"
@@ -168,6 +176,10 @@ export default function ReviewsSection({ businessId }) {
               : 'Publicar reseña'}
           </button>
         </form>
+      ) : currentUser ? (
+        <p className="text-muted reviews-login-prompt">
+          Las reseñas están disponibles para usuarios registrados.
+        </p>
       ) : (
         <p className="text-muted reviews-login-prompt">
           <Link to="/login" className="link">Iniciá sesión</Link> como usuario para dejar una reseña.
