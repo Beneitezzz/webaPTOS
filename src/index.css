@@ -808,7 +808,7 @@ img { display: block; max-width: 100%; }
   min-width: 180px;
   max-width: 240px;
   background: white;
-  border: 2px solid var(--color-primary, #1a6b3c);
+  border: 2px solid var(--primary, #1a6b3c);
   border-radius: 14px;
   padding: 2rem 1.5rem;
   text-align: center;
@@ -826,7 +826,7 @@ img { display: block; max-width: 100%; }
 }
 
 .rol-card-icon {
-  color: var(--color-primary, #1a6b3c);
+  color: var(--primary, #1a6b3c);
 }
 
 .rol-card h2 {

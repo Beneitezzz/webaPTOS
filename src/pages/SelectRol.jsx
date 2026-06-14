@@ -1,4 +1,4 @@
-import { useNavigate, useSearchParams, Navigate } from 'react-router-dom'
+import { useNavigate, useSearchParams, Navigate, Link } from 'react-router-dom'
 import { User, Store } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 
@@ -42,7 +42,12 @@ export default function SelectRol() {
 
         <p className="auth-footer" style={{ textAlign: 'center', marginTop: '1.5rem' }}>
           ¿Ya tenés cuenta?{' '}
-          <a href="/login" className="link">Iniciá sesión</a>
+          <Link
+            to={`/login${redirect !== '/' ? `?redirect=${encodeURIComponent(redirect)}` : ''}`}
+            className="link"
+          >
+            Iniciá sesión
+          </Link>
         </p>
       </div>
     </div>
