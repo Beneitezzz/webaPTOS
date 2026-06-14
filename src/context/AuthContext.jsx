@@ -55,14 +55,14 @@ export function AuthProvider({ children }) {
   const signInWithEmail = (email, password) =>
     signInWithEmailAndPassword(auth, email, password)
 
-  const registerWithEmail = async (email, password, displayName) => {
+  const registerWithEmail = async (email, password, displayName, role = 'user') => {
     const credential = await createUserWithEmailAndPassword(auth, email, password)
     await updateProfile(credential.user, { displayName })
     try {
       await setDoc(doc(db, 'users', credential.user.uid), {
         email,
         displayName,
-        role: 'user',
+        role,
         createdAt: serverTimestamp(),
         lastLogin: serverTimestamp(),
       })
@@ -73,7 +73,7 @@ export function AuthProvider({ children }) {
     return credential
   }
 
-  const signInWithProvider = async (provider) => {
+  const signInWithProvider = async (provider, role = 'user') => {
     const credential = await signInWithPopup(auth, provider)
     const userRef = doc(db, 'users', credential.user.uid)
     try {
@@ -82,7 +82,7 @@ export function AuthProvider({ children }) {
         await setDoc(userRef, {
           email: credential.user.email,
           displayName: credential.user.displayName,
-          role: 'user',
+          role,
           createdAt: serverTimestamp(),
           lastLogin: serverTimestamp(),
         })
