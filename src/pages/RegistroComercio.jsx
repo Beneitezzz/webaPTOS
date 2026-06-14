@@ -27,8 +27,7 @@ const initialForm = {
   description: '',
   tags: [],
   certifications: [],
-  instagramUrl: '',
-  websiteUrl: '',
+  socialLinks: [''],
   menu: [{ name: '', price: '' }],
 }
 
@@ -140,6 +139,19 @@ export default function RegistroComercio() {
     setForm((prev) => ({ ...prev, menu: prev.menu.filter((_, idx) => idx !== i) }))
   }
 
+  const addSocialLink = () =>
+    setForm((prev) => ({ ...prev, socialLinks: [...prev.socialLinks, ''] }))
+
+  const updateSocialLink = (i, value) =>
+    setForm((prev) => {
+      const socialLinks = [...prev.socialLinks]
+      socialLinks[i] = value
+      return { ...prev, socialLinks }
+    })
+
+  const removeSocialLink = (i) =>
+    setForm((prev) => ({ ...prev, socialLinks: prev.socialLinks.filter((_, idx) => idx !== i) }))
+
   const isValidUrl = (url) => {
     try {
       const u = new URL(url)
@@ -166,10 +178,10 @@ export default function RegistroComercio() {
     if (!form.phone.trim()) errs.phone = 'El teléfono es requerido'
     if (form.tags.length === 0) errs.tags = 'Seleccioná al menos una restricción alimentaria'
     if (form.certifications.length === 0) errs.certifications = 'Seleccioná al menos una certificación'
-    if (form.websiteUrl.trim() && !isValidUrl(form.websiteUrl.trim()))
-      errs.websiteUrl = 'Ingresá una URL válida (ej: https://micomercio.com)'
-    if (form.instagramUrl.trim() && (!isValidUrl(form.instagramUrl.trim()) || !form.instagramUrl.includes('instagram.com/')))
-      errs.instagramUrl = 'Ingresá una URL de Instagram válida (ej: https://instagram.com/milocal)'
+    form.socialLinks.forEach((url, i) => {
+      if (url.trim() && !isValidUrl(url.trim()))
+        errs[`socialLink_${i}`] = 'Ingresá una URL válida (ej: https://instagram.com/milocal)'
+    })
     return errs
   }
 
@@ -186,8 +198,7 @@ export default function RegistroComercio() {
         lat: coords.lat,
         lng: coords.lng,
         whatsapp: form.phone.replace(/\D/g, ''),
-        instagramUrl: form.instagramUrl.trim() || null,
-        websiteUrl: form.websiteUrl.trim() || null,
+        socialLinks: form.socialLinks.filter((u) => u.trim()),
         menu: form.menu
           .filter((m) => m.name.trim())
           .map((m) => ({ name: m.name, price: m.price ? Number(m.price) : null })),
@@ -371,27 +382,31 @@ export default function RegistroComercio() {
             />
           </div>
 
-          <div className="form-row">
-            <div className="form-group">
-              <label className="form-label">Sitio web (opcional)</label>
-              <input
-                className={`form-input ${errors.websiteUrl ? 'error' : ''}`}
-                placeholder="https://micomercio.com"
-                value={form.websiteUrl}
-                onChange={(e) => handleChange('websiteUrl', e.target.value)}
-              />
-              {errors.websiteUrl && <span className="form-error">{errors.websiteUrl}</span>}
-            </div>
-            <div className="form-group">
-              <label className="form-label">Instagram (opcional)</label>
-              <input
-                className={`form-input ${errors.instagramUrl ? 'error' : ''}`}
-                placeholder="https://instagram.com/milocal"
-                value={form.instagramUrl}
-                onChange={(e) => handleChange('instagramUrl', e.target.value)}
-              />
-              {errors.instagramUrl && <span className="form-error">{errors.instagramUrl}</span>}
-            </div>
+          <div className="form-group">
+            <label className="form-label">Links del comercio <span style={{ fontWeight: 400, color: '#888' }}>(opcional)</span></label>
+            <p className="form-hint" style={{ marginTop: 0, marginBottom: '0.75rem' }}>
+              Agregá tu sitio web, Instagram, Facebook, TikTok, etc.
+            </p>
+            {form.socialLinks.map((url, i) => (
+              <div key={i} className="social-link-row">
+                <input
+                  type="url"
+                  className={`form-input ${errors[`socialLink_${i}`] ? 'error' : ''}`}
+                  placeholder="https://instagram.com/milocal"
+                  value={url}
+                  onChange={(e) => updateSocialLink(i, e.target.value)}
+                />
+                {form.socialLinks.length > 1 && (
+                  <button type="button" className="btn-remove" onClick={() => removeSocialLink(i)}>×</button>
+                )}
+                {errors[`socialLink_${i}`] && (
+                  <span className="form-error">{errors[`socialLink_${i}`]}</span>
+                )}
+              </div>
+            ))}
+            <button type="button" className="btn btn-outline btn-sm" style={{ marginTop: '0.5rem' }} onClick={addSocialLink}>
+              + Agregar link
+            </button>
           </div>
 
           <div className="form-group">

@@ -973,3 +973,16 @@ img { display: block; max-width: 100%; }
 .review-comment { font-size: 0.875rem; color: #555; margin: 4px 0 0; line-height: 1.5; }
 
 .link { color: var(--primary, #1a6b3c); text-decoration: underline; cursor: pointer; }
+
+/* RegistroComercio — social links */
+.social-link-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+
+.social-link-row .form-input { flex: 1; min-width: 0; }
+
+.social-link-row .form-error { width: 100%; }

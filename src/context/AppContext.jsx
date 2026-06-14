@@ -21,7 +21,14 @@ export function AppProvider({ children }) {
     const unsubscribe = onSnapshot(
       collection(db, 'businesses'),
       (snapshot) => {
-        setBusinesses(snapshot.docs.map((d) => ({ id: d.id, ...d.data() })))
+        setBusinesses(snapshot.docs.map((d) => {
+          const data = d.data()
+          return {
+            id: d.id,
+            ...data,
+            socialLinks: data.socialLinks ?? [data.instagramUrl, data.websiteUrl].filter(Boolean),
+          }
+        }))
         setBusinessesLoading(false)
         setBusinessesError(null)
       },
