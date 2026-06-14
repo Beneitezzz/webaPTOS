@@ -1,7 +1,8 @@
 import { useParams, Link } from 'react-router-dom'
-import { MapPin, Clock, Phone, MessageCircle, Star, ArrowLeft, ShieldCheck, Globe, Instagram } from 'lucide-react'
+import { MapPin, Clock, Phone, MessageCircle, ArrowLeft, ShieldCheck, Globe } from 'lucide-react'
 import { useApp } from '../context/AppContext'
 import RestrictionBadge from '../components/RestrictionBadge'
+import ReviewsSection from '../components/ReviewsSection'
 import { BUSINESS_TYPE_MAP, CERTIFICATIONS } from '../data/mockData'
 import { isOpenNow, formatOpeningHours } from '../utils/hours'
 
@@ -57,12 +58,6 @@ export default function DetalleComercio() {
                   {openStatus ? 'Abierto ahora' : 'Cerrado'}
                 </span>
               )}
-              {business.rating && (
-                <div className="business-rating">
-                  <Star size={16} fill="#ffc107" color="#ffc107" />
-                  <span>{business.rating} / 5.0</span>
-                </div>
-              )}
             </div>
             {business.verified && (
               <div className="verified-badge">
@@ -95,26 +90,21 @@ export default function DetalleComercio() {
               <a href={`tel:${business.phone}`} className="btn btn-outline">
                 <Phone size={16} /> Llamar
               </a>
-              {business.instagramUrl && (
-                <a
-                  href={business.instagramUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="btn btn-instagram"
-                >
-                  <Instagram size={16} /> Instagram
-                </a>
-              )}
-              {business.websiteUrl && (
-                <a
-                  href={business.websiteUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="btn btn-outline"
-                >
-                  <Globe size={16} /> Sitio web
-                </a>
-              )}
+              {(business.socialLinks ?? []).map((url) => {
+                let label = url
+                try { label = new URL(url).hostname.replace('www.', '') } catch { /* mantener url */ }
+                return (
+                  <a
+                    key={url}
+                    href={url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn btn-outline"
+                  >
+                    <Globe size={16} /> {label}
+                  </a>
+                )
+              })}
             </div>
           </div>
 
@@ -163,6 +153,8 @@ export default function DetalleComercio() {
             </p>
           </div>
         )}
+
+        <ReviewsSection businessId={id} />
 
         {/* Legal */}
         <div className="disclaimer-card">
