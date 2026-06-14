@@ -555,6 +555,20 @@ img { display: block; max-width: 100%; }
 
 .btn-ghost:hover { color: #444; }
 
+/* ── Register — chip de rol ── */
+.auth-rol-chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #e8f5e9;
+  color: #1a6b3c;
+  border-radius: 8px;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.825rem;
+  font-weight: 500;
+  margin-bottom: 1rem;
+}
+
 /* ── Navbar dropdown ── */
 .navbar-user-menu {
   position: relative;

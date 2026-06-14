@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link, useNavigate, useSearchParams, Navigate } from 'react-router-dom'
-import { UserPlus } from 'lucide-react'
+import { UserPlus, Store } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 import { googleProvider, appleProvider, facebookProvider } from '../firebase'
 import { getAuthError } from '../utils/authErrors'
@@ -19,6 +19,7 @@ export default function Register() {
   const [submitting, setSubmitting] = useState(false)
 
   const redirect = searchParams.get('redirect') || '/'
+  const rol = searchParams.get('rol') || 'user'
 
   if (loading) return null
   if (currentUser) return <Navigate to={redirect} replace />
@@ -37,8 +38,8 @@ export default function Register() {
     setError('')
     setSubmitting(true)
     try {
-      await registerWithEmail(email, password, displayName)
-      navigate(redirect, { replace: true })
+      await registerWithEmail(email, password, displayName, rol)
+      navigate(rol === 'comercio' ? '/registro-comercio' : redirect, { replace: true })
     } catch (err) {
       const msg = getAuthError(err.code)
       if (msg) setError(msg)
@@ -50,8 +51,8 @@ export default function Register() {
   const handleProvider = async (provider) => {
     setError('')
     try {
-      await signInWithProvider(provider)
-      navigate(redirect, { replace: true })
+      await signInWithProvider(provider, rol)
+      navigate(rol === 'comercio' ? '/registro-comercio' : redirect, { replace: true })
     } catch (err) {
       const msg = getAuthError(err.code)
       if (msg) setError(msg)
@@ -70,6 +71,12 @@ export default function Register() {
         </div>
 
         <div className="card form-card">
+          {rol === 'comercio' && (
+            <div className="auth-rol-chip">
+              <Store size={14} />
+              Registrándote como comercio — completarás los datos de tu negocio al finalizar
+            </div>
+          )}
           <div className="oauth-buttons">
             <button type="button" className="oauth-btn" onClick={() => handleProvider(googleProvider)}>
               <span className="oauth-icon">G</span>
