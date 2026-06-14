@@ -143,7 +143,7 @@ export default function Login() {
           <p className="auth-footer">
             ¿No tenés cuenta?{' '}
             <Link
-              to={`/register${redirect !== '/' ? `?redirect=${encodeURIComponent(redirect)}` : ''}`}
+              to={`/register/tipo${redirect !== '/' ? `?redirect=${encodeURIComponent(redirect)}` : ''}`}
               className="link"
             >
               Registrate
