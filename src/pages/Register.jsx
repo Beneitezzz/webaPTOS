@@ -161,9 +161,11 @@ export default function Register() {
             </Link>
           </p>
 
-          <button className="btn-ghost" onClick={handleGuest}>
-            Continuar sin iniciar sesión
-          </button>
+          {rol !== 'comercio' && (
+            <button className="btn-ghost" onClick={handleGuest}>
+              Continuar sin iniciar sesión
+            </button>
+          )}
         </div>
       </div>
     </div>
