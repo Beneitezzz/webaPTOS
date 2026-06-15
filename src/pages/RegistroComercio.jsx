@@ -272,7 +272,16 @@ export default function RegistroComercio() {
           </p>
           <button
             className="btn btn-primary"
-            onClick={() => { setForm(initialForm); setCoords(null); setGeocodeError(''); setGeocoding(false); setSubmitted(false) }}
+            onClick={() => {
+              setForm(initialForm)
+              setCoords(null)
+              setGeocodeError('')
+              setGeocoding(false)
+              setSubmitted(false)
+              setMenuFile(null)
+              setMenuFileError('')
+              setExistingMenuFileUrl(null)
+            }}
           >
             Registrar otro comercio
           </button>
@@ -550,7 +559,7 @@ export default function RegistroComercio() {
                     style={{ display: 'none' }}
                     onChange={(e) => handleMenuFile(e.target.files[0] ?? null)}
                   />
-                  📎 Arrastrá o hacé clic para seleccionar
+                  📎 Hacé clic para seleccionar un archivo
                   <span className="menu-upload-hint">PDF · JPG · PNG</span>
                 </label>
               )
