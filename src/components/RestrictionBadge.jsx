@@ -1,4 +1,4 @@
-import { RESTRICTION_MAP } from '../data/mockData'
+import { RESTRICTION_MAP } from '../models/mockData'
 
 export default function RestrictionBadge({ tagId, size = 'md' }) {
   const restriction = RESTRICTION_MAP[tagId]

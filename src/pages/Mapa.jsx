@@ -2,7 +2,7 @@ import { useState, useMemo, useEffect } from 'react'
 import { SlidersHorizontal, X } from 'lucide-react'
 import MapView from '../components/MapView'
 import BusinessCard from '../components/BusinessCard'
-import { RESTRICTIONS, BUSINESS_TYPES, BUSINESS_TYPE_MAP } from '../data/mockData'
+import { RESTRICTIONS, BUSINESS_TYPES, BUSINESS_TYPE_MAP } from '../models/mockData'
 import { useApp } from '../context/AppContext'
 import { toggleItem } from '../utils/array'
 

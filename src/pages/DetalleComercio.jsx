@@ -3,7 +3,7 @@ import { MapPin, Clock, Phone, MessageCircle, ArrowLeft, ShieldCheck, Globe } fr
 import { useApp } from '../context/AppContext'
 import RestrictionBadge from '../components/RestrictionBadge'
 import ReviewsSection from '../components/ReviewsSection'
-import { BUSINESS_TYPE_MAP, CERTIFICATIONS } from '../data/mockData'
+import { BUSINESS_TYPE_MAP, CERTIFICATIONS } from '../models/mockData'
 import { isOpenNow, formatOpeningHours } from '../utils/hours'
 
 

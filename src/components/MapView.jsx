@@ -3,7 +3,7 @@ import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet'
 import { Link } from 'react-router-dom'
 import { Locate } from 'lucide-react'
 import L from 'leaflet'
-import { BUSINESS_TYPE_MAP } from '../data/mockData'
+import { BUSINESS_TYPE_MAP } from '../models/mockData'
 
 const CORDOBA_CENTER = [-31.4201, -64.1888]
 

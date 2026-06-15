@@ -1,6 +1,6 @@
 import { CheckCircle, Store } from 'lucide-react'
 import { MapContainer, TileLayer, Marker } from 'react-leaflet'
-import { RESTRICTIONS, BUSINESS_TYPES, CERTIFICATIONS } from '../data/mockData'
+import { RESTRICTIONS, BUSINESS_TYPES, CERTIFICATIONS } from '../models/mockData'
 import { useBusinessForm } from '../hooks/useBusinessForm'
 
 const availableCerts = ['RNPA', 'ALG', 'RME', 'POES', 'ACA']

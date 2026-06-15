@@ -4,7 +4,7 @@ import { Store, CheckCircle, XCircle, Clock, PauseCircle } from 'lucide-react'
 import { useApp } from '../context/AppContext'
 import { useAuth } from '../context/AuthContext'
 import RestrictionBadge from '../components/RestrictionBadge'
-import { BUSINESS_TYPE_MAP } from '../data/mockData'
+import { BUSINESS_TYPE_MAP } from '../models/mockData'
 
 const STATUS_CONFIG = {
   pendiente: {

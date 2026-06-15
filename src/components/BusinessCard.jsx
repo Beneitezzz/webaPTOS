@@ -2,7 +2,7 @@ import { memo } from 'react'
 import { Link } from 'react-router-dom'
 import { MapPin, Star, CheckCircle } from 'lucide-react'
 import RestrictionBadge from './RestrictionBadge'
-import { BUSINESS_TYPE_MAP } from '../data/mockData'
+import { BUSINESS_TYPE_MAP } from '../models/mockData'
 import { isOpenNow } from '../utils/hours'
 
 export default memo(function BusinessCard({ business }) {

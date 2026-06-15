@@ -1,7 +1,7 @@
 import { Link, useNavigate } from 'react-router-dom'
 import { MapPin, Search, ShieldCheck, User, Store } from 'lucide-react'
 import { useState } from 'react'
-import { RESTRICTIONS } from '../data/mockData'
+import { RESTRICTIONS } from '../models/mockData'
 
 const features = [
   {
