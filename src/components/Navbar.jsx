@@ -58,8 +58,8 @@ export default function Navbar() {
 
         {(userRole === 'comercio' || userRole === 'admin') && (
           <Link
-            to="/registro-comercio"
-            className={`nav-link ${pathname === '/registro-comercio' ? 'active' : ''}`}
+            to="/mi-comercio"
+            className={`nav-link ${pathname === '/mi-comercio' ? 'active' : ''}`}
             onClick={() => setMenuOpen(false)}
           >
             Mi Comercio

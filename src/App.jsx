@@ -9,6 +9,7 @@ import Mapa from './pages/Mapa'
 import Perfil from './pages/Perfil'
 import DetalleComercio from './pages/DetalleComercio'
 import RegistroComercio from './pages/RegistroComercio'
+import MiComercio from './pages/MiComercio'
 import AdminPanel from './pages/AdminPanel'
 import Login from './pages/Login'
 import Register from './pages/Register'
@@ -30,6 +31,7 @@ export default function App() {
               <Route path="/register" element={<Register />} />
               <Route path="/perfil" element={<PrivateRoute><Perfil /></PrivateRoute>} />
               <Route path="/registro-comercio" element={<PrivateRoute><RegistroComercio /></PrivateRoute>} />
+              <Route path="/mi-comercio" element={<PrivateRoute><MiComercio /></PrivateRoute>} />
               <Route path="/admin" element={<AdminRoute><AdminPanel /></AdminRoute>} />
             </Routes>
           </main>
