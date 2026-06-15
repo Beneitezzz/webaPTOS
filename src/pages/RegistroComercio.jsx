@@ -137,8 +137,10 @@ export default function RegistroComercio() {
       socialLinks: existing.socialLinks?.length ? existing.socialLinks : [''],
     })
     if (existing.menuFileUrl) setExistingMenuFileUrl(existing.menuFileUrl)
+    setMenuFileError('')
     if (existing.lat && existing.lng) setCoords({ lat: existing.lat, lng: existing.lng })
     setGeocodeId((n) => n + 1)
+    setGeocodeError('')
     /* eslint-enable react-hooks/set-state-in-effect */
   }, [businesses, businessesLoading, currentUser, navigate])
 
