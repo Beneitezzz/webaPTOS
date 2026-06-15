@@ -1,10 +1,10 @@
 import { useState, useMemo, useEffect } from 'react'
 import { SlidersHorizontal, X } from 'lucide-react'
-import MapView from '../views/components/MapView'
-import BusinessCard from '../views/components/BusinessCard'
-import { RESTRICTIONS, BUSINESS_TYPES, BUSINESS_TYPE_MAP } from '../models/mockData'
-import { useApp } from '../context/AppContext'
-import { toggleItem } from '../utils/array'
+import MapView from '../components/MapView'
+import BusinessCard from '../components/BusinessCard'
+import { RESTRICTIONS, BUSINESS_TYPES, BUSINESS_TYPE_MAP } from '../../models/mockData'
+import { useApp } from '../../context/AppContext'
+import { toggleItem } from '../../utils/array'
 
 export default function Mapa() {
   const { userProfile, businesses, businessesLoading, businessesError, profileLoading } = useApp()

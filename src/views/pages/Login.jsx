@@ -2,9 +2,9 @@ import { useState } from 'react'
 import { Link, useNavigate, useSearchParams, Navigate } from 'react-router-dom'
 import { LogIn } from 'lucide-react'
 import { sendPasswordResetEmail } from 'firebase/auth'
-import { useAuth } from '../context/AuthContext'
-import { googleProvider, appleProvider, facebookProvider, auth } from '../firebase'
-import { getAuthError } from '../utils/authErrors'
+import { useAuth } from '../../context/AuthContext'
+import { googleProvider, appleProvider, facebookProvider, auth } from '../../firebase'
+import { getAuthError } from '../../utils/authErrors'
 
 const PROTECTED_ROUTES = ['/perfil', '/registro-comercio', '/admin']
 

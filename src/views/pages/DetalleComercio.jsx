@@ -1,10 +1,10 @@
 import { useParams, Link } from 'react-router-dom'
 import { MapPin, Clock, Phone, MessageCircle, ArrowLeft, ShieldCheck, Globe } from 'lucide-react'
-import { useApp } from '../context/AppContext'
-import RestrictionBadge from '../views/components/RestrictionBadge'
-import ReviewsSection from '../views/components/ReviewsSection'
-import { BUSINESS_TYPE_MAP, CERTIFICATIONS } from '../models/mockData'
-import { isOpenNow, formatOpeningHours } from '../utils/hours'
+import { useApp } from '../../context/AppContext'
+import RestrictionBadge from '../components/RestrictionBadge'
+import ReviewsSection from '../components/ReviewsSection'
+import { BUSINESS_TYPE_MAP, CERTIFICATIONS } from '../../models/mockData'
+import { isOpenNow, formatOpeningHours } from '../../utils/hours'
 
 
 export default function DetalleComercio() {

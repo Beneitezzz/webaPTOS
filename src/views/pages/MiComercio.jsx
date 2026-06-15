@@ -1,10 +1,10 @@
 import { useMemo, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Store, CheckCircle, XCircle, Clock, PauseCircle } from 'lucide-react'
-import { useApp } from '../context/AppContext'
-import { useAuth } from '../context/AuthContext'
-import RestrictionBadge from '../views/components/RestrictionBadge'
-import { BUSINESS_TYPE_MAP } from '../models/mockData'
+import { useApp } from '../../context/AppContext'
+import { useAuth } from '../../context/AuthContext'
+import RestrictionBadge from '../components/RestrictionBadge'
+import { BUSINESS_TYPE_MAP } from '../../models/mockData'
 
 const STATUS_CONFIG = {
   pendiente: {

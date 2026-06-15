@@ -1,6 +1,6 @@
 import { useNavigate, useSearchParams, Navigate, Link } from 'react-router-dom'
 import { User, Store } from 'lucide-react'
-import { useAuth } from '../context/AuthContext'
+import { useAuth } from '../../context/AuthContext'
 
 export default function SelectRol() {
   const navigate = useNavigate()

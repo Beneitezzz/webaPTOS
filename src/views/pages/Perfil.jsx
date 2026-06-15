@@ -1,7 +1,7 @@
 import { useState } from 'react'
-import { useApp } from '../context/AppContext'
-import { RESTRICTIONS } from '../models/mockData'
-import { toggleItem } from '../utils/array'
+import { useApp } from '../../context/AppContext'
+import { RESTRICTIONS } from '../../models/mockData'
+import { toggleItem } from '../../utils/array'
 import { CheckCircle, User } from 'lucide-react'
 
 export default function Perfil() {
