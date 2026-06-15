@@ -114,6 +114,34 @@ export default function RegistroComercio() {
     }
   }, [form.address])
 
+  useEffect(() => {
+    if (businessesLoading || !currentUser || initializedRef.current) return
+    initializedRef.current = true
+    const existing = businesses.find((b) => b.ownerId === currentUser.uid)
+    if (!existing) return
+    if (existing.status !== 'rechazado') {
+      navigate('/mi-comercio', { replace: true })
+      return
+    }
+    /* eslint-disable react-hooks/set-state-in-effect */
+    setEditingBusinessId(existing.id)
+    setForm({
+      name: existing.name ?? '',
+      type: existing.type ?? '',
+      address: existing.address ?? '',
+      phone: existing.phone ?? '',
+      openingHours: existing.openingHours ?? DEFAULT_OPENING_HOURS,
+      description: existing.description ?? '',
+      tags: existing.tags ?? [],
+      certifications: existing.certifications ?? [],
+      socialLinks: existing.socialLinks?.length ? existing.socialLinks : [''],
+    })
+    if (existing.menuFileUrl) setExistingMenuFileUrl(existing.menuFileUrl)
+    if (existing.lat && existing.lng) setCoords({ lat: existing.lat, lng: existing.lng })
+    setGeocodeId((n) => n + 1)
+    /* eslint-enable react-hooks/set-state-in-effect */
+  }, [businesses, businessesLoading, currentUser, navigate])
+
   const handleChange = (field, value) => {
     setForm((prev) => ({ ...prev, [field]: value }))
     setErrors((prev) => ({ ...prev, [field]: '' }))
