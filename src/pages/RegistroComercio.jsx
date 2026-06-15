@@ -1,12 +1,17 @@
 import { useState, useEffect, useRef } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { CheckCircle, Store } from 'lucide-react'
 import { MapContainer, TileLayer, Marker } from 'react-leaflet'
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage'
 import { doc, updateDoc } from 'firebase/firestore'
 import { storage, db } from '../firebase'
 import { useApp } from '../context/AppContext'
+import { useAuth } from '../context/AuthContext'
 import { RESTRICTIONS, BUSINESS_TYPES, CERTIFICATIONS } from '../data/mockData'
 import { toggleItem } from '../utils/array'
+
+const ALLOWED_MENU_TYPES = new Set(['application/pdf', 'image/jpeg', 'image/png'])
+const MAX_MENU_SIZE = 5 * 1024 * 1024
 
 const DEFAULT_OPENING_HOURS = [
   { day: 'lunes',     open: '09:00', close: '20:00', closed: false },
@@ -28,7 +33,6 @@ const initialForm = {
   tags: [],
   certifications: [],
   socialLinks: [''],
-  menu: [{ name: '', price: '' }],
 }
 
 const availableCerts = ['RNPA', 'ALG', 'RME', 'POES', 'ACA']
@@ -49,9 +53,15 @@ function DraggableMarker({ coords, onMove }) {
 }
 
 export default function RegistroComercio() {
-  const { addBusiness } = useApp()
+  const { addBusiness, businesses, businessesLoading } = useApp()
+  const { currentUser } = useAuth()
+  const navigate = useNavigate()
   const [form, setForm] = useState(initialForm)
   const [certFiles, setCertFiles] = useState({})
+  const [menuFile, setMenuFile] = useState(null)
+  const [existingMenuFileUrl, setExistingMenuFileUrl] = useState(null)
+  const [menuFileError, setMenuFileError] = useState('')
+  const [editingBusinessId, setEditingBusinessId] = useState(null)
   const [submitted, setSubmitted] = useState(false)
   const [errors, setErrors] = useState({})
   const [coords, setCoords] = useState(null)
@@ -59,6 +69,7 @@ export default function RegistroComercio() {
   const [geocodeError, setGeocodeError] = useState('')
   const [geocodeId, setGeocodeId] = useState(0)
   const debounceRef = useRef(null)
+  const initializedRef = useRef(false)
 
   useEffect(() => {
     const addr = form.address.trim()
@@ -123,22 +134,6 @@ export default function RegistroComercio() {
     }
   }
 
-  const addMenuItem = () => {
-    setForm((prev) => ({ ...prev, menu: [...prev.menu, { name: '', price: '' }] }))
-  }
-
-  const updateMenuItem = (i, field, value) => {
-    setForm((prev) => {
-      const menu = [...prev.menu]
-      menu[i] = { ...menu[i], [field]: value }
-      return { ...prev, menu }
-    })
-  }
-
-  const removeMenuItem = (i) => {
-    setForm((prev) => ({ ...prev, menu: prev.menu.filter((_, idx) => idx !== i) }))
-  }
-
   const addSocialLink = () =>
     setForm((prev) => ({ ...prev, socialLinks: [...prev.socialLinks, ''] }))
 
@@ -154,6 +149,21 @@ export default function RegistroComercio() {
   const removeSocialLink = (i) => {
     setForm((prev) => ({ ...prev, socialLinks: prev.socialLinks.filter((_, idx) => idx !== i) }))
     setErrors((prev) => { const next = { ...prev }; delete next[`socialLink_${i}`]; return next })
+  }
+
+  const handleMenuFile = (file) => {
+    if (!file) { setMenuFile(null); setMenuFileError(''); return }
+    if (!ALLOWED_MENU_TYPES.has(file.type)) {
+      setMenuFileError('Solo se aceptan PDF, JPG o PNG')
+      return
+    }
+    if (file.size > MAX_MENU_SIZE) {
+      setMenuFileError('El archivo no puede superar los 5 MB')
+      return
+    }
+    setMenuFile(file)
+    setMenuFileError('')
+    setExistingMenuFileUrl(null)
   }
 
   const isValidUrl = (url) => {
@@ -197,26 +207,48 @@ export default function RegistroComercio() {
       return
     }
     try {
-      const docRef = await addBusiness({
+      const businessData = {
         ...form,
         lat: coords.lat,
         lng: coords.lng,
         whatsapp: form.phone.replace(/\D/g, ''),
         socialLinks: form.socialLinks.filter((u) => u.trim()),
-        menu: form.menu
-          .filter((m) => m.name.trim())
-          .map((m) => ({ name: m.name, price: m.price ? Number(m.price) : null })),
-      })
+      }
+
+      let businessId
+      if (editingBusinessId) {
+        await updateDoc(doc(db, 'businesses', editingBusinessId), {
+          ...businessData,
+          status: 'pendiente',
+          pending: true,
+          verified: false,
+          rejectionReason: null,
+        })
+        businessId = editingBusinessId
+      } else {
+        const docRef = await addBusiness(businessData)
+        businessId = docRef.id
+      }
+
       const certUrls = {}
       for (const [certCode, file] of Object.entries(certFiles)) {
         const ext = file.name.split('.').pop().toLowerCase()
-        const fileRef = ref(storage, `certificados/${docRef.id}/${certCode}.${ext}`)
+        const fileRef = ref(storage, `certificados/${businessId}/${certCode}.${ext}`)
         await uploadBytes(fileRef, file)
         certUrls[certCode] = await getDownloadURL(fileRef)
       }
       if (Object.keys(certUrls).length > 0) {
-        await updateDoc(doc(db, 'businesses', docRef.id), { certDocuments: certUrls })
+        await updateDoc(doc(db, 'businesses', businessId), { certDocuments: certUrls })
       }
+
+      if (menuFile) {
+        const ext = menuFile.name.split('.').pop().toLowerCase()
+        const menuRef = ref(storage, `menus/${businessId}/menu.${ext}`)
+        await uploadBytes(menuRef, menuFile)
+        const menuUrl = await getDownloadURL(menuRef)
+        await updateDoc(doc(db, 'businesses', businessId), { menuFileUrl: menuUrl })
+      }
+
       setSubmitted(true)
     } catch {
       setErrors({ submit: 'Error al enviar el comercio. Intentá de nuevo.' })
@@ -228,10 +260,11 @@ export default function RegistroComercio() {
       <div className="page page-centered">
         <div className="container container-sm success-screen">
           <CheckCircle size={64} className="success-icon" />
-          <h1>¡Registro enviado!</h1>
+          <h1>{editingBusinessId ? '¡Re-envío exitoso!' : '¡Registro enviado!'}</h1>
           <p>
-            Tu comercio fue enviado para revisión. Una vez aprobado por un administrador,
-            aparecerá en el mapa.
+            {editingBusinessId
+              ? 'Tu comercio fue re-enviado y está nuevamente en revisión. Te avisaremos cuando haya novedades.'
+              : 'Tu comercio fue enviado para revisión. Una vez aprobado por un administrador, aparecerá en el mapa.'}
           </p>
           <p className="text-muted" style={{ fontSize: '0.875rem' }}>
             ¿Sos administrador?{' '}
@@ -478,35 +511,60 @@ export default function RegistroComercio() {
           </div>
 
           <div className="form-group">
-            <label className="form-label">Productos / Menú</label>
-            {form.menu.map((item, i) => (
-              <div key={i} className="menu-input-row">
-                <input
-                  className="form-input"
-                  placeholder="Nombre del producto"
-                  value={item.name}
-                  onChange={(e) => updateMenuItem(i, 'name', e.target.value)}
-                />
-                <input
-                  className="form-input price-input"
-                  placeholder="Precio ($)"
-                  type="number"
-                  value={item.price}
-                  onChange={(e) => updateMenuItem(i, 'price', e.target.value)}
-                />
-                {form.menu.length > 1 && (
-                  <button type="button" className="btn-remove" onClick={() => removeMenuItem(i)}>×</button>
-                )}
+            <label className="form-label">
+              Carta / menú <span style={{ fontWeight: 400, color: '#888' }}>(opcional)</span>
+            </label>
+            <p className="form-hint" style={{ marginTop: 0, marginBottom: '0.75rem' }}>
+              Subí una foto o PDF de tu carta. Máx. 5 MB.
+            </p>
+            {existingMenuFileUrl && !menuFile && (
+              <div className="menu-file-selected">
+                <span>
+                  📄 Archivo actual:{' '}
+                  <a href={existingMenuFileUrl} target="_blank" rel="noopener noreferrer" className="link">
+                    ver menú
+                  </a>
+                </span>
+                <button type="button" className="btn-remove" onClick={() => setExistingMenuFileUrl(null)}>
+                  ×
+                </button>
               </div>
-            ))}
-            <button type="button" className="btn btn-outline btn-sm" onClick={addMenuItem}>
-              + Agregar producto
-            </button>
+            )}
+            {!existingMenuFileUrl && (
+              menuFile ? (
+                <div className="menu-file-selected">
+                  <span>📄 {menuFile.name}</span>
+                  <button
+                    type="button"
+                    className="btn-remove"
+                    onClick={() => { setMenuFile(null); setMenuFileError('') }}
+                  >
+                    ×
+                  </button>
+                </div>
+              ) : (
+                <label className="menu-upload-zone">
+                  <input
+                    type="file"
+                    accept=".pdf,.jpg,.jpeg,.png"
+                    style={{ display: 'none' }}
+                    onChange={(e) => handleMenuFile(e.target.files[0] ?? null)}
+                  />
+                  📎 Arrastrá o hacé clic para seleccionar
+                  <span className="menu-upload-hint">PDF · JPG · PNG</span>
+                </label>
+              )
+            )}
+            {menuFileError && <span className="form-error">{menuFileError}</span>}
           </div>
 
           {errors.submit && <div className="auth-error">{errors.submit}</div>}
           <button type="submit" className="btn btn-primary btn-full" disabled={geocoding}>
-            {geocoding ? 'Verificando ubicación...' : 'Enviar para verificación'}
+            {geocoding
+              ? 'Verificando ubicación...'
+              : editingBusinessId
+              ? 'Re-enviar para verificación'
+              : 'Enviar para verificación'}
           </button>
 
           <p className="form-footer-note">
