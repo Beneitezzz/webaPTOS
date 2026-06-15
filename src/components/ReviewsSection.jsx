@@ -1,11 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { Star } from 'lucide-react'
-import {
-  collection, query, orderBy, onSnapshot,
-  doc, setDoc, serverTimestamp,
-} from 'firebase/firestore'
-import { db } from '../firebase'
+import { subscribeToReviews, saveReview } from '../services/reviewService'
 import { useAuth } from '../context/AuthContext'
 
 function StarDisplay({ rating, size = 16 }) {
@@ -44,21 +40,11 @@ export default function ReviewsSection({ businessId }) {
   const [submitting, setSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState('')
 
-  useEffect(() => {
-    const q = query(
-      collection(db, 'businesses', businessId, 'reviews'),
-      orderBy('createdAt', 'desc')
-    )
-    const unsub = onSnapshot(q, (snap) => {
-      const data = snap.docs.map((d) => ({ id: d.id, ...d.data() }))
-      setReviews(data)
-      setLoading(false)
-    }, (err) => {
-      console.error('reviews snapshot error:', err)
-      setLoading(false)
-    })
-    return unsub
-  }, [businessId])
+  useEffect(() => subscribeToReviews(
+    businessId,
+    (data) => { setReviews(data); setLoading(false) },
+    (err) => { console.error('reviews snapshot error:', err); setLoading(false) }
+  ), [businessId])
 
   const myReview = currentUser
     ? reviews.find((r) => r.id === currentUser.uid) ?? null
@@ -84,13 +70,16 @@ export default function ReviewsSection({ businessId }) {
     setSubmitting(true)
     setSubmitError('')
     try {
-      await setDoc(doc(db, 'businesses', businessId, 'reviews', currentUser.uid), {
-        userId: currentUser.uid,
-        userName: currentUser.displayName || currentUser.email?.split('@')[0] || 'Usuario',
-        rating,
-        comment: comment.trim() || null,
-        ...(myReview ? { updatedAt: serverTimestamp() } : { createdAt: serverTimestamp() }),
-      }, { merge: true })
+      await saveReview(
+        businessId,
+        currentUser.uid,
+        {
+          userName: currentUser.displayName || currentUser.email?.split('@')[0] || 'Usuario',
+          rating,
+          comment: comment.trim(),
+        },
+        !!myReview
+      )
     } catch {
       setSubmitError('No se pudo publicar la reseña. Intentá de nuevo.')
     } finally {
