@@ -1,8 +1,8 @@
 import { Navigate, useLocation } from 'react-router-dom'
-import { useAuth } from '../context/AuthContext'
+import { useAuth } from '../../context/AuthContext'
 
-export default function AdminRoute({ children }) {
-  const { currentUser, userRole, loading } = useAuth()
+export default function PrivateRoute({ children }) {
+  const { currentUser, loading } = useAuth()
   const { pathname } = useLocation()
 
   if (loading) return (
@@ -13,8 +13,6 @@ export default function AdminRoute({ children }) {
 
   if (!currentUser)
     return <Navigate to={`/login?redirect=${encodeURIComponent(pathname)}`} replace />
-
-  if (userRole !== 'admin') return <Navigate to="/" replace />
 
   return children
 }

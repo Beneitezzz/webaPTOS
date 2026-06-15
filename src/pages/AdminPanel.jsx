@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react'
 import { ShieldCheck, ShieldX, Eye, AlertCircle, PauseCircle } from 'lucide-react'
 import { useApp } from '../context/AppContext'
-import RestrictionBadge from '../components/RestrictionBadge'
+import RestrictionBadge from '../views/components/RestrictionBadge'
 import { BUSINESS_TYPE_MAP, CERTIFICATIONS } from '../models/mockData'
 import { sendApprovalEmail, sendRejectionEmail } from '../utils/emailService'
 import { formatOpeningHours } from '../utils/hours'

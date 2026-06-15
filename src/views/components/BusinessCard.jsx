@@ -2,8 +2,8 @@ import { memo } from 'react'
 import { Link } from 'react-router-dom'
 import { MapPin, Star, CheckCircle } from 'lucide-react'
 import RestrictionBadge from './RestrictionBadge'
-import { BUSINESS_TYPE_MAP } from '../models/mockData'
-import { isOpenNow } from '../utils/hours'
+import { BUSINESS_TYPE_MAP } from '../../models/mockData'
+import { isOpenNow } from '../../utils/hours'
 
 export default memo(function BusinessCard({ business }) {
   const typeInfo = BUSINESS_TYPE_MAP[business.type]

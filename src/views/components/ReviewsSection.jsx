@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { Star } from 'lucide-react'
-import { subscribeToReviews, saveReview } from '../services/reviewService'
-import { useAuth } from '../context/AuthContext'
+import { subscribeToReviews, saveReview } from '../../services/reviewService'
+import { useAuth } from '../../context/AuthContext'
 
 function StarDisplay({ rating, size = 16 }) {
   return (
