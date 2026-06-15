@@ -27,6 +27,7 @@ export function AppProvider({ children }) {
             id: d.id,
             ...data,
             socialLinks: data.socialLinks ?? [data.instagramUrl, data.websiteUrl].filter(Boolean),
+            menuFileUrl: data.menuFileUrl ?? null,
           }
         }))
         setBusinessesLoading(false)

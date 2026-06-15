@@ -6,7 +6,6 @@ import ReviewsSection from '../components/ReviewsSection'
 import { BUSINESS_TYPE_MAP, CERTIFICATIONS } from '../data/mockData'
 import { isOpenNow, formatOpeningHours } from '../utils/hours'
 
-const MENU_TYPES = new Set(['restaurante', 'cafe'])
 
 export default function DetalleComercio() {
   const { id } = useParams()
@@ -132,25 +131,18 @@ export default function DetalleComercio() {
           </div>
         </div>
 
-        {/* Menu */}
-        {business.menu.length > 0 && (
+        {/* Menú */}
+        {business.menuFileUrl && (
           <div className="card">
-            <h2>
-              {MENU_TYPES.has(business.type) ? 'Menú' : 'Productos disponibles'}
-            </h2>
-            <div className="menu-grid">
-              {business.menu.map((item) => (
-                <div key={item.name} className="menu-item">
-                  <span className="menu-item-name">{item.name}</span>
-                  {item.price && (
-                    <span className="menu-item-price">${item.price.toLocaleString('es-AR')}</span>
-                  )}
-                </div>
-              ))}
-            </div>
-            <p className="menu-disclaimer">
-              * Los precios son orientativos y pueden variar. Consultá directamente con el comercio.
-            </p>
+            <h2>Carta / Menú</h2>
+            <a
+              href={business.menuFileUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn btn-outline"
+            >
+              📄 Ver carta del menú
+            </a>
           </div>
         )}
 
