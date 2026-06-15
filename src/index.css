@@ -986,3 +986,31 @@ img { display: block; max-width: 100%; }
 .social-link-row .form-input { flex: 1; min-width: 0; }
 
 .social-link-row .form-error { width: 100%; }
+
+/* ─── Menu file upload ─── */
+.menu-upload-zone {
+  display: block; cursor: pointer; text-align: center;
+  border: 2px dashed var(--border); border-radius: var(--radius-sm);
+  padding: 1.25rem 1rem; color: var(--text-muted); font-size: 0.875rem;
+  transition: border-color 0.15s, background 0.15s;
+}
+.menu-upload-zone:hover { border-color: var(--primary); background: var(--primary-lighter); color: var(--primary); }
+.menu-upload-hint { display: block; font-size: 0.75rem; color: #bbb; margin-top: 4px; }
+.menu-file-selected {
+  display: flex; align-items: center; justify-content: space-between;
+  background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-sm);
+  padding: 0.5rem 0.75rem; font-size: 0.875rem;
+}
+
+/* ─── Status banner (mi-comercio) ─── */
+.status-banner {
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: 1rem 1.25rem; border-radius: var(--radius); margin-bottom: 1rem;
+  border: 1px solid;
+}
+.status-banner strong { display: block; margin-bottom: 2px; }
+.status-banner p { font-size: 0.875rem; margin: 0; opacity: 0.9; }
+.status-banner--pending  { background: #fff8e1; border-color: #ffc107; color: #7a5c00; }
+.status-banner--approved { background: #e8f5e9; border-color: #4caf50; color: #1b5e20; }
+.status-banner--rejected { background: #ffebee; border-color: #ef5350; color: #7f0000; }
+.status-banner--suspended { background: #f5f5f5; border-color: #9e9e9e; color: #424242; }
