@@ -5,8 +5,9 @@ const PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY
 const TEMPLATE_APROBACION = import.meta.env.VITE_EMAILJS_TEMPLATE_APROBACION
 const TEMPLATE_RECHAZO = import.meta.env.VITE_EMAILJS_TEMPLATE_RECHAZO
 
-// Sends approval email to business owner. No-ops if env vars not configured.
+// Sends approval email to business owner. No-ops if env vars not configured or in dev.
 export async function sendApprovalEmail({ businessName, ownerEmail }) {
+  if (import.meta.env.DEV) return
   if (!SERVICE_ID || !PUBLIC_KEY || !TEMPLATE_APROBACION || !ownerEmail) return
   await emailjs.send(
     SERVICE_ID,
@@ -16,8 +17,9 @@ export async function sendApprovalEmail({ businessName, ownerEmail }) {
   )
 }
 
-// Sends rejection email with reason. No-ops if env vars not configured.
+// Sends rejection email with reason. No-ops if env vars not configured or in dev.
 export async function sendRejectionEmail({ businessName, ownerEmail, reason }) {
+  if (import.meta.env.DEV) return
   if (!SERVICE_ID || !PUBLIC_KEY || !TEMPLATE_RECHAZO || !ownerEmail) return
   await emailjs.send(
     SERVICE_ID,
