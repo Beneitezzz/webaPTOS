@@ -1,15 +1,30 @@
 import { CheckCircle, Store } from 'lucide-react'
 import { MapContainer, TileLayer, Marker } from 'react-leaflet'
+import L from 'leaflet'
 import { RESTRICTIONS, BUSINESS_TYPES, CERTIFICATIONS } from '../../models/mockData'
 import { useBusinessForm } from '../../hooks/useBusinessForm'
 
 const availableCerts = ['RNPA', 'ALG', 'RME', 'POES', 'ACA']
+
+const DRAGGABLE_ICON = L.divIcon({
+  html: `<img src="data:image/svg+xml,${encodeURIComponent(
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 32" width="28" height="38">
+      <path fill="#2d6a4f" stroke="white" stroke-width="1.5"
+        d="M12 0C7.58 0 4 3.58 4 8c0 6.67 8 16 8 16s8-9.33 8-16c0-4.42-3.58-8-8-8z"/>
+      <circle cx="12" cy="8" r="3.5" fill="white"/>
+    </svg>`
+  )}" width="28" height="38" />`,
+  className: '',
+  iconSize: [28, 38],
+  iconAnchor: [14, 38],
+})
 
 function DraggableMarker({ coords, onMove }) {
   return (
     <Marker
       position={[coords.lat, coords.lng]}
       draggable
+      icon={DRAGGABLE_ICON}
       eventHandlers={{
         dragend: (e) => {
           const { lat, lng } = e.target.getLatLng()
@@ -23,9 +38,9 @@ function DraggableMarker({ coords, onMove }) {
 export default function RegistroComercio() {
   const {
     form, certFiles, menuFile, existingMenuFileUrl, setExistingMenuFileUrl,
-    menuFileError, editingBusinessId, submitted, errors, coords, setCoords,
+    menuFileError, editingBusinessId, submitted, errors, coords,
     geocoding, geocodeError, geocodeId,
-    handleChange, handleMenuFile, handleCertFile,
+    handleChange, handleMarkerMove, handleMenuFile, handleCertFile,
     addSocialLink, updateSocialLink, removeSocialLink,
     updateHourField, toggleTag, toggleCert,
     handleSubmit, onSuccessReset,
@@ -126,7 +141,7 @@ export default function RegistroComercio() {
                   />
                   <DraggableMarker
                     coords={coords}
-                    onMove={(lat, lng) => setCoords({ lat, lng })}
+                    onMove={handleMarkerMove}
                   />
                 </MapContainer>
               </div>
@@ -259,9 +274,6 @@ export default function RegistroComercio() {
                 )
               })}
             </div>
-            <p className="form-hint">
-              Podés adjuntar los archivos ahora o presentarlos durante la verificación.
-            </p>
             {form.certifications.length > 0 && (
               <div className="cert-files-section">
                 {form.certifications.map((cert) => (

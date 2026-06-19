@@ -50,8 +50,13 @@ export function useBusinessForm() {
   const [geocodeId, setGeocodeId] = useState(0)
   const debounceRef = useRef(null)
   const initializedRef = useRef(false)
+  const skipNextGeocodeRef = useRef(false)
 
   useEffect(() => {
+    if (skipNextGeocodeRef.current) {
+      skipNextGeocodeRef.current = false
+      return
+    }
     const addr = form.address.trim()
     if (addr.length < 5) {
       /* eslint-disable react-hooks/set-state-in-effect */
@@ -272,6 +277,27 @@ export function useBusinessForm() {
     setExistingMenuFileUrl(null)
   }
 
+  const handleMarkerMove = async (lat, lng) => {
+    setCoords({ lat, lng })
+    try {
+      const res = await fetch(
+        `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`,
+        { headers: { 'Accept-Language': 'es' } }
+      )
+      const data = await res.json()
+      const road = data.address?.road ?? data.address?.pedestrian ?? data.address?.footway ?? ''
+      const number = data.address?.house_number ?? ''
+      const address = [road, number].filter(Boolean).join(' ') || data.display_name?.split(',')[0] || ''
+      if (address) {
+        skipNextGeocodeRef.current = true
+        setForm((prev) => ({ ...prev, address }))
+        setErrors((prev) => ({ ...prev, address: '' }))
+      }
+    } catch {
+      // reverse geocode is best-effort; coords already updated
+    }
+  }
+
   return {
     form,
     certFiles,
@@ -288,6 +314,7 @@ export function useBusinessForm() {
     geocodeError,
     geocodeId,
     handleChange,
+    handleMarkerMove,
     handleMenuFile,
     handleCertFile,
     addSocialLink,

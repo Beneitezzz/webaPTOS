@@ -756,6 +756,28 @@ img { display: block; max-width: 100%; }
   margin-top: 10px;
 }
 
+/* ── Admin toast notification ── */
+.admin-toast {
+  position: fixed;
+  bottom: 28px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  box-shadow: 0 4px 16px rgba(0,0,0,.18);
+  z-index: 9999;
+  animation: toast-in .2s ease;
+  white-space: nowrap;
+}
+.admin-toast--success { background: #198754; color: #fff; }
+.admin-toast--error   { background: #dc3545; color: #fff; }
+@keyframes toast-in {
+  from { opacity: 0; transform: translateX(-50%) translateY(12px); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
 /* ── Approved businesses section in AdminPanel ── */
 .admin-section {
   margin-top: 36px;

@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useCallback } from 'react'
 import { ShieldCheck, ShieldX, Eye, AlertCircle, PauseCircle } from 'lucide-react'
 import { useApp } from '../../context/AppContext'
 import RestrictionBadge from '../components/RestrictionBadge'
@@ -13,6 +13,12 @@ export default function AdminPanel() {
   const [rejectingId, setRejectingId] = useState(null)
   const [rejectReason, setRejectReason] = useState('')
   const [suspendingId, setSuspendingId] = useState(null)
+  const [toast, setToast] = useState(null)
+
+  const showToast = useCallback((msg, type = 'success') => {
+    setToast({ msg, type })
+    setTimeout(() => setToast(null), 3500)
+  }, [])
 
   const pending = useMemo(
     () => businesses.filter((b) => b.pending && !b.verified),
@@ -26,6 +32,11 @@ export default function AdminPanel() {
 
   return (
     <div className="page">
+      {toast && (
+        <div className={`admin-toast admin-toast--${toast.type}`}>
+          {toast.msg}
+        </div>
+      )}
       <div className="container container-md">
         <div className="page-header">
           <div className="page-icon"><ShieldCheck size={28} /></div>
@@ -198,6 +209,7 @@ export default function AdminPanel() {
                                   })
                                   setRejectingId(null)
                                   setRejectReason('')
+                                  showToast(`Rechazo de "${b.name}" enviado correctamente.`)
                                 } catch {
                                   setActionError('Error al rechazar. Intentá de nuevo.')
                                 }
