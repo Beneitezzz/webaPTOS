@@ -2,7 +2,7 @@ import { useState, useMemo, useEffect } from 'react'
 import { SlidersHorizontal, X } from 'lucide-react'
 import MapView from '../components/MapView'
 import BusinessCard from '../components/BusinessCard'
-import { RESTRICTIONS, BUSINESS_TYPES, BUSINESS_TYPE_MAP } from '../../models/mockData'
+import { RESTRICTIONS, BUSINESS_TYPES, BUSINESS_TYPE_MAP, mockBusinesses } from '../../models/mockData'
 import { useApp } from '../../context/AppContext'
 import { toggleItem } from '../../utils/array'
 
@@ -24,10 +24,12 @@ export default function Mapa() {
     }
   }, [profileLoading, filtersInitialized, userProfile.restrictions])
 
-  const verifiedBusinesses = useMemo(
-    () => businesses.filter((b) => b.verified && !b.pending),
-    [businesses]
-  )
+  const verifiedBusinesses = useMemo(() => {
+    const fromFirebase = businesses.filter((b) => b.verified && !b.pending)
+    return fromFirebase.length > 0
+      ? fromFirebase
+      : mockBusinesses.filter((b) => b.verified && !b.pending)
+  }, [businesses])
 
   const filtered = useMemo(() => {
     const q = searchQuery.trim().normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase()
@@ -158,7 +160,7 @@ export default function Mapa() {
             <p className="text-muted">{businessesError}</p>
           </div>
         ) : (
-          <MapView businesses={filtered} />
+          <MapView businesses={filtered} sidebarOpen={sidebarOpen} />
         )}
       </div>
     </div>

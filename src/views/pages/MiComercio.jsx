@@ -9,7 +9,7 @@ import { BUSINESS_TYPE_MAP } from '../../models/mockData'
 const STATUS_CONFIG = {
   pendiente: {
     label: 'Pendiente de revisión',
-    description: 'Tu comercio está siendo verificado por el equipo de MapaApto. Te avisaremos por mail cuando haya novedades.',
+    description: 'Tu comercio está siendo verificado por el equipo de PuntoSano. Te avisaremos por mail cuando haya novedades.',
     Icon: Clock,
     modifier: 'pending',
   },
@@ -27,7 +27,7 @@ const STATUS_CONFIG = {
   },
   suspendido: {
     label: 'Comercio suspendido',
-    description: 'Tu comercio no aparece en el mapa. Contactá con el equipo de MapaApto para más información.',
+    description: 'Tu comercio no aparece en el mapa. Contactá con el equipo de PuntoSano para más información.',
     Icon: PauseCircle,
     modifier: 'suspended',
   },
@@ -65,7 +65,7 @@ export default function MiComercio() {
             <Store size={48} style={{ color: 'var(--primary)', margin: '0 auto 1rem' }} />
             <h2 style={{ marginBottom: '0.5rem' }}>Todavía no registraste un comercio</h2>
             <p className="text-muted" style={{ marginBottom: '1.5rem' }}>
-              Registrá tu negocio para que aparezca en el mapa de MapaApto.
+              Registrá tu negocio para que aparezca en el mapa de PuntoSano.
             </p>
             <Link to="/registro-comercio" className="btn btn-primary">
               Registrar mi comercio
@@ -88,7 +88,7 @@ export default function MiComercio() {
           <div className="page-icon"><Store size={28} /></div>
           <div>
             <h1>Mi Comercio</h1>
-            <p className="text-muted">Estado de tu establecimiento en MapaApto</p>
+            <p className="text-muted">Estado de tu establecimiento en PuntoSano</p>
           </div>
         </div>
 

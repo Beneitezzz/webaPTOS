@@ -1,40 +1,34 @@
 import { Link, useNavigate } from 'react-router-dom'
-import { MapPin, Search, ShieldCheck, User, Store } from 'lucide-react'
-import { useState } from 'react'
+import { Search, ArrowRight } from 'lucide-react'
+import { useState, useEffect } from 'react'
 import { RESTRICTIONS } from '../../models/mockData'
+import TopRatedSection from '../components/TopRatedSection'
+import HowItWorks from '../components/HowItWorks'
+import WhatWeDo from '../components/WhatWeDo'
 
-const features = [
-  {
-    icon: <User size={28} />,
-    title: 'Perfil personalizado',
-    desc: 'Configurá tus restricciones alimentarias una sola vez y el sistema filtra automáticamente.',
-  },
-  {
-    icon: <MapPin size={28} />,
-    title: 'Mapa interactivo',
-    desc: 'Encontrá restaurantes, dietéticas y supermercados aptos cerca tuyo en Córdoba.',
-  },
-  {
-    icon: <ShieldCheck size={28} />,
-    title: 'Información verificada',
-    desc: 'Solo mostramos comercios con certificaciones oficiales (ANMAT, RNPA, RME).',
-  },
-  {
-    icon: <Store size={28} />,
-    title: 'Para comercios',
-    desc: 'Si tenés un local con productos aptos, registrate y llegá a tu público objetivo.',
-  },
-]
 
-const steps = [
-  { n: 1, title: 'Creá tu perfil', desc: 'Indicá tus restricciones: celiaquía, diabetes, SIBO, lactosa.' },
-  { n: 2, title: 'Explorá el mapa', desc: 'El mapa resalta automáticamente los comercios que se adaptan a tu perfil.' },
-  { n: 3, title: 'Visitá con confianza', desc: 'Cada comercio tiene menú, horarios y contacto directo verificados.' },
-]
+function useFadeIn(delay) {
+  const [visible, setVisible] = useState(false)
+  useEffect(() => {
+    const t = setTimeout(() => setVisible(true), delay)
+    return () => clearTimeout(t)
+  }, [delay])
+  return {
+    opacity: visible ? 1 : 0,
+    transform: visible ? 'translateY(0)' : 'translateY(28px)',
+    transition: 'opacity 0.6s ease, transform 0.6s ease',
+  }
+}
 
 export default function Home() {
   const [search, setSearch] = useState('')
   const navigate = useNavigate()
+
+  const anim1 = useFadeIn(50)
+  const anim2 = useFadeIn(200)
+  const anim3 = useFadeIn(350)
+  const anim4 = useFadeIn(500)
+  const anim5 = useFadeIn(650)
 
   const handleSearch = (e) => {
     e.preventDefault()
@@ -46,29 +40,34 @@ export default function Home() {
       {/* Hero */}
       <section className="hero">
         <div className="hero-content">
-          <div className="hero-badge">📍 Córdoba, Argentina</div>
-          <h1 className="hero-title">
+          <div className="hero-badge" style={anim1}>📍 Córdoba, Argentina</div>
+          <h1 className="hero-title" style={anim2}>
             Encontrá alimentos <span className="text-primary">seguros</span> cerca tuyo
           </h1>
-          <p className="hero-subtitle">
+          <p className="hero-subtitle" style={anim3}>
             La primera plataforma de Córdoba que centraliza comercios verificados para
             personas con celiaquía, diabetes, SIBO e intolerancia a la lactosa.
           </p>
 
-          <form className="hero-search" onSubmit={handleSearch}>
-            <Search size={18} className="search-icon" />
-            <input
-              type="text"
-              placeholder="Buscar por tipo de local o producto..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
-            <button type="submit" className="btn btn-primary">
-              Explorar mapa
-            </button>
-          </form>
+          <div className="hero-search-wrap" style={anim4}>
+            <div className="sonar-ring" />
+            <div className="sonar-ring sonar-delay" />
+            <form className="hero-search" onSubmit={handleSearch}>
+              <Search size={18} className="search-icon" />
+              <input
+                type="text"
+                placeholder="Buscar por tipo de local, restricción o dirección..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+              />
+              <button type="submit" className="btn btn-primary">
+                Explorar mapa
+                <ArrowRight size={14} />
+              </button>
+            </form>
+          </div>
 
-          <div className="hero-tags">
+          <div className="hero-tags" style={anim5}>
             {RESTRICTIONS.map((r) => (
               <span key={r.id} className="badge badge-md" style={{ backgroundColor: r.color }}>
                 {r.label}
@@ -78,37 +77,11 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Features */}
-      <section className="section">
-        <div className="container">
-          <h2 className="section-title">¿Qué hace MapaApto?</h2>
-          <div className="features-grid">
-            {features.map((f, i) => (
-              <div key={i} className="feature-card">
-                <div className="feature-icon">{f.icon}</div>
-                <h3>{f.title}</h3>
-                <p>{f.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+      <TopRatedSection />
 
-      {/* Steps */}
-      <section className="section section-alt">
-        <div className="container">
-          <h2 className="section-title">¿Cómo funciona?</h2>
-          <div className="steps-grid">
-            {steps.map((s) => (
-              <div key={s.n} className="step-card">
-                <div className="step-number">{s.n}</div>
-                <h3>{s.title}</h3>
-                <p>{s.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+      <WhatWeDo />
+
+      <HowItWorks />
 
       {/* CTA */}
       <section className="section cta-section">
@@ -130,10 +103,10 @@ export default function Home() {
       <footer className="app-footer">
         <div className="container">
           <p>
-            <strong>Aviso legal:</strong> MapaApto es una herramienta informativa. No reemplaza diagnósticos
+            <strong>Aviso legal:</strong> PuntoSano es una herramienta informativa. No reemplaza diagnósticos
             médicos ni se hace responsable legalmente por reacciones alérgicas. Siempre consultá con tu médico.
           </p>
-          <p className="footer-copy">© 2025 MapaApto · Proyecto académico — Universidad Siglo 21</p>
+          <p className="footer-copy">© 2025 PuntoSano · Proyecto académico — Universidad Siglo 21</p>
         </div>
       </footer>
     </div>

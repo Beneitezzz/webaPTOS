@@ -3,11 +3,14 @@ import { useNavigate } from 'react-router-dom'
 import { useApp } from '../context/AppContext'
 import { useAuth } from '../context/AuthContext'
 import { updateBusiness } from '../services/businessService'
-import { uploadCertFile, uploadMenuFile } from '../services/storageService'
+import { uploadCertFile, uploadMenuFile, uploadBusinessPhoto } from '../services/storageService'
 import { toggleItem } from '../utils/array'
 
 const ALLOWED_MENU_TYPES = new Set(['application/pdf', 'image/jpeg', 'image/png'])
+const ALLOWED_PHOTO_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp'])
 const MAX_MENU_SIZE = 5 * 1024 * 1024
+const MAX_PHOTO_SIZE = 5 * 1024 * 1024
+const MAX_PHOTOS = 5
 
 const DEFAULT_OPENING_HOURS = [
   { day: 'lunes',     open: '09:00', close: '20:00', closed: false },
@@ -41,6 +44,9 @@ export function useBusinessForm() {
   const [menuFile, setMenuFile] = useState(null)
   const [existingMenuFileUrl, setExistingMenuFileUrl] = useState(null)
   const [menuFileError, setMenuFileError] = useState('')
+  const [newPhotos, setNewPhotos] = useState([])
+  const [existingPhotos, setExistingPhotos] = useState([])
+  const [photoError, setPhotoError] = useState('')
   const [editingBusinessId, setEditingBusinessId] = useState(null)
   const [submitted, setSubmitted] = useState(false)
   const [errors, setErrors] = useState({})
@@ -123,6 +129,8 @@ export function useBusinessForm() {
     })
     if (existing.menuFileUrl) setExistingMenuFileUrl(existing.menuFileUrl)
     setMenuFileError('')
+    if (existing.photos?.length) setExistingPhotos(existing.photos)
+    setPhotoError('')
     if (existing.lat && existing.lng) setCoords({ lat: existing.lat, lng: existing.lng })
     setGeocodeId((n) => n + 1)
     setGeocodeError('')
@@ -183,6 +191,33 @@ export function useBusinessForm() {
     setExistingMenuFileUrl(null)
   }
 
+  const handleAddPhotos = (files) => {
+    const list = Array.from(files)
+    const total = existingPhotos.length + newPhotos.length + list.length
+    if (total > MAX_PHOTOS) {
+      setPhotoError(`Máximo ${MAX_PHOTOS} fotos en total`)
+      return
+    }
+    for (const f of list) {
+      if (!ALLOWED_PHOTO_TYPES.has(f.type)) {
+        setPhotoError('Solo se aceptan JPG, PNG o WebP')
+        return
+      }
+      if (f.size > MAX_PHOTO_SIZE) {
+        setPhotoError('Cada foto no puede superar los 5 MB')
+        return
+      }
+    }
+    setNewPhotos((prev) => [...prev, ...list])
+    setPhotoError('')
+  }
+
+  const removeNewPhoto = (index) =>
+    setNewPhotos((prev) => prev.filter((_, i) => i !== index))
+
+  const removeExistingPhoto = (index) =>
+    setExistingPhotos((prev) => prev.filter((_, i) => i !== index))
+
   const isValidUrl = (url) => {
     try {
       const u = new URL(url)
@@ -209,6 +244,7 @@ export function useBusinessForm() {
     if (!form.phone.trim()) errs.phone = 'El teléfono es requerido'
     if (form.tags.length === 0) errs.tags = 'Seleccioná al menos una restricción alimentaria'
     if (form.certifications.length === 0) errs.certifications = 'Seleccioná al menos una certificación'
+    if (!menuFile && !existingMenuFileUrl) errs.menu = 'La carta/menú es requerida'
     form.socialLinks.forEach((url, i) => {
       if (url.trim() && !isValidUrl(url.trim()))
         errs[`socialLink_${i}`] = 'Ingresá una URL válida (ej: https://instagram.com/milocal)'
@@ -260,6 +296,16 @@ export function useBusinessForm() {
         await updateBusiness(businessId, { menuFileUrl: menuUrl })
       }
 
+      const uploadedPhotoUrls = []
+      for (let i = 0; i < newPhotos.length; i++) {
+        const url = await uploadBusinessPhoto(businessId, newPhotos[i], existingPhotos.length + i)
+        uploadedPhotoUrls.push(url)
+      }
+      const allPhotos = [...existingPhotos, ...uploadedPhotoUrls]
+      if (allPhotos.length > 0) {
+        await updateBusiness(businessId, { photos: allPhotos })
+      }
+
       setSubmitted(true)
     } catch {
       setErrors({ submit: 'Error al enviar el comercio. Intentá de nuevo.' })
@@ -275,6 +321,9 @@ export function useBusinessForm() {
     setMenuFile(null)
     setMenuFileError('')
     setExistingMenuFileUrl(null)
+    setNewPhotos([])
+    setExistingPhotos([])
+    setPhotoError('')
   }
 
   const handleMarkerMove = async (lat, lng) => {
@@ -305,6 +354,12 @@ export function useBusinessForm() {
     existingMenuFileUrl,
     setExistingMenuFileUrl,
     menuFileError,
+    newPhotos,
+    existingPhotos,
+    photoError,
+    handleAddPhotos,
+    removeNewPhoto,
+    removeExistingPhoto,
     editingBusinessId,
     submitted,
     errors,

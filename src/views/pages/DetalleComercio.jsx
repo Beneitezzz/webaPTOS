@@ -3,14 +3,17 @@ import { MapPin, Clock, Phone, MessageCircle, ArrowLeft, ShieldCheck, Globe } fr
 import { useApp } from '../../context/AppContext'
 import RestrictionBadge from '../components/RestrictionBadge'
 import ReviewsSection from '../components/ReviewsSection'
-import { BUSINESS_TYPE_MAP, CERTIFICATIONS } from '../../models/mockData'
-import { isOpenNow, formatOpeningHours } from '../../utils/hours'
+import { BUSINESS_TYPE_MAP, CERTIFICATIONS, mockBusinesses } from '../../models/mockData'
+import { formatOpeningHours } from '../../utils/hours'
+import { useOpenStatus } from '../../hooks/useOpenStatus'
 
 
 export default function DetalleComercio() {
   const { id } = useParams()
   const { businesses, businessesLoading } = useApp()
-  const business = businesses.find((b) => String(b.id) === id)
+  const business =
+    businesses.find((b) => String(b.id) === id) ||
+    mockBusinesses.find((b) => String(b.id) === id)
 
   if (businessesLoading) return (
     <div className="page page-centered">
@@ -30,7 +33,7 @@ export default function DetalleComercio() {
   }
 
   const typeInfo = BUSINESS_TYPE_MAP[business.type]
-  const openStatus = business.openingHours ? isOpenNow(business.openingHours) : null
+  const openStatus = useOpenStatus(business.openingHours)
   const hoursDisplay = business.openingHours
     ? formatOpeningHours(business.openingHours)
     : business.hours ?? null
@@ -53,9 +56,9 @@ export default function DetalleComercio() {
               </span>
               <h1 className="detail-name">{business.name}</h1>
               {openStatus !== null && (
-                <span className={openStatus ? 'open-chip' : 'closed-chip'} style={{ marginTop: '4px', display: 'inline-flex' }}>
+                <div className={openStatus ? 'open-chip' : 'closed-chip'} style={{ marginTop: '4px', width: 'fit-content' }}>
                   {openStatus ? 'Abierto ahora' : 'Cerrado'}
-                </span>
+                </div>
               )}
             </div>
             {business.verified && (
@@ -131,6 +134,20 @@ export default function DetalleComercio() {
           </div>
         </div>
 
+        {/* Fotos */}
+        {business.photos?.length > 0 && (
+          <div className="card">
+            <h2>Fotos del comercio</h2>
+            <div className="detail-photos-grid">
+              {business.photos.map((url, i) => (
+                <a key={i} href={url} target="_blank" rel="noopener noreferrer" className="detail-photo-link">
+                  <img src={url} alt={`${business.name} foto ${i + 1}`} className="detail-photo-img" />
+                </a>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Menú */}
         {business.menuFileUrl && (
           <div className="card">
@@ -150,7 +167,7 @@ export default function DetalleComercio() {
 
         {/* Legal */}
         <div className="disclaimer-card">
-          <strong>Aviso legal:</strong> MapaApto es una herramienta informativa. No reemplaza
+          <strong>Aviso legal:</strong> PuntoSano es una herramienta informativa. No reemplaza
           diagnósticos médicos ni garantiza la ausencia total de alérgenos. Ante cualquier duda,
           consultá directamente con el establecimiento.
         </div>

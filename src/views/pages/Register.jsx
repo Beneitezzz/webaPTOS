@@ -67,7 +67,7 @@ export default function Register() {
           <div className="page-icon"><UserPlus size={28} /></div>
           <div>
             <h1>Creá tu cuenta</h1>
-            <p className="text-muted">Unite a MapaApto</p>
+            <p className="text-muted">Unite a PuntoSano</p>
           </div>
         </div>
 

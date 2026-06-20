@@ -76,7 +76,7 @@ export default function Login() {
           <div className="page-icon"><LogIn size={28} /></div>
           <div>
             <h1>Iniciá sesión</h1>
-            <p className="text-muted">Accedé a tu cuenta MapaApto</p>
+            <p className="text-muted">Accedé a tu cuenta PuntoSano</p>
           </div>
         </div>
 

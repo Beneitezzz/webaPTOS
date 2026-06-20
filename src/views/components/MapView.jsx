@@ -1,5 +1,5 @@
-import { useRef, useState } from 'react'
-import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet'
+import { useRef, useState, useEffect } from 'react'
+import { MapContainer, TileLayer, Marker, Popup, useMap, ZoomControl } from 'react-leaflet'
 import { Link } from 'react-router-dom'
 import { Locate } from 'lucide-react'
 import L from 'leaflet'
@@ -28,6 +28,15 @@ const PIN_ICONS = Object.fromEntries(
   Object.values(BUSINESS_TYPE_MAP).map(({ id, color }) => [id, buildDivIcon(color)])
 )
 const DEFAULT_ICON = buildDivIcon('#2d6a4f')
+
+function ResizeWatcher({ trigger }) {
+  const map = useMap()
+  useEffect(() => {
+    const t = setTimeout(() => map.invalidateSize(), 220)
+    return () => clearTimeout(t)
+  }, [trigger, map])
+  return null
+}
 
 function LocateButton() {
   const map = useMap()
@@ -78,17 +87,20 @@ function LocateButton() {
   )
 }
 
-export default function MapView({ businesses }) {
+export default function MapView({ businesses, sidebarOpen }) {
   return (
     <MapContainer
       center={CORDOBA_CENTER}
       zoom={13}
       style={{ height: '100%', width: '100%' }}
+      zoomControl={false}
     >
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
+      <ZoomControl position="topright" />
+      <ResizeWatcher trigger={sidebarOpen} />
       <LocateButton />
       {businesses.map((b) => {
         const typeInfo = BUSINESS_TYPE_MAP[b.type]

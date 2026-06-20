@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { MapPin, Menu, X, ChevronDown } from 'lucide-react'
+import { Menu, X, ChevronDown } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
 
 const PUBLIC_LINKS = [
@@ -30,8 +30,8 @@ export default function Navbar() {
   return (
     <nav className="navbar">
       <Link to="/" className="navbar-brand">
-        <MapPin size={22} />
-        <span>MapaApto</span>
+        <img src="/logo.png" alt="PuntoSano" style={{ height: '42px', width: 'auto' }} />
+        <span>PuntoSano</span>
       </Link>
 
       <div className={`navbar-links ${menuOpen ? 'open' : ''}`}>
@@ -105,8 +105,7 @@ export default function Navbar() {
         ) : (
           <Link
             to="/login"
-            className="btn btn-sm"
-            style={{ background: 'white', color: '#1a6b3c', fontWeight: 600 }}
+            className="btn btn-primary btn-sm"
             onClick={() => setMenuOpen(false)}
           >
             Ingresar

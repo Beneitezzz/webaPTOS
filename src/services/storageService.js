@@ -14,3 +14,10 @@ export const uploadMenuFile = async (businessId, file) => {
   await uploadBytes(menuRef, file)
   return getDownloadURL(menuRef)
 }
+
+export const uploadBusinessPhoto = async (businessId, file, index) => {
+  const ext = file.name.split('.').pop().toLowerCase()
+  const photoRef = ref(storage, `fotos/${businessId}/foto_${index}.${ext}`)
+  await uploadBytes(photoRef, file)
+  return getDownloadURL(photoRef)
+}

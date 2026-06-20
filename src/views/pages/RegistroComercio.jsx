@@ -38,7 +38,9 @@ function DraggableMarker({ coords, onMove }) {
 export default function RegistroComercio() {
   const {
     form, certFiles, menuFile, existingMenuFileUrl, setExistingMenuFileUrl,
-    menuFileError, editingBusinessId, submitted, errors, coords,
+    menuFileError, newPhotos, existingPhotos, photoError,
+    handleAddPhotos, removeNewPhoto, removeExistingPhoto,
+    editingBusinessId, submitted, errors, coords,
     geocoding, geocodeError, geocodeId,
     handleChange, handleMarkerMove, handleMenuFile, handleCertFile,
     addSocialLink, updateSocialLink, removeSocialLink,
@@ -296,9 +298,7 @@ export default function RegistroComercio() {
           </div>
 
           <div className="form-group">
-            <label className="form-label">
-              Carta / menú <span style={{ fontWeight: 400, color: '#888' }}>(opcional)</span>
-            </label>
+            <label className="form-label">Carta / menú *</label>
             <p className="form-hint" style={{ marginTop: 0, marginBottom: '0.75rem' }}>
               Subí una foto o PDF de tu carta. Máx. 5 MB.
             </p>
@@ -341,6 +341,48 @@ export default function RegistroComercio() {
               )
             )}
             {menuFileError && <span className="form-error">{menuFileError}</span>}
+            {errors.menu && <span className="form-error">{errors.menu}</span>}
+          </div>
+
+          <div className="form-group">
+            <label className="form-label">
+              Fotos del comercio <span style={{ fontWeight: 400, color: '#888' }}>(opcional, máx. 5)</span>
+            </label>
+            <p className="form-hint" style={{ marginTop: 0, marginBottom: '0.75rem' }}>
+              Subí fotos del local, productos o ambiente. JPG · PNG · WebP, hasta 5 MB cada una.
+            </p>
+
+            {(existingPhotos.length > 0 || newPhotos.length > 0) && (
+              <div className="photo-preview-grid">
+                {existingPhotos.map((url, i) => (
+                  <div key={`ex-${i}`} className="photo-preview-item">
+                    <img src={url} alt={`Foto ${i + 1}`} className="photo-preview-img" />
+                    <button type="button" className="photo-preview-remove" onClick={() => removeExistingPhoto(i)}>×</button>
+                  </div>
+                ))}
+                {newPhotos.map((file, i) => (
+                  <div key={`new-${i}`} className="photo-preview-item">
+                    <img src={URL.createObjectURL(file)} alt={file.name} className="photo-preview-img" />
+                    <button type="button" className="photo-preview-remove" onClick={() => removeNewPhoto(i)}>×</button>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {existingPhotos.length + newPhotos.length < 5 && (
+              <label className="menu-upload-zone">
+                <input
+                  type="file"
+                  accept=".jpg,.jpeg,.png,.webp"
+                  multiple
+                  style={{ display: 'none' }}
+                  onChange={(e) => handleAddPhotos(e.target.files)}
+                />
+                🖼️ Hacé clic para agregar fotos
+                <span className="menu-upload-hint">JPG · PNG · WebP</span>
+              </label>
+            )}
+            {photoError && <span className="form-error">{photoError}</span>}
           </div>
 
           {errors.submit && <div className="auth-error">{errors.submit}</div>}
@@ -353,7 +395,7 @@ export default function RegistroComercio() {
           </button>
 
           <p className="form-footer-note">
-            Al enviar, aceptás que MapaApto pueda mostrar la información de tu comercio en la plataforma
+            Al enviar, aceptás que PuntoSano pueda mostrar la información de tu comercio en la plataforma
             una vez verificada.
           </p>
         </form>
