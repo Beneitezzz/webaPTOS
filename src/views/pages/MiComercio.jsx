@@ -1,5 +1,5 @@
 import { useMemo, useEffect } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { Store, CheckCircle, XCircle, Clock, PauseCircle } from 'lucide-react'
 import { useApp } from '../../context/AppContext'
 import { useAuth } from '../../context/AuthContext'
@@ -37,6 +37,8 @@ export default function MiComercio() {
   const { businesses, businessesLoading } = useApp()
   const { currentUser, userRole } = useAuth()
   const navigate = useNavigate()
+  const location = useLocation()
+  const successMessage = location.state?.successMessage ?? null
 
   useEffect(() => {
     if (userRole !== 'comercio' && userRole !== 'admin') {
@@ -91,6 +93,13 @@ export default function MiComercio() {
             <p className="text-muted">Estado de tu establecimiento en PuntoSano</p>
           </div>
         </div>
+
+        {successMessage && (
+          <div className="status-banner status-banner--approved" style={{ marginBottom: '1rem' }}>
+            <CheckCircle size={20} />
+            <div><p>{successMessage}</p></div>
+          </div>
+        )}
 
         <div className={`status-banner status-banner--${config.modifier}`}>
           <Icon size={20} />

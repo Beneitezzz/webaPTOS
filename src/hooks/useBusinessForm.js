@@ -134,6 +134,7 @@ export function useBusinessForm() {
       setEditingSuspendedBusiness(true)
     }
     setEditingBusinessId(existing.id)
+    skipNextGeocodeRef.current = true
     setForm({
       name: existing.name ?? '',
       type: existing.type ?? '',
@@ -353,7 +354,18 @@ export function useBusinessForm() {
         await updateBusiness(businessId, { photos: allPhotos })
       }
 
-      setSubmitted(true)
+      if (editingApprovedBusiness) {
+        const msg = certsChanged
+          ? 'Tu comercio volvió a revisión. Te avisaremos cuando sea aprobado.'
+          : 'Tu ficha fue actualizada. Los cambios ya son visibles en el mapa.'
+        navigate('/mi-comercio', { state: { successMessage: msg } })
+      } else if (editingSuspendedBusiness) {
+        navigate('/mi-comercio', {
+          state: { successMessage: 'Tu comercio fue enviado a revisión. Te avisaremos cuando sea aprobado.' },
+        })
+      } else {
+        setSubmitted(true)
+      }
     } catch {
       setErrors({ submit: 'Error al enviar el comercio. Intentá de nuevo.' })
     }
