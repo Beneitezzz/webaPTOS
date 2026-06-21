@@ -1,7 +1,9 @@
 import { Link, useNavigate } from 'react-router-dom'
 import { Search, ArrowRight, Mail, Phone } from 'lucide-react'
-import { useState, useEffect } from 'react'
-import { RESTRICTIONS } from '../../models/mockData'
+import { useState, useEffect, useMemo } from 'react'
+import { RESTRICTIONS, BUSINESS_TYPES, mockBusinesses } from '../../models/mockData'
+import { useApp } from '../../context/AppContext'
+import SearchAutocomplete from '../components/SearchAutocomplete'
 import TopRatedSection from '../components/TopRatedSection'
 import HowItWorks from '../components/HowItWorks'
 import WhatWeDo from '../components/WhatWeDo'
@@ -23,6 +25,17 @@ function useFadeIn(delay) {
 export default function Home() {
   const [search, setSearch] = useState('')
   const navigate = useNavigate()
+  const { businesses } = useApp()
+
+  const searchSuggestions = useMemo(() => {
+    const verified = businesses.filter((b) => b.verified && !b.pending)
+    const names = verified.length > 0
+      ? verified.map((b) => b.name)
+      : mockBusinesses.filter((b) => b.verified && !b.pending).map((b) => b.name)
+    const types = BUSINESS_TYPES.map((t) => t.label)
+    const restrictions = RESTRICTIONS.map((r) => r.label)
+    return [...new Set([...types, ...restrictions, ...names])]
+  }, [businesses])
 
   const anim1 = useFadeIn(50)
   const anim2 = useFadeIn(200)
@@ -32,7 +45,13 @@ export default function Home() {
 
   const handleSearch = (e) => {
     e.preventDefault()
-    navigate('/mapa')
+    const q = search.trim()
+    navigate(q ? `/mapa?q=${encodeURIComponent(q)}` : '/mapa')
+  }
+
+  const handleSuggestionSelect = (suggestion) => {
+    setSearch(suggestion)
+    navigate(`/mapa?q=${encodeURIComponent(suggestion)}`)
   }
 
   return (
@@ -54,11 +73,13 @@ export default function Home() {
             <div className="sonar-ring sonar-delay" />
             <form className="hero-search" onSubmit={handleSearch}>
               <Search size={18} className="search-icon" />
-              <input
-                type="text"
-                placeholder="Buscar por tipo de local, restricción o dirección..."
+              <SearchAutocomplete
                 value={search}
-                onChange={(e) => setSearch(e.target.value)}
+                onChange={setSearch}
+                onSelect={handleSuggestionSelect}
+                suggestions={searchSuggestions}
+                placeholder="Buscar por tipo de local, restricción o dirección..."
+                wrapperStyle={{ flex: 1 }}
               />
               <button type="submit" className="btn btn-primary">
                 Explorar mapa

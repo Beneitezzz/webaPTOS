@@ -170,6 +170,7 @@ img { display: block; max-width: 100%; }
 .hero-search-wrap {
   position: relative;
   margin: 0 auto 1.5rem;
+  z-index: 10;
 }
 
 .hero-search-wrap::before {
@@ -973,9 +974,28 @@ img { display: block; max-width: 100%; }
 /* ── Search bar ── */
 .search-bar-wrapper {
   margin-bottom: 12px;
+  position: relative;
 }
 .search-input {
   width: 100%;
+}
+
+/* ── Autocomplete ── */
+.autocomplete-wrapper { position: relative; }
+.autocomplete-wrapper input { width: 100%; }
+.autocomplete-list {
+  position: absolute; top: calc(100% + 4px); left: 0; right: 0; z-index: 1100;
+  background: #fff; border: 1px solid var(--border); border-radius: var(--radius-sm);
+  box-shadow: 0 8px 24px rgba(0,0,0,.13); max-height: 240px; overflow-y: auto;
+  list-style: none; padding: 4px 0; margin: 0;
+}
+.autocomplete-item {
+  padding: 9px 14px; font-size: 0.88rem; cursor: pointer; color: var(--text);
+  border-left: 3px solid transparent;
+}
+.autocomplete-item:hover,
+.autocomplete-item.active {
+  background: var(--surface); border-left-color: var(--green-primary);
 }
 
 /* ── Locate button (overlaid on map) ── */

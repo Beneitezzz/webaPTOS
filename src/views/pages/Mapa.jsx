@@ -1,7 +1,9 @@
 import { useState, useMemo, useEffect } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { SlidersHorizontal, X } from 'lucide-react'
 import MapView from '../components/MapView'
 import BusinessCard from '../components/BusinessCard'
+import SearchAutocomplete from '../components/SearchAutocomplete'
 import { RESTRICTIONS, BUSINESS_TYPES, BUSINESS_TYPE_MAP, mockBusinesses } from '../../models/mockData'
 import { useApp } from '../../context/AppContext'
 import { useAuth } from '../../context/AuthContext'
@@ -19,7 +21,8 @@ export default function Mapa() {
   const [onlyOpen, setOnlyOpen] = useState(false)
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const [filtersInitialized, setFiltersInitialized] = useState(false)
-  const [searchQuery, setSearchQuery] = useState('')
+  const [searchParams] = useSearchParams()
+  const [searchQuery, setSearchQuery] = useState(() => searchParams.get('q') ?? '')
   const [selectedBusinessId, setSelectedBusinessId] = useState(null)
 
   useEffect(() => {
@@ -50,11 +53,23 @@ export default function Mapa() {
         !q ||
         b.name.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().includes(q) ||
         (b.address ?? '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().includes(q) ||
-        (BUSINESS_TYPE_MAP[b.type]?.label ?? '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().includes(q)
+        (BUSINESS_TYPE_MAP[b.type]?.label ?? '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().includes(q) ||
+        b.tags.some((tag) => {
+          const r = RESTRICTIONS.find((res) => res.id === tag)
+          return r && r.label.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().includes(q)
+        })
       const matchesOpen = !onlyOpen || isOpenNow(b.openingHours) === true
       return matchesRestrictions && matchesType && matchesSearch && matchesOpen
     })
   }, [verifiedBusinesses, selectedRestrictions, selectedTypes, searchQuery, onlyOpen])
+
+  const searchSuggestions = useMemo(() => {
+    const names = verifiedBusinesses.map((b) => b.name)
+    const addresses = verifiedBusinesses.map((b) => b.address).filter(Boolean)
+    const types = BUSINESS_TYPES.map((t) => t.label)
+    const restrictions = RESTRICTIONS.map((r) => r.label)
+    return [...new Set([...types, ...restrictions, ...names, ...addresses])]
+  }, [verifiedBusinesses])
 
   const toggleRestriction = (id) => setSelectedRestrictions((prev) => toggleItem(prev, id))
   const toggleType = (id) => setSelectedTypes((prev) => toggleItem(prev, id))
@@ -88,12 +103,12 @@ export default function Mapa() {
         {sidebarOpen && (
           <>
             <div className="search-bar-wrapper">
-              <input
-                className="form-input search-input"
-                type="search"
-                placeholder="Buscar comercio, dirección..."
+              <SearchAutocomplete
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={setSearchQuery}
+                suggestions={searchSuggestions}
+                placeholder="Buscar comercio, dirección..."
+                inputClassName="form-input search-input"
               />
             </div>
 
