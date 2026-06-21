@@ -86,12 +86,21 @@ function formatMemberSince(dateStr) {
 }
 
 export default function Perfil() {
-  const { userProfile, updateProfile, businesses } = useApp()
+  const { userProfile, updateProfile, businesses, profileLoading } = useApp()
   const { currentUser, deleteAccount } = useAuth()
   const navigate = useNavigate()
 
   const [name, setName] = useState(userProfile.profileName)
-  const [restrictions, setRestrictions] = useState(userProfile.restrictions)
+  const [restrictions, setRestrictions] = useState(userProfile.restrictions ?? [])
+
+  // Sync form when Firestore finishes loading the profile (handles fresh page load)
+  useEffect(() => {
+    if (!profileLoading) {
+      setName(userProfile.profileName)
+      setRestrictions(userProfile.restrictions ?? [])
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [profileLoading])
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
   const [saveError, setSaveError] = useState('')
@@ -248,8 +257,8 @@ export default function Perfil() {
 
           {saveError && <div className="auth-error">{saveError}</div>}
 
-          <button type="submit" className="btn btn-primary btn-full" disabled={saving}>
-            {saving ? 'Guardando...' : saved ? '✓ Guardado' : 'Guardar perfil'}
+          <button type="submit" className="btn btn-primary btn-full" disabled={saving || profileLoading}>
+            {profileLoading ? 'Cargando perfil...' : saving ? 'Guardando...' : saved ? '✓ Guardado' : 'Guardar perfil'}
           </button>
         </form>
 
