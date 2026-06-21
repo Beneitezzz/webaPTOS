@@ -44,7 +44,7 @@ export default function RegistroComercio() {
     geocoding, geocodeError, geocodeId,
     handleChange, handleMarkerMove, handleMenuFile, handleCertFile,
     addSocialLink, updateSocialLink, removeSocialLink,
-    updateHourField, toggleTag, toggleCert,
+    updateHourField, toggleSecondShift, toggleTag, toggleCert,
     handleSubmit, onSuccessReset,
   } = useBusinessForm()
 
@@ -168,31 +168,56 @@ export default function RegistroComercio() {
             <label className="form-label">Horarios de atención</label>
             <div className="hours-grid">
               {form.openingHours.map((h, i) => (
-                <div key={h.day} className="hours-row">
-                  <span className="hours-day">{h.day.charAt(0).toUpperCase() + h.day.slice(1)}</span>
-                  <label className="hours-closed-label">
+                <div key={h.day} className="hours-day-block">
+                  <div className="hours-row">
+                    <span className="hours-day">{h.day.charAt(0).toUpperCase() + h.day.slice(1)}</span>
+                    <label className="hours-closed-label">
+                      <input
+                        type="checkbox"
+                        checked={h.closed}
+                        onChange={(e) => updateHourField(i, 'closed', e.target.checked)}
+                      />
+                      Cerrado
+                    </label>
                     <input
-                      type="checkbox"
-                      checked={h.closed}
-                      onChange={(e) => updateHourField(i, 'closed', e.target.checked)}
+                      type="time"
+                      className="form-input time-input"
+                      value={h.open}
+                      disabled={h.closed}
+                      onChange={(e) => updateHourField(i, 'open', e.target.value)}
                     />
-                    Cerrado
-                  </label>
-                  <input
-                    type="time"
-                    className="form-input time-input"
-                    value={h.open}
-                    disabled={h.closed}
-                    onChange={(e) => updateHourField(i, 'open', e.target.value)}
-                  />
-                  <span className="hours-separator">–</span>
-                  <input
-                    type="time"
-                    className="form-input time-input"
-                    value={h.close}
-                    disabled={h.closed}
-                    onChange={(e) => updateHourField(i, 'close', e.target.value)}
-                  />
+                    <span className="hours-separator">–</span>
+                    <input
+                      type="time"
+                      className="form-input time-input"
+                      value={h.close}
+                      disabled={h.closed}
+                      onChange={(e) => updateHourField(i, 'close', e.target.value)}
+                    />
+                    {!h.closed && !h.open2 && (
+                      <button type="button" className="hours-shift-btn" onClick={() => toggleSecondShift(i)} title="Agregar segundo turno">+</button>
+                    )}
+                  </div>
+                  {!h.closed && h.open2 && (
+                    <div className="hours-row hours-second-shift">
+                      <span />
+                      <span />
+                      <input
+                        type="time"
+                        className="form-input time-input"
+                        value={h.open2}
+                        onChange={(e) => updateHourField(i, 'open2', e.target.value)}
+                      />
+                      <span className="hours-separator">–</span>
+                      <input
+                        type="time"
+                        className="form-input time-input"
+                        value={h.close2}
+                        onChange={(e) => updateHourField(i, 'close2', e.target.value)}
+                      />
+                      <button type="button" className="hours-shift-btn hours-shift-btn--remove" onClick={() => toggleSecondShift(i)} title="Quitar segundo turno">×</button>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>

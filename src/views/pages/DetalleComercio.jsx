@@ -15,6 +15,8 @@ export default function DetalleComercio() {
     businesses.find((b) => String(b.id) === id) ||
     mockBusinesses.find((b) => String(b.id) === id)
 
+  const openStatus = useOpenStatus(business?.openingHours)
+
   if (businessesLoading) return (
     <div className="page page-centered">
       <div className="spinner" />
@@ -33,7 +35,6 @@ export default function DetalleComercio() {
   }
 
   const typeInfo = BUSINESS_TYPE_MAP[business.type]
-  const openStatus = useOpenStatus(business.openingHours)
   const hoursDisplay = business.openingHours
     ? formatOpeningHours(business.openingHours)
     : business.hours ?? null

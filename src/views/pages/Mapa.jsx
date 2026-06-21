@@ -5,12 +5,14 @@ import BusinessCard from '../components/BusinessCard'
 import { RESTRICTIONS, BUSINESS_TYPES, BUSINESS_TYPE_MAP, mockBusinesses } from '../../models/mockData'
 import { useApp } from '../../context/AppContext'
 import { toggleItem } from '../../utils/array'
+import { isOpenNow } from '../../utils/hours'
 
 export default function Mapa() {
   const { userProfile, businesses, businessesLoading, businessesError, profileLoading } = useApp()
 
   const [selectedRestrictions, setSelectedRestrictions] = useState([])
   const [selectedTypes, setSelectedTypes] = useState([])
+  const [onlyOpen, setOnlyOpen] = useState(false)
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const [filtersInitialized, setFiltersInitialized] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
@@ -44,9 +46,10 @@ export default function Mapa() {
         b.name.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().includes(q) ||
         (b.address ?? '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().includes(q) ||
         (BUSINESS_TYPE_MAP[b.type]?.label ?? '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().includes(q)
-      return matchesRestrictions && matchesType && matchesSearch
+      const matchesOpen = !onlyOpen || isOpenNow(b.openingHours) === true
+      return matchesRestrictions && matchesType && matchesSearch && matchesOpen
     })
-  }, [verifiedBusinesses, selectedRestrictions, selectedTypes, searchQuery])
+  }, [verifiedBusinesses, selectedRestrictions, selectedTypes, searchQuery, onlyOpen])
 
   const toggleRestriction = (id) => setSelectedRestrictions((prev) => toggleItem(prev, id))
   const toggleType = (id) => setSelectedTypes((prev) => toggleItem(prev, id))
@@ -54,10 +57,11 @@ export default function Mapa() {
   const clearFilters = () => {
     setSelectedRestrictions([])
     setSelectedTypes([])
+    setOnlyOpen(false)
     setSearchQuery('')
   }
 
-  const hasFilters = selectedRestrictions.length > 0 || selectedTypes.length > 0 || searchQuery.length > 0
+  const hasFilters = selectedRestrictions.length > 0 || selectedTypes.length > 0 || onlyOpen || searchQuery.length > 0
 
   return (
     <div className="map-page">
@@ -122,6 +126,18 @@ export default function Mapa() {
                   {t.label}
                 </label>
               ))}
+            </div>
+
+            <div className="filter-group">
+              <label className="filter-open-toggle">
+                <span>Abierto ahora</span>
+                <button
+                  role="switch"
+                  aria-checked={onlyOpen}
+                  className={`toggle-switch ${onlyOpen ? 'on' : ''}`}
+                  onClick={() => setOnlyOpen((v) => !v)}
+                />
+              </label>
             </div>
 
             <div className="sidebar-results-count">

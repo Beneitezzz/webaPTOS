@@ -5,6 +5,12 @@ function jsDayToIndex(jsDay) {
   return jsDay === 0 ? 6 : jsDay - 1
 }
 
+function inSlot(cur, open, close) {
+  const [oh, om] = open.split(':').map(Number)
+  const [ch, cm] = close.split(':').map(Number)
+  return cur >= oh * 60 + om && cur < ch * 60 + cm
+}
+
 // Returns true if open, false if closed, null if no data
 export function isOpenNow(openingHours) {
   if (!openingHours?.length) return null
@@ -12,10 +18,10 @@ export function isOpenNow(openingHours) {
   const today = openingHours[jsDayToIndex(now.getDay())]
   if (!today || today.closed) return false
   if (!today.open || !today.close) return null
-  const [oh, om] = today.open.split(':').map(Number)
-  const [ch, cm] = today.close.split(':').map(Number)
   const cur = now.getHours() * 60 + now.getMinutes()
-  return cur >= oh * 60 + om && cur < ch * 60 + cm
+  if (inSlot(cur, today.open, today.close)) return true
+  if (today.open2 && today.close2) return inSlot(cur, today.open2, today.close2)
+  return false
 }
 
 const DAY_ABBREV = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom']
@@ -31,11 +37,18 @@ export function formatOpeningHours(openingHours) {
     let j = i + 1
     while (j < openingHours.length) {
       const next = openingHours[j]
-      if (next.closed === cur.closed && next.open === cur.open && next.close === cur.close) j++
+        if (
+        next.closed === cur.closed &&
+        next.open === cur.open && next.close === cur.close &&
+        (next.open2 ?? '') === (cur.open2 ?? '') &&
+        (next.close2 ?? '') === (cur.close2 ?? '')
+      ) j++
       else break
     }
     const range = i === j - 1 ? DAY_ABBREV[i] : `${DAY_ABBREV[i]}–${DAY_ABBREV[j - 1]}`
-    parts.push(cur.closed ? `${range}: Cerrado` : `${range}: ${cur.open}–${cur.close}`)
+    if (cur.closed) parts.push(`${range}: Cerrado`)
+    else if (cur.open2 && cur.close2) parts.push(`${range}: ${cur.open}–${cur.close} y ${cur.open2}–${cur.close2}`)
+    else parts.push(`${range}: ${cur.open}–${cur.close}`)
     i = j
   }
   return parts.join(' | ')
