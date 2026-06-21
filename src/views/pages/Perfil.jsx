@@ -87,8 +87,8 @@ function formatMemberSince(dateStr) {
 
 export default function Perfil() {
   const { userProfile, updateProfile, businesses, profileLoading } = useApp()
-  const { currentUser, deleteAccount, loading: authLoading } = useAuth()
-  const isLoading = authLoading || profileLoading
+  const { currentUser, deleteAccount } = useAuth()
+  const isLoading = profileLoading
   const navigate = useNavigate()
 
   const [name, setName] = useState(userProfile.profileName)

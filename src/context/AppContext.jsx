@@ -13,13 +13,13 @@ import {
 const AppContext = createContext()
 
 export function AppProvider({ children }) {
-  const { currentUser } = useAuth()
+  const { currentUser, loading: authLoading } = useAuth()
 
   const [businesses, setBusinesses] = useState([])
   const [businessesLoading, setBusinessesLoading] = useState(true)
   const [businessesError, setBusinessesError] = useState(null)
   const [userProfile, setUserProfile] = useState({ profileName: '', restrictions: [] })
-  const [profileLoading, setProfileLoading] = useState(false)
+  const [profileLoading, setProfileLoading] = useState(true)
 
   useEffect(() => subscribeToBusinesses(
     (data) => { setBusinesses(data); setBusinessesLoading(false); setBusinessesError(null) },
@@ -31,6 +31,7 @@ export function AppProvider({ children }) {
   ), [])
 
   useEffect(() => {
+    if (authLoading) return
     if (!currentUser) {
       /* eslint-disable react-hooks/set-state-in-effect */
       setUserProfile({ profileName: '', restrictions: [] })
@@ -54,7 +55,7 @@ export function AppProvider({ children }) {
       .catch((err) => console.error('profile load error:', err))
       .finally(() => { if (!cancelled) setProfileLoading(false) })
     return () => { cancelled = true }
-  }, [currentUser])
+  }, [currentUser, authLoading])
 
   const updateProfile = async (updates) => {
     await setDoc(doc(db, 'users', currentUser.uid), updates, { merge: true })
