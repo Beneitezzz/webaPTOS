@@ -2148,3 +2148,23 @@ img { display: block; max-width: 100%; }
   0%   { background-position: 100% 0; }
   100% { background-position: -100% 0; }
 }
+
+.info-banner--edit {
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  color: #1e40af;
+  border-radius: 8px;
+  padding: 0.875rem 1rem;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.cert-review-warning {
+  background: #fffbeb;
+  border: 1px solid #fcd34d;
+  color: #92400e;
+  border-radius: 6px;
+  padding: 0.625rem 0.875rem;
+  font-size: 0.875rem;
+  margin-bottom: 0.75rem;
+}

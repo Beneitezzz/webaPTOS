@@ -42,6 +42,7 @@ export default function RegistroComercio() {
     handleAddPhotos, removeNewPhoto, removeExistingPhoto,
     editingBusinessId, submitted, errors, coords,
     geocoding, geocodeError, geocodeId,
+    editingApprovedBusiness, certsChanged,
     handleChange, handleMarkerMove, handleMenuFile, handleCertFile,
     addSocialLink, updateSocialLink, removeSocialLink,
     updateHourField, toggleSecondShift, toggleTag, toggleCert,
@@ -49,23 +50,40 @@ export default function RegistroComercio() {
   } = useBusinessForm()
 
   if (submitted) {
+    let successTitle, successMessage
+    if (editingApprovedBusiness) {
+      if (certsChanged) {
+        successTitle = '¡Cambios enviados!'
+        successMessage = 'Tus certificaciones cambiaron, por lo que tu comercio volvió a revisión y dejará de aparecer en el mapa hasta ser aprobado nuevamente.'
+      } else {
+        successTitle = '¡Cambios guardados!'
+        successMessage = 'Tu ficha fue actualizada y los cambios ya son visibles en el mapa.'
+      }
+    } else if (editingBusinessId) {
+      successTitle = '¡Re-envío exitoso!'
+      successMessage = 'Tu comercio fue re-enviado y está nuevamente en revisión. Te avisaremos cuando haya novedades.'
+    } else {
+      successTitle = '¡Registro enviado!'
+      successMessage = 'Tu comercio fue enviado para revisión. Una vez aprobado por un administrador, aparecerá en el mapa.'
+    }
+
     return (
       <div className="page page-centered">
         <div className="container container-sm success-screen">
           <CheckCircle size={64} className="success-icon" />
-          <h1>{editingBusinessId ? '¡Re-envío exitoso!' : '¡Registro enviado!'}</h1>
-          <p>
-            {editingBusinessId
-              ? 'Tu comercio fue re-enviado y está nuevamente en revisión. Te avisaremos cuando haya novedades.'
-              : 'Tu comercio fue enviado para revisión. Una vez aprobado por un administrador, aparecerá en el mapa.'}
-          </p>
-          <p className="text-muted" style={{ fontSize: '0.875rem' }}>
-            ¿Sos administrador?{' '}
-            <a href="/admin" className="link">Ir al panel de administración</a> para aprobar el comercio.
-          </p>
-          <button className="btn btn-primary" onClick={onSuccessReset}>
-            Registrar otro comercio
-          </button>
+          <h1>{successTitle}</h1>
+          <p>{successMessage}</p>
+          {!editingApprovedBusiness && (
+            <p className="text-muted" style={{ fontSize: '0.875rem' }}>
+              ¿Sos administrador?{' '}
+              <a href="/admin" className="link">Ir al panel de administración</a> para aprobar el comercio.
+            </p>
+          )}
+          {!editingApprovedBusiness && (
+            <button className="btn btn-primary" onClick={onSuccessReset}>
+              Registrar otro comercio
+            </button>
+          )}
         </div>
       </div>
     )
@@ -87,6 +105,12 @@ export default function RegistroComercio() {
         </div>
 
         <form onSubmit={handleSubmit} className="card form-card">
+          {editingApprovedBusiness && (
+            <div className="info-banner info-banner--edit" style={{ marginBottom: '1.5rem' }}>
+              <strong>Estás editando tu ficha.</strong>
+              {' '}Los cambios se aplican de inmediato. Si modificás las certificaciones, tu comercio volverá a revisión y dejará de aparecer en el mapa hasta ser aprobado nuevamente.
+            </div>
+          )}
           <div className="form-group">
             <label className="form-label">Nombre del comercio *</label>
             <input
@@ -286,6 +310,11 @@ export default function RegistroComercio() {
           <div className="form-group">
             <label className="form-label">Certificaciones que posee *</label>
             {errors.certifications && <span className="form-error">{errors.certifications}</span>}
+            {editingApprovedBusiness && certsChanged && (
+              <div className="cert-review-warning">
+                ⚠️ Modificaste las certificaciones — al guardar, tu comercio pasará a revisión y dejará de ser visible en el mapa.
+              </div>
+            )}
             <div className="certs-grid">
               {availableCerts.map((cert) => {
                 const active = form.certifications.includes(cert)
@@ -414,6 +443,10 @@ export default function RegistroComercio() {
           <button type="submit" className="btn btn-primary btn-full" disabled={geocoding}>
             {geocoding
               ? 'Verificando ubicación...'
+              : editingApprovedBusiness
+              ? certsChanged
+                ? 'Guardar y enviar a revisión'
+                : 'Guardar cambios'
               : editingBusinessId
               ? 'Re-enviar para verificación'
               : 'Enviar para verificación'}
