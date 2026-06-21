@@ -42,7 +42,7 @@ export default function RegistroComercio() {
     handleAddPhotos, removeNewPhoto, removeExistingPhoto,
     editingBusinessId, submitted, errors, coords,
     geocoding, geocodeError, geocodeId,
-    editingApprovedBusiness, certsChanged,
+    editingApprovedBusiness, editingSuspendedBusiness, certsChanged,
     handleChange, handleMarkerMove, handleMenuFile, handleCertFile,
     addSocialLink, updateSocialLink, removeSocialLink,
     updateHourField, toggleSecondShift, toggleTag, toggleCert,
@@ -59,6 +59,9 @@ export default function RegistroComercio() {
         successTitle = '¡Cambios guardados!'
         successMessage = 'Tu ficha fue actualizada y los cambios ya son visibles en el mapa.'
       }
+    } else if (editingSuspendedBusiness) {
+      successTitle = '¡Cambios enviados!'
+      successMessage = 'Tu comercio fue re-enviado y está en revisión. Te avisaremos cuando sea aprobado y vuelva a aparecer en el mapa.'
     } else if (editingBusinessId) {
       successTitle = '¡Re-envío exitoso!'
       successMessage = 'Tu comercio fue re-enviado y está nuevamente en revisión. Te avisaremos cuando haya novedades.'
@@ -73,13 +76,13 @@ export default function RegistroComercio() {
           <CheckCircle size={64} className="success-icon" />
           <h1>{successTitle}</h1>
           <p>{successMessage}</p>
-          {!editingApprovedBusiness && (
+          {!editingApprovedBusiness && !editingSuspendedBusiness && (
             <p className="text-muted" style={{ fontSize: '0.875rem' }}>
               ¿Sos administrador?{' '}
               <a href="/admin" className="link">Ir al panel de administración</a> para aprobar el comercio.
             </p>
           )}
-          {!editingApprovedBusiness && (
+          {!editingApprovedBusiness && !editingSuspendedBusiness && (
             <button className="btn btn-primary" onClick={onSuccessReset}>
               Registrar otro comercio
             </button>
@@ -109,6 +112,12 @@ export default function RegistroComercio() {
             <div className="info-banner info-banner--edit" style={{ marginBottom: '1.5rem' }}>
               <strong>Estás editando tu ficha.</strong>
               {' '}Los cambios se aplican de inmediato. Si modificás las certificaciones, tu comercio volverá a revisión y dejará de aparecer en el mapa hasta ser aprobado nuevamente.
+            </div>
+          )}
+          {editingSuspendedBusiness && (
+            <div className="info-banner info-banner--edit" style={{ marginBottom: '1.5rem' }}>
+              <strong>Estás editando tu ficha.</strong>
+              {' '}Al guardar, tu comercio volverá a revisión y quedará visible en el mapa una vez aprobado.
             </div>
           )}
           <div className="form-group">
@@ -447,6 +456,8 @@ export default function RegistroComercio() {
               ? certsChanged
                 ? 'Guardar y enviar a revisión'
                 : 'Guardar cambios'
+              : editingSuspendedBusiness
+              ? 'Guardar y enviar a revisión'
               : editingBusinessId
               ? 'Re-enviar para verificación'
               : 'Enviar para verificación'}

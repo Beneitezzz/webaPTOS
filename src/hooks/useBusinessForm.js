@@ -50,6 +50,7 @@ export function useBusinessForm() {
   const [editingBusinessId, setEditingBusinessId] = useState(null)
   const [submitted, setSubmitted] = useState(false)
   const [editingApprovedBusiness, setEditingApprovedBusiness] = useState(false)
+  const [editingSuspendedBusiness, setEditingSuspendedBusiness] = useState(false)
   const [initialCertifications, setInitialCertifications] = useState([])
   const [errors, setErrors] = useState({})
   const [coords, setCoords] = useState(null)
@@ -120,7 +121,7 @@ export function useBusinessForm() {
     initializedRef.current = true
     const existing = businesses.find((b) => b.ownerId === currentUser.uid)
     if (!existing) return
-    if (existing.status !== 'rechazado' && existing.status !== 'aprobado') {
+    if (existing.status !== 'rechazado' && existing.status !== 'aprobado' && existing.status !== 'suspendido') {
       navigate('/mi-comercio', { replace: true })
       return
     }
@@ -128,6 +129,9 @@ export function useBusinessForm() {
     if (existing.status === 'aprobado') {
       setEditingApprovedBusiness(true)
       setInitialCertifications(existing.certifications ?? [])
+    }
+    if (existing.status === 'suspendido') {
+      setEditingSuspendedBusiness(true)
     }
     setEditingBusinessId(existing.id)
     setForm({
@@ -303,6 +307,14 @@ export function useBusinessForm() {
             updateData.verified = false
           }
           await updateBusiness(editingBusinessId, updateData)
+        } else if (editingSuspendedBusiness) {
+          await updateBusiness(editingBusinessId, {
+            ...businessData,
+            status: 'pendiente',
+            pending: true,
+            verified: false,
+            suspensionReason: null,
+          })
         } else {
           await updateBusiness(editingBusinessId, {
             ...businessData,
@@ -397,6 +409,7 @@ export function useBusinessForm() {
     removeExistingPhoto,
     editingBusinessId,
     editingApprovedBusiness,
+    editingSuspendedBusiness,
     certsChanged,
     submitted,
     errors,

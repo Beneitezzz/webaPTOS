@@ -141,6 +141,11 @@ export default function MiComercio() {
               Corregir y re-enviar
             </Link>
           )}
+          {status === 'suspendido' && (
+            <Link to="/registro-comercio" className="btn btn-primary">
+              Editar y re-enviar
+            </Link>
+          )}
         </div>
       </div>
     </div>
