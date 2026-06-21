@@ -84,17 +84,47 @@ export default function Home() {
       <HowItWorks />
 
       {/* CTA */}
-      <section className="section cta-section">
-        <div className="container cta-container">
-          <h2>Empezá ahora, es gratis</h2>
-          <p>Configurá tu perfil en menos de un minuto y empezá a explorar.</p>
-          <div className="cta-buttons">
-            <Link to="/perfil" className="btn btn-primary btn-lg">
-              Crear mi perfil
-            </Link>
-            <Link to="/mapa" className="btn btn-outline btn-lg">
-              Ver mapa directamente
-            </Link>
+      <section className="cta-section">
+        <div className="cta-inner">
+          <h2 className="cta-title">Empezá ahora, es gratis</h2>
+          <p className="cta-sub">Configurá tu perfil en menos de un minuto y empezá a explorar.</p>
+
+          <div className="cta-benefits">
+            <div className="cta-benefit" style={{ '--accent': '#296148' }}>
+              <div className="cta-benefit-icon">
+                <svg viewBox="0 0 24 24" fill="none" strokeWidth="2" stroke="var(--accent)">
+                  <path d="M12 2 2 7l10 5 10-5-10-5Z"/>
+                  <path d="M2 17l10 5 10-5M2 12l10 5 10-5"/>
+                </svg>
+              </div>
+              <h3>Guardá tus etiquetas</h3>
+              <p>Configurá tus restricciones una sola vez y no las repitas en cada búsqueda.</p>
+            </div>
+
+            <div className="cta-benefit" style={{ '--accent': '#457B9D' }}>
+              <div className="cta-benefit-icon">
+                <svg viewBox="0 0 24 24" fill="none" strokeWidth="2" stroke="var(--accent)">
+                  <path d="M21 11.5a8.5 8.5 0 0 1-12.4 7.55L3 20l1.05-5.4A8.5 8.5 0 1 1 21 11.5Z"/>
+                </svg>
+              </div>
+              <h3>Dejá tus reseñas</h3>
+              <p>Contá tu experiencia y ayudá a que otros encuentren mejores opciones.</p>
+            </div>
+
+            <div className="cta-benefit" style={{ '--accent': '#E63946' }}>
+              <div className="cta-benefit-icon">
+                <svg viewBox="0 0 24 24" fill="none" strokeWidth="2" stroke="var(--accent)">
+                  <path d="M20.8 8.6c0 5.5-8.8 10.4-8.8 10.4S3.2 14.1 3.2 8.6a4.8 4.8 0 0 1 8.8-2.7 4.8 4.8 0 0 1 8.8 2.7Z"/>
+                </svg>
+              </div>
+              <h3>Elegí tus favoritos</h3>
+              <p>Guardá los comercios que más te gustan y encontralos rápido después.</p>
+            </div>
+          </div>
+
+          <div className="cta-actions">
+            <Link to="/perfil" className="btn-cta-primary">Crear mi perfil</Link>
+            <Link to="/mapa" className="btn-cta-secondary">Ver mapa directamente</Link>
           </div>
         </div>
       </section>
