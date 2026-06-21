@@ -3,7 +3,7 @@ import { ShieldCheck, ShieldX, Eye, AlertCircle, PauseCircle } from 'lucide-reac
 import { useApp } from '../../context/AppContext'
 import RestrictionBadge from '../components/RestrictionBadge'
 import { BUSINESS_TYPE_MAP, CERTIFICATIONS } from '../../models/mockData'
-import { sendApprovalEmail, sendRejectionEmail } from '../../utils/emailService'
+import { sendApprovalEmail, sendRejectionEmail, sendSuspensionEmail } from '../../utils/emailService'
 import { formatOpeningHours } from '../../utils/hours'
 
 export default function AdminPanel() {
@@ -13,6 +13,8 @@ export default function AdminPanel() {
   const [rejectingId, setRejectingId] = useState(null)
   const [rejectReason, setRejectReason] = useState('')
   const [suspendingId, setSuspendingId] = useState(null)
+  const [suspendReason, setSuspendReason] = useState('')
+  const [suspendReasonError, setSuspendReasonError] = useState(false)
   const [toast, setToast] = useState(null)
 
   const showToast = useCallback((msg, type = 'success') => {
@@ -253,7 +255,17 @@ export default function AdminPanel() {
                       </div>
                       <button
                         className="btn btn-outline btn-sm"
-                        onClick={() => setSuspendingId(suspendingId === b.id ? null : b.id)}
+                        onClick={() => {
+                          if (suspendingId === b.id) {
+                            setSuspendingId(null)
+                            setSuspendReason('')
+                            setSuspendReasonError(false)
+                          } else {
+                            setSuspendingId(b.id)
+                            setSuspendReason('')
+                            setSuspendReasonError(false)
+                          }
+                        }}
                       >
                         <PauseCircle size={14} /> {suspendingId === b.id ? 'Cancelar' : 'Suspender'}
                       </button>
@@ -264,21 +276,53 @@ export default function AdminPanel() {
                           ¿Confirmás la suspensión de <strong>{b.name}</strong>?
                           El comercio dejará de aparecer en el mapa inmediatamente.
                         </p>
-                        <button
-                          className="btn btn-danger btn-sm"
-                          onClick={async () => {
-                            setActionError(null)
-                            try {
-                              await suspendBusiness(b.id)
-                              setSuspendingId(null)
-                              showToast(`Suspensión de "${b.name}" aplicada.`)
-                            } catch {
-                              setActionError('Error al suspender. Intentá de nuevo.')
-                            }
-                          }}
-                        >
-                          Confirmar suspensión
-                        </button>
+                        <div className="reject-reason-form">
+                          <label className="form-label">Motivo de la suspensión *</label>
+                          <textarea
+                            className="form-textarea"
+                            rows={3}
+                            placeholder="Explicá por qué se suspende este comercio (mínimo 10 caracteres)..."
+                            value={suspendReason}
+                            onChange={(e) => { setSuspendReason(e.target.value); setSuspendReasonError(false) }}
+                          />
+                          {suspendReasonError && (
+                            <p className="form-error">El motivo debe tener al menos 10 caracteres.</p>
+                          )}
+                          <div className="reject-reason-actions">
+                            <button
+                              className="btn btn-danger btn-sm"
+                              onClick={async () => {
+                                if (suspendReason.trim().length < 10) {
+                                  setSuspendReasonError(true)
+                                  return
+                                }
+                                setActionError(null)
+                                try {
+                                  await suspendBusiness(b.id, suspendReason.trim())
+                                  await sendSuspensionEmail({
+                                    businessName: b.name,
+                                    ownerEmail: b.ownerEmail ?? null,
+                                    reason: suspendReason.trim(),
+                                  })
+                                  setSuspendingId(null)
+                                  setSuspendReason('')
+                                  setSuspendReasonError(false)
+                                  showToast(`Suspensión de "${b.name}" aplicada correctamente.`)
+                                } catch {
+                                  setActionError('Error al suspender. Intentá de nuevo.')
+                                }
+                              }}
+                            >
+                              Confirmar suspensión
+                            </button>
+                            <button
+                              className="btn btn-outline btn-sm"
+                              onClick={() => { setSuspendingId(null); setSuspendReason(''); setSuspendReasonError(false) }}
+                            >
+                              Cancelar
+                            </button>
+                          </div>
+                        </div>
                       </div>
                     )}
                   </div>
