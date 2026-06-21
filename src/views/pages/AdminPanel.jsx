@@ -167,14 +167,50 @@ export default function AdminPanel() {
                           <strong>Documentos adjuntos:</strong>
                           <div className="cert-docs-list">
                             {Object.entries(b.certDocuments).map(([cert, url]) => (
-                              <a
-                                key={cert}
-                                href={url}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="cert-doc-link"
-                              >
-                                <ShieldCheck size={13} /> Ver {cert}
+                              /\.(jpg|jpeg|png|webp)/i.test(url) ? (
+                                <a key={cert} href={url} target="_blank" rel="noopener noreferrer" title={`Ver ${cert}`}>
+                                  <img src={url} alt={cert} className="admin-photo-thumb" />
+                                </a>
+                              ) : (
+                                <a
+                                  key={cert}
+                                  href={url}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="cert-doc-link"
+                                >
+                                  📄 Ver {cert}
+                                </a>
+                              )
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {b.menuFileUrl && (
+                        <div className="pending-section">
+                          <strong>Carta / menú:</strong>
+                          <div style={{ marginTop: '6px' }}>
+                            {/\.(jpg|jpeg|png|webp)/i.test(b.menuFileUrl) ? (
+                              <a href={b.menuFileUrl} target="_blank" rel="noopener noreferrer">
+                                <img src={b.menuFileUrl} alt="Menú" className="admin-photo-thumb" style={{ width: 'auto', maxWidth: '200px', height: '120px' }} />
+                              </a>
+                            ) : (
+                              <a href={b.menuFileUrl} target="_blank" rel="noopener noreferrer" className="cert-doc-link">
+                                📄 Ver carta / menú
+                              </a>
+                            )}
+                          </div>
+                        </div>
+                      )}
+
+                      {b.photos && b.photos.length > 0 && (
+                        <div className="pending-section">
+                          <strong>Fotos del local:</strong>
+                          <div className="admin-photos-grid">
+                            {b.photos.map((url, i) => (
+                              <a key={i} href={url} target="_blank" rel="noopener noreferrer">
+                                <img src={url} alt={`Foto ${i + 1}`} className="admin-photo-thumb" />
                               </a>
                             ))}
                           </div>
