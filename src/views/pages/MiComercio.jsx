@@ -127,9 +127,14 @@ export default function MiComercio() {
 
         <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
           {status === 'aprobado' && (
-            <Link to={`/comercio/${myBusiness.id}`} className="btn btn-outline">
-              Ver ficha pública
-            </Link>
+            <>
+              <Link to={`/comercio/${myBusiness.id}`} className="btn btn-outline">
+                Ver ficha pública
+              </Link>
+              <Link to="/registro-comercio" className="btn btn-primary">
+                Editar datos
+              </Link>
+            </>
           )}
           {status === 'rechazado' && (
             <Link to="/registro-comercio" className="btn btn-primary">
