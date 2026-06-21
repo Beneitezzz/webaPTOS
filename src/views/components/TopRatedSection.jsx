@@ -2,6 +2,8 @@ import { useState, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { Star, ChevronLeft, ChevronRight, Coffee, Utensils, ShoppingBag, Heart } from 'lucide-react'
 import { useApp } from '../../context/AppContext'
+import { useAuth } from '../../context/AuthContext'
+import { useFavorites } from '../../hooks/useFavorites'
 import { BUSINESS_TYPES, RESTRICTION_MAP, mockBusinesses } from '../../models/mockData'
 import { useOpenStatus } from '../../hooks/useOpenStatus'
 
@@ -56,7 +58,7 @@ function OpenBadge({ openingHours }) {
   )
 }
 
-function TypeCarousel({ type, topBusinesses }) {
+function TypeCarousel({ type, topBusinesses, favoriteIds, onToggleFavorite, isLoggedIn }) {
   const [index, setIndex] = useState(0)
   const business = topBusinesses[index]
   if (!business) return null
@@ -104,7 +106,18 @@ function TypeCarousel({ type, topBusinesses }) {
             )}
           </div>
           <div className="top-rated-info">
-            <p className="top-rated-name">{business.name}</p>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '6px' }}>
+              <p className="top-rated-name" style={{ margin: 0 }}>{business.name}</p>
+              {isLoggedIn && onToggleFavorite && (
+                <button
+                  className={`card-fav-btn${favoriteIds?.has(String(business.id)) ? ' active' : ''}`}
+                  onClick={(e) => { e.preventDefault(); e.stopPropagation(); onToggleFavorite(String(business.id)) }}
+                  title={favoriteIds?.has(String(business.id)) ? 'Quitar de favoritos' : 'Marcar como favorito'}
+                >
+                  {favoriteIds?.has(String(business.id)) ? '♥' : '♡'}
+                </button>
+              )}
+            </div>
             <p className="top-rated-address">{getNeighborhood(business.address)}</p>
             {business.rating != null ? (
               <div className="top-rated-stars">
@@ -150,6 +163,8 @@ function TypeCarousel({ type, topBusinesses }) {
 
 export default function TopRatedSection() {
   const { businesses, businessesLoading } = useApp()
+  const { currentUser } = useAuth()
+  const { favoriteIds, toggleFavorite } = useFavorites()
 
   const topByType = useMemo(() => {
     const approvedFromFirebase = businesses.filter((b) => b.verified && !b.pending)
@@ -181,7 +196,14 @@ export default function TopRatedSection() {
 
         <div className="top-rated-grid">
           {topByType.map(({ type, topBusinesses }) => (
-            <TypeCarousel key={type.id} type={type} topBusinesses={topBusinesses} />
+            <TypeCarousel
+              key={type.id}
+              type={type}
+              topBusinesses={topBusinesses}
+              favoriteIds={favoriteIds}
+              onToggleFavorite={toggleFavorite}
+              isLoggedIn={!!currentUser}
+            />
           ))}
         </div>
 

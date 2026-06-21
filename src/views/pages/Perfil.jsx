@@ -5,6 +5,7 @@ import { useAuth } from '../../context/AuthContext'
 import { RESTRICTIONS, BUSINESS_TYPE_MAP } from '../../models/mockData'
 import { toggleItem } from '../../utils/array'
 import { subscribeToUserReviews, deleteReview } from '../../services/reviewService'
+import { useFavorites } from '../../hooks/useFavorites'
 
 const TYPE_ICONS = {
   restaurante: (
@@ -108,6 +109,9 @@ export default function Perfil() {
 
   const [notifNew, setNotifNew] = useState(true)
   const [notifNews, setNotifNews] = useState(false)
+
+  const { favoriteIds, toggleFavorite, loading: favLoading } = useFavorites()
+  const favoriteBusinesses = businesses.filter((b) => favoriteIds.has(String(b.id)))
 
   const [myReviews, setMyReviews] = useState([])
   const [reviewsLoading, setReviewsLoading] = useState(true)
@@ -314,6 +318,53 @@ export default function Perfil() {
               <span className="p-slider" />
             </label>
           </div>
+        </div>
+
+        {/* ── Mis favoritos ── */}
+        <div className="perfil-card">
+          <div className="card-title">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78Z"/>
+            </svg>
+            Mis favoritos
+          </div>
+          <p className="card-desc">Los comercios que guardaste. Tocá el corazón en cualquier ficha para agregarlos.</p>
+
+          {favLoading ? (
+            <div style={{ textAlign: 'center', padding: '1.5rem 0' }}>
+              <div className="spinner-sm" style={{ margin: '0 auto' }} />
+            </div>
+          ) : favoriteBusinesses.length === 0 ? (
+            <p style={{ fontSize: '13.5px', color: 'var(--text-muted)', textAlign: 'center', padding: '1rem 0' }}>
+              Todavía no guardaste ningún comercio.
+            </p>
+          ) : (
+            <div className="mis-favoritos-list">
+              {favoriteBusinesses.map((b) => {
+                const typeColor = BUSINESS_TYPE_MAP[b.type]?.color ?? 'var(--primary)'
+                const typeLabel = BUSINESS_TYPE_MAP[b.type]?.label ?? ''
+                return (
+                  <div key={b.id} className="fav-item">
+                    <div className="fav-item-dot" style={{ background: typeColor }} />
+                    <div className="fav-item-body">
+                      <Link to={`/comercio/${b.id}`} className="fav-item-name">{b.name}</Link>
+                      <span className="fav-item-type" style={{ color: typeColor }}>{typeLabel}</span>
+                    </div>
+                    <button
+                      type="button"
+                      className="icon-btn-small icon-btn-danger"
+                      title="Quitar de favoritos"
+                      onClick={() => toggleFavorite(String(b.id))}
+                    >
+                      <svg viewBox="0 0 24 24" fill="currentColor" width="13" height="13">
+                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78Z"/>
+                      </svg>
+                    </button>
+                  </div>
+                )
+              })}
+            </div>
+          )}
         </div>
 
         {/* ── Mis reseñas ── */}

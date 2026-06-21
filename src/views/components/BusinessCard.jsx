@@ -5,7 +5,7 @@ import RestrictionBadge from './RestrictionBadge'
 import { BUSINESS_TYPE_MAP } from '../../models/mockData'
 import { useOpenStatus } from '../../hooks/useOpenStatus'
 
-export default memo(function BusinessCard({ business }) {
+export default memo(function BusinessCard({ business, isFavorite, onToggleFavorite }) {
   const typeInfo = BUSINESS_TYPE_MAP[business.type]
   const openStatus = useOpenStatus(business.openingHours)
 
@@ -18,12 +18,23 @@ export default memo(function BusinessCard({ business }) {
             {typeInfo?.label}
           </span>
         </div>
-        {business.rating && (
-          <div className="business-rating">
-            <Star size={14} fill="#ffc107" color="#ffc107" />
-            <span>{business.rating}</span>
-          </div>
-        )}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+          {business.rating && (
+            <div className="business-rating">
+              <Star size={14} fill="#ffc107" color="#ffc107" />
+              <span>{business.rating}</span>
+            </div>
+          )}
+          {onToggleFavorite && (
+            <button
+              className={`card-fav-btn${isFavorite ? ' active' : ''}`}
+              onClick={(e) => { e.preventDefault(); e.stopPropagation(); onToggleFavorite(String(business.id)) }}
+              title={isFavorite ? 'Quitar de favoritos' : 'Marcar como favorito'}
+            >
+              {isFavorite ? '♥' : '♡'}
+            </button>
+          )}
+        </div>
       </div>
 
       <div className="business-card-info">

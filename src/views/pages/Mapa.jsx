@@ -4,11 +4,15 @@ import MapView from '../components/MapView'
 import BusinessCard from '../components/BusinessCard'
 import { RESTRICTIONS, BUSINESS_TYPES, BUSINESS_TYPE_MAP, mockBusinesses } from '../../models/mockData'
 import { useApp } from '../../context/AppContext'
+import { useAuth } from '../../context/AuthContext'
+import { useFavorites } from '../../hooks/useFavorites'
 import { toggleItem } from '../../utils/array'
 import { isOpenNow } from '../../utils/hours'
 
 export default function Mapa() {
   const { userProfile, businesses, businessesLoading, businessesError, profileLoading } = useApp()
+  const { currentUser } = useAuth()
+  const { favoriteIds, toggleFavorite } = useFavorites()
 
   const [selectedRestrictions, setSelectedRestrictions] = useState([])
   const [selectedTypes, setSelectedTypes] = useState([])
@@ -150,7 +154,14 @@ export default function Mapa() {
                   Ningún comercio coincide con los filtros seleccionados.
                 </p>
               ) : (
-                filtered.map((b) => <BusinessCard key={b.id} business={b} />)
+                filtered.map((b) => (
+                  <BusinessCard
+                    key={b.id}
+                    business={b}
+                    isFavorite={currentUser ? favoriteIds.has(String(b.id)) : undefined}
+                    onToggleFavorite={currentUser ? toggleFavorite : undefined}
+                  />
+                ))
               )}
             </div>
           </>
@@ -176,7 +187,12 @@ export default function Mapa() {
             <p className="text-muted">{businessesError}</p>
           </div>
         ) : (
-          <MapView businesses={filtered} sidebarOpen={sidebarOpen} />
+          <MapView
+            businesses={filtered}
+            sidebarOpen={sidebarOpen}
+            favoriteIds={currentUser ? favoriteIds : undefined}
+            onToggleFavorite={currentUser ? toggleFavorite : undefined}
+          />
         )}
       </div>
     </div>

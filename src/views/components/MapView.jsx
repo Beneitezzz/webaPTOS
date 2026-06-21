@@ -87,7 +87,7 @@ function LocateButton() {
   )
 }
 
-export default function MapView({ businesses, sidebarOpen }) {
+export default function MapView({ businesses, sidebarOpen, favoriteIds, onToggleFavorite }) {
   return (
     <MapContainer
       center={CORDOBA_CENTER}
@@ -108,7 +108,18 @@ export default function MapView({ businesses, sidebarOpen }) {
           <Marker key={b.id} position={[b.lat, b.lng]} icon={PIN_ICONS[b.type] ?? DEFAULT_ICON}>
             <Popup>
               <div className="map-popup">
-                <strong>{b.name}</strong>
+                <div className="map-popup-header">
+                  <strong>{b.name}</strong>
+                  {onToggleFavorite && (
+                    <button
+                      className={`popup-fav-btn${favoriteIds?.has(String(b.id)) ? ' active' : ''}`}
+                      onClick={() => onToggleFavorite(String(b.id))}
+                      title={favoriteIds?.has(String(b.id)) ? 'Quitar de favoritos' : 'Guardar en favoritos'}
+                    >
+                      {favoriteIds?.has(String(b.id)) ? '♥' : '♡'}
+                    </button>
+                  )}
+                </div>
                 <span className="map-popup-type" style={{ color: typeInfo?.color }}>
                   {typeInfo?.label}
                 </span>

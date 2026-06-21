@@ -1,6 +1,8 @@
 import { useParams, Link } from 'react-router-dom'
 import { MapPin, Clock, Phone, MessageCircle, ArrowLeft, ShieldCheck, Globe } from 'lucide-react'
 import { useApp } from '../../context/AppContext'
+import { useAuth } from '../../context/AuthContext'
+import { useFavorites } from '../../hooks/useFavorites'
 import RestrictionBadge from '../components/RestrictionBadge'
 import ReviewsSection from '../components/ReviewsSection'
 import { BUSINESS_TYPE_MAP, CERTIFICATIONS, mockBusinesses } from '../../models/mockData'
@@ -11,6 +13,9 @@ import { useOpenStatus } from '../../hooks/useOpenStatus'
 export default function DetalleComercio() {
   const { id } = useParams()
   const { businesses, businessesLoading } = useApp()
+  const { currentUser } = useAuth()
+  const { favoriteIds, toggleFavorite } = useFavorites()
+  const isFav = favoriteIds.has(String(id))
   const business =
     businesses.find((b) => String(b.id) === id) ||
     mockBusinesses.find((b) => String(b.id) === id)
@@ -62,12 +67,24 @@ export default function DetalleComercio() {
                 </div>
               )}
             </div>
-            {business.verified && (
-              <div className="verified-badge">
-                <ShieldCheck size={18} />
-                Verificado
-              </div>
-            )}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              {currentUser && (
+                <button
+                  className={`fav-btn${isFav ? ' fav-btn--active' : ''}`}
+                  onClick={() => toggleFavorite(String(id))}
+                  title={isFav ? 'Quitar de favoritos' : 'Marcar como favorito'}
+                >
+                  {isFav ? '♥' : '♡'}
+                  <span>{isFav ? 'Favorito' : 'Marcar como favorito'}</span>
+                </button>
+              )}
+              {business.verified && (
+                <div className="verified-badge">
+                  <ShieldCheck size={18} />
+                  Verificado
+                </div>
+              )}
+            </div>
           </div>
           <p className="detail-description">{business.description}</p>
         </div>
