@@ -64,8 +64,9 @@ export function useBusinessForm() {
     if (!editingApprovedBusiness) return false
     const cur = [...form.certifications].sort().join(',')
     const orig = [...initialCertifications].sort().join(',')
-    return cur !== orig
-  }, [editingApprovedBusiness, form.certifications, initialCertifications])
+    if (cur !== orig) return true
+    return Object.keys(certFiles).length > 0
+  }, [editingApprovedBusiness, form.certifications, initialCertifications, certFiles])
 
   useEffect(() => {
     if (skipNextGeocodeRef.current) {
