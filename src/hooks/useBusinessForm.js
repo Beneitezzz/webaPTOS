@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useApp } from '../context/AppContext'
 import { useAuth } from '../context/AuthContext'
@@ -49,6 +49,8 @@ export function useBusinessForm() {
   const [photoError, setPhotoError] = useState('')
   const [editingBusinessId, setEditingBusinessId] = useState(null)
   const [submitted, setSubmitted] = useState(false)
+  const [editingApprovedBusiness, setEditingApprovedBusiness] = useState(false)
+  const [initialCertifications, setInitialCertifications] = useState([])
   const [errors, setErrors] = useState({})
   const [coords, setCoords] = useState(null)
   const [geocoding, setGeocoding] = useState(false)
@@ -57,6 +59,13 @@ export function useBusinessForm() {
   const debounceRef = useRef(null)
   const initializedRef = useRef(false)
   const skipNextGeocodeRef = useRef(false)
+
+  const certsChanged = useMemo(() => {
+    if (!editingApprovedBusiness) return false
+    const cur = [...form.certifications].sort().join(',')
+    const orig = [...initialCertifications].sort().join(',')
+    return cur !== orig
+  }, [editingApprovedBusiness, form.certifications, initialCertifications])
 
   useEffect(() => {
     if (skipNextGeocodeRef.current) {
@@ -110,11 +119,15 @@ export function useBusinessForm() {
     initializedRef.current = true
     const existing = businesses.find((b) => b.ownerId === currentUser.uid)
     if (!existing) return
-    if (existing.status !== 'rechazado') {
+    if (existing.status !== 'rechazado' && existing.status !== 'aprobado') {
       navigate('/mi-comercio', { replace: true })
       return
     }
     /* eslint-disable react-hooks/set-state-in-effect */
+    if (existing.status === 'aprobado') {
+      setEditingApprovedBusiness(true)
+      setInitialCertifications(existing.certifications ?? [])
+    }
     setEditingBusinessId(existing.id)
     setForm({
       name: existing.name ?? '',
@@ -281,13 +294,23 @@ export function useBusinessForm() {
 
       let businessId
       if (editingBusinessId) {
-        await updateBusiness(editingBusinessId, {
-          ...businessData,
-          status: 'pendiente',
-          pending: true,
-          verified: false,
-          rejectionReason: null,
-        })
+        if (editingApprovedBusiness) {
+          const updateData = { ...businessData }
+          if (certsChanged) {
+            updateData.status = 'pendiente'
+            updateData.pending = true
+            updateData.verified = false
+          }
+          await updateBusiness(editingBusinessId, updateData)
+        } else {
+          await updateBusiness(editingBusinessId, {
+            ...businessData,
+            status: 'pendiente',
+            pending: true,
+            verified: false,
+            rejectionReason: null,
+          })
+        }
         businessId = editingBusinessId
       } else {
         const docRef = await addBusiness(businessData, currentUser?.uid, currentUser?.email)
@@ -372,6 +395,8 @@ export function useBusinessForm() {
     removeNewPhoto,
     removeExistingPhoto,
     editingBusinessId,
+    editingApprovedBusiness,
+    certsChanged,
     submitted,
     errors,
     coords,
