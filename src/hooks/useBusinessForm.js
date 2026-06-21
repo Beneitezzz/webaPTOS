@@ -227,6 +227,17 @@ export function useBusinessForm() {
     }
   }
 
+  const toggleSecondShift = (i) => {
+    setForm((prev) => {
+      const openingHours = [...prev.openingHours]
+      const day = { ...openingHours[i] }
+      if (day.open2) { delete day.open2; delete day.close2 }
+      else { day.open2 = '17:00'; day.close2 = '21:00' }
+      openingHours[i] = day
+      return { ...prev, openingHours }
+    })
+  }
+
   const updateHourField = (i, field, value) => {
     setForm((prev) => {
       const openingHours = [...prev.openingHours]
@@ -279,7 +290,7 @@ export function useBusinessForm() {
         })
         businessId = editingBusinessId
       } else {
-        const docRef = await addBusiness(businessData)
+        const docRef = await addBusiness(businessData, currentUser?.uid, currentUser?.email)
         businessId = docRef.id
       }
 
@@ -376,6 +387,7 @@ export function useBusinessForm() {
     updateSocialLink,
     removeSocialLink,
     updateHourField,
+    toggleSecondShift,
     toggleTag,
     toggleCert,
     handleSubmit,

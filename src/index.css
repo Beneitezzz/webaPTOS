@@ -962,12 +962,23 @@ img { display: block; max-width: 100%; }
   gap: 8px;
   margin-top: 6px;
 }
+.hours-day-block { display: flex; flex-direction: column; gap: 4px; }
 .hours-row {
   display: grid;
-  grid-template-columns: 90px 90px 1fr 14px 1fr;
+  grid-template-columns: 90px 90px 1fr 14px 1fr 28px;
   align-items: center;
   gap: 8px;
 }
+.hours-shift-btn {
+  width: 24px; height: 24px; border-radius: 50%;
+  border: 1.5px solid var(--primary); background: none;
+  color: var(--primary); font-size: 1rem; line-height: 1;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; padding: 0; flex-shrink: 0;
+}
+.hours-shift-btn:hover { background: var(--primary-lighter); }
+.hours-shift-btn--remove { border-color: #dc3545; color: #dc3545; }
+.hours-shift-btn--remove:hover { background: #fde8ea; }
 .hours-day {
   font-size: 0.875rem;
   font-weight: 500;
@@ -1078,7 +1089,7 @@ img { display: block; max-width: 100%; }
 /* ── Responsive adjustments for hours grid ── */
 @media (max-width: 500px) {
   .hours-row {
-    grid-template-columns: 80px 80px 1fr 10px 1fr;
+    grid-template-columns: 80px 80px 1fr 10px 1fr 28px;
     gap: 4px;
   }
   .hours-day { font-size: 0.8rem; }
