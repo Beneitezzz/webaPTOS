@@ -1993,3 +1993,18 @@ img { display: block; max-width: 100%; }
 .icon-btn-small:hover { background: var(--primary); border-color: var(--primary); color: #fff; transform: scale(1.08); }
 .icon-btn-small.icon-btn-danger:hover { background: #E63946; border-color: #E63946; }
 .icon-btn-small:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+/* ─── Perfil skeleton ─── */
+.perfil-skeleton { display: flex; flex-direction: column; gap: 12px; margin-top: 16px; }
+.sk-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.sk-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.sk-block {
+  border-radius: 10px;
+  background: linear-gradient(90deg, #eef3f0 25%, #e2ece7 50%, #eef3f0 75%);
+  background-size: 300% 100%;
+  animation: sk-shimmer 1.4s infinite ease-in-out;
+}
+@keyframes sk-shimmer {
+  0%   { background-position: 100% 0; }
+  100% { background-position: -100% 0; }
+}

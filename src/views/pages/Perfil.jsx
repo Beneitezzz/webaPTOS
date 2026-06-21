@@ -87,7 +87,8 @@ function formatMemberSince(dateStr) {
 
 export default function Perfil() {
   const { userProfile, updateProfile, businesses, profileLoading } = useApp()
-  const { currentUser, deleteAccount } = useAuth()
+  const { currentUser, deleteAccount, loading: authLoading } = useAuth()
+  const isLoading = authLoading || profileLoading
   const navigate = useNavigate()
 
   const [name, setName] = useState(userProfile.profileName)
@@ -187,6 +188,24 @@ export default function Perfil() {
             Datos personales
           </div>
 
+          {isLoading ? (
+            <div className="perfil-skeleton">
+              <div className="sk-row">
+                <div className="sk-block" style={{ height: 62 }} />
+                <div className="sk-block" style={{ height: 62 }} />
+              </div>
+              <div className="sk-block" style={{ height: 14, width: '50%' }} />
+              <div className="sk-block" style={{ height: 10, width: '80%' }} />
+              <div className="sk-grid">
+                <div className="sk-block" style={{ height: 58 }} />
+                <div className="sk-block" style={{ height: 58 }} />
+                <div className="sk-block" style={{ height: 58 }} />
+                <div className="sk-block" style={{ height: 58 }} />
+              </div>
+              <div className="sk-block" style={{ height: 46, borderRadius: 11 }} />
+            </div>
+          ) : (
+            <>
           <div className="form-row" style={{ marginTop: '16px', marginBottom: '20px' }}>
             <div>
               <label className="form-label">Tu nombre (opcional)</label>
@@ -257,9 +276,11 @@ export default function Perfil() {
 
           {saveError && <div className="auth-error">{saveError}</div>}
 
-          <button type="submit" className="btn btn-primary btn-full" disabled={saving || profileLoading}>
-            {profileLoading ? 'Cargando perfil...' : saving ? 'Guardando...' : saved ? '✓ Guardado' : 'Guardar perfil'}
+          <button type="submit" className="btn btn-primary btn-full" disabled={saving}>
+            {saving ? 'Guardando...' : saved ? '✓ Guardado' : 'Guardar perfil'}
           </button>
+            </>
+          )}
         </form>
 
         {/* ── Notificaciones ── */}
