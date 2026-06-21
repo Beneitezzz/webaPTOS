@@ -346,10 +346,45 @@ img { display: block; max-width: 100%; }
 .cta-container p { color: var(--text-muted); margin-bottom: 1.75rem; }
 .cta-buttons { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
 
+/* ─── Contact section ─── */
+.contact-section { background: var(--surface); }
+.contact-header { text-align: center; margin-bottom: 2.5rem; }
+.contact-header h2 { font-size: 1.6rem; font-weight: 700; margin-bottom: 0.5rem; }
+.contact-header p { color: var(--text-muted); font-size: 0.95rem; }
+.contact-cards { display: flex; gap: 1.5rem; justify-content: center; flex-wrap: wrap; }
+.contact-card {
+  display: flex; align-items: center; gap: 1rem;
+  background: var(--bg); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 1.5rem 2rem;
+  min-width: 260px; flex: 1; max-width: 360px;
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+.contact-card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
+.contact-card-icon {
+  display: flex; align-items: center; justify-content: center;
+  width: 52px; height: 52px; border-radius: 50%;
+  background: var(--primary-lighter); color: var(--primary);
+  flex-shrink: 0;
+}
+.contact-card-body { display: flex; flex-direction: column; gap: 4px; }
+.contact-card-label { font-size: 0.78rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+.contact-card-value { font-size: 1.05rem; font-weight: 700; color: var(--text); }
+.contact-card-value a { color: var(--primary); }
+.contact-card-value a:hover { text-decoration: underline; }
+.contact-card-sub { font-size: 0.8rem; color: var(--text-muted); }
+@media (max-width: 600px) {
+  .contact-cards { flex-direction: column; align-items: stretch; }
+  .contact-card { max-width: 100%; }
+}
+
 /* ─── Footer ─── */
 .app-footer { background: var(--text); color: rgba(255,255,255,0.7); padding: 2rem 0; font-size: 0.85rem; }
 .app-footer .container { text-align: center; }
 .app-footer p { margin-bottom: 0.5rem; }
+.footer-links { display: flex; justify-content: center; align-items: center; gap: 10px; margin-bottom: 0.5rem; flex-wrap: wrap; }
+.footer-links a { color: rgba(255,255,255,0.55); transition: color 0.15s; }
+.footer-links a:hover { color: #fff; }
+.footer-links span { color: rgba(255,255,255,0.25); }
 .footer-copy { color: rgba(255,255,255,0.4); font-size: 0.8rem; }
 
 /* ─── Map page ─── */
@@ -583,6 +618,9 @@ img { display: block; max-width: 100%; }
   padding: 3px 8px;
 }
 .cert-doc-link:hover { background: var(--primary-lighter); }
+.admin-photos-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+.admin-photo-thumb { width: 80px; height: 60px; object-fit: cover; border-radius: var(--radius-sm); border: 1px solid var(--border); display: block; transition: opacity 0.15s; }
+.admin-photo-thumb:hover { opacity: 0.85; }
 .cert-files-section { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
 .cert-file-row { display: flex; flex-direction: column; gap: 3px; }
 .cert-file-label {
@@ -713,6 +751,68 @@ img { display: block; max-width: 100%; }
   text-align: center;
   transition: color 0.15s;
 }
+
+/* ─── Políticas de registro ─── */
+.politicas-checks {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+.politicas-checks-title {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.25rem;
+}
+.policy-check-label {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 0.875rem;
+  color: var(--text);
+  line-height: 1.5;
+  cursor: pointer;
+}
+.policy-check-label input[type='checkbox'] {
+  margin-top: 2px;
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  accent-color: var(--primary);
+  cursor: pointer;
+}
+.oauth-btn-disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+.btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* ─── Página de Políticas ─── */
+.politicas-card { padding: 2rem; }
+.politica-section { padding: 1.5rem 0; }
+.politica-highlight { background: var(--primary-lighter); border-radius: var(--radius); padding: 1.5rem; margin: 0 -0.5rem; }
+.politica-title { font-size: 1.15rem; font-weight: 700; color: var(--primary); margin-bottom: 0.75rem; }
+.politica-subtitle { font-size: 0.95rem; font-weight: 600; margin: 1rem 0 0.4rem; }
+.politica-list { padding-left: 1.25rem; display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.5rem; }
+.politica-list li { font-size: 0.9rem; color: var(--text); line-height: 1.55; }
+.politica-aviso {
+  background: #fff8e1; border-left: 4px solid #f59e0b;
+  padding: 0.75rem 1rem; border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  font-size: 0.9rem; margin: 0.75rem 0;
+}
+.politica-divider { border: none; border-top: 1px solid var(--border); margin: 0; }
+.politica-back { margin-top: 2rem; display: flex; justify-content: center; }
 
 .btn-ghost:hover { color: #444; }
 
@@ -930,6 +1030,19 @@ img { display: block; max-width: 100%; }
 .detail-photo-link { display: block; border-radius: 8px; overflow: hidden; aspect-ratio: 4/3; }
 .detail-photo-img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.2s; }
 .detail-photo-link:hover .detail-photo-img { transform: scale(1.04); }
+
+/* ── Detail empty state ── */
+.detail-empty-state { color: var(--text-muted); font-size: 0.875rem; margin-top: 0.25rem; }
+
+/* ── Menu items list ── */
+.menu-items-list { margin-top: 0.75rem; display: flex; flex-direction: column; gap: 0; }
+.menu-item {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 0.9rem;
+}
+.menu-item:last-child { border-bottom: none; }
+.menu-item-name { color: var(--text); }
+.menu-item-price { font-weight: 600; color: var(--primary); white-space: nowrap; margin-left: 1rem; }
 
 /* ── Instagram button ── */
 .btn-instagram {

@@ -14,6 +14,7 @@ import AdminPanel from './views/pages/AdminPanel'
 import Login from './views/pages/Login'
 import Register from './views/pages/Register'
 import SelectRol from './views/pages/SelectRol'
+import Politicas from './views/pages/Politicas'
 
 export default function App() {
   return (
@@ -29,6 +30,7 @@ export default function App() {
               <Route path="/login" element={<Login />} />
               <Route path="/register/tipo" element={<SelectRol />} />
               <Route path="/register" element={<Register />} />
+              <Route path="/politicas" element={<Politicas />} />
               <Route path="/perfil" element={<PrivateRoute><Perfil /></PrivateRoute>} />
               <Route path="/registro-comercio" element={<PrivateRoute><RegistroComercio /></PrivateRoute>} />
               <Route path="/mi-comercio" element={<PrivateRoute><MiComercio /></PrivateRoute>} />

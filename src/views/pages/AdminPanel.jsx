@@ -181,7 +181,7 @@ export default function AdminPanel() {
 
                       <div className="verify-note">
                         <AlertCircle size={14} />
-                        Verificar los certificados antes de aprobar.
+                        Verificar certificados antes de aprobar.
                       </div>
 
                       {rejectingId === b.id && (
@@ -271,6 +271,7 @@ export default function AdminPanel() {
                             try {
                               await suspendBusiness(b.id)
                               setSuspendingId(null)
+                              showToast(`Suspensión de "${b.name}" aplicada.`)
                             } catch {
                               setActionError('Error al suspender. Intentá de nuevo.')
                             }

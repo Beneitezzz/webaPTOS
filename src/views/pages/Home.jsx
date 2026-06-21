@@ -1,5 +1,5 @@
 import { Link, useNavigate } from 'react-router-dom'
-import { Search, ArrowRight } from 'lucide-react'
+import { Search, ArrowRight, Mail, Phone } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { RESTRICTIONS } from '../../models/mockData'
 import TopRatedSection from '../components/TopRatedSection'
@@ -99,12 +99,49 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Contacto */}
+      <section className="section contact-section">
+        <div className="container">
+          <div className="contact-header">
+            <h2>Contactanos</h2>
+            <p>Estamos para ayudarte. Escribinos o llamanos sin cargo.</p>
+          </div>
+          <div className="contact-cards">
+            <div className="contact-card">
+              <div className="contact-card-icon">
+                <Mail size={24} />
+              </div>
+              <div className="contact-card-body">
+                <span className="contact-card-label">Correo electrónico</span>
+                <span className="contact-card-value">
+                  <a href="mailto:contacto@puntosano.com.ar">contacto@puntosano.com.ar</a>
+                </span>
+                <span className="contact-card-sub">Respondemos en menos de 48 hs</span>
+              </div>
+            </div>
+            <div className="contact-card">
+              <div className="contact-card-icon">
+                <Phone size={24} />
+              </div>
+              <div className="contact-card-body">
+                <span className="contact-card-label">Línea gratuita</span>
+                <span className="contact-card-value">0800-555-SANO (7266)</span>
+                <span className="contact-card-sub">Lun a Vie, 9 a 18 hs</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Disclaimer */}
       <footer className="app-footer">
         <div className="container">
           <p>
             <strong>Aviso legal:</strong> PuntoSano es una herramienta informativa. No reemplaza diagnósticos
             médicos ni se hace responsable legalmente por reacciones alérgicas. Siempre consultá con tu médico.
+          </p>
+          <p className="footer-links">
+            <Link to="/politicas">Políticas y Privacidad</Link>
           </p>
           <p className="footer-copy">© 2025 PuntoSano · Proyecto académico — Universidad Siglo 21</p>
         </div>

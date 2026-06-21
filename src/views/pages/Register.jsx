@@ -17,6 +17,10 @@ export default function Register() {
   const [confirm, setConfirm] = useState('')
   const [error, setError] = useState('')
   const [submitting, setSubmitting] = useState(false)
+  const [acceptTerms, setAcceptTerms] = useState(false)
+  const [acceptDisclaimer, setAcceptDisclaimer] = useState(false)
+  const [acceptVeracity, setAcceptVeracity] = useState(false)
+  const [acceptReview, setAcceptReview] = useState(false)
 
   const redirect = searchParams.get('redirect') || '/'
   const ALLOWED_ROLES = ['user', 'comercio']
@@ -25,6 +29,10 @@ export default function Register() {
   if (loading) return null
   if (currentUser) return <Navigate to={redirect} replace />
 
+  const policiesAccepted =
+    acceptTerms &&
+    (rol === 'user' ? acceptDisclaimer : acceptVeracity && acceptReview)
+
   const handleGuest = () => {
     const isProtected = PROTECTED_ROUTES.some((r) => redirect.startsWith(r))
     navigate(isProtected ? '/' : redirect, { replace: true })
@@ -32,6 +40,10 @@ export default function Register() {
 
   const handleEmail = async (e) => {
     e.preventDefault()
+    if (!policiesAccepted) {
+      setError('Debés aceptar todas las políticas para continuar')
+      return
+    }
     if (password !== confirm) {
       setError('Las contraseñas no coinciden')
       return
@@ -50,6 +62,10 @@ export default function Register() {
   }
 
   const handleProvider = async (provider) => {
+    if (!policiesAccepted) {
+      setError('Debés aceptar todas las políticas para continuar')
+      return
+    }
     setError('')
     try {
       await signInWithProvider(provider, rol)
@@ -78,16 +94,29 @@ export default function Register() {
               Registrándote como comercio — completarás los datos de tu negocio al finalizar
             </div>
           )}
+
           <div className="oauth-buttons">
-            <button type="button" className="oauth-btn" onClick={() => handleProvider(googleProvider)}>
+            <button
+              type="button"
+              className={`oauth-btn${!policiesAccepted ? ' oauth-btn-disabled' : ''}`}
+              onClick={() => handleProvider(googleProvider)}
+            >
               <span className="oauth-icon">G</span>
               Registrarse con Google
             </button>
-            <button type="button" className="oauth-btn" onClick={() => handleProvider(appleProvider)}>
+            <button
+              type="button"
+              className={`oauth-btn${!policiesAccepted ? ' oauth-btn-disabled' : ''}`}
+              onClick={() => handleProvider(appleProvider)}
+            >
               <span className="oauth-icon"></span>
               Registrarse con Apple
             </button>
-            <button type="button" className="oauth-btn" onClick={() => handleProvider(facebookProvider)}>
+            <button
+              type="button"
+              className={`oauth-btn${!policiesAccepted ? ' oauth-btn-disabled' : ''}`}
+              onClick={() => handleProvider(facebookProvider)}
+            >
               <span className="oauth-icon">f</span>
               Registrarse con Facebook
             </button>
@@ -147,7 +176,73 @@ export default function Register() {
               />
             </div>
 
-            <button type="submit" className="btn btn-primary btn-full" disabled={submitting}>
+            {/* Políticas — justo antes del botón Crear cuenta */}
+            <div className="politicas-checks">
+              <p className="politicas-checks-title">Antes de continuar, aceptá las políticas:</p>
+
+              <label className="policy-check-label">
+                <input
+                  type="checkbox"
+                  checked={acceptTerms}
+                  onChange={(e) => setAcceptTerms(e.target.checked)}
+                />
+                <span>
+                  Leí y acepto los{' '}
+                  <Link to="/politicas?seccion=terminos" className="link" target="_blank">Términos y Condiciones</Link>
+                  {' '}y la{' '}
+                  <Link to="/politicas?seccion=privacidad" className="link" target="_blank">Política de Privacidad</Link>
+                  {' '}de PuntoSano
+                </span>
+              </label>
+
+              {rol === 'user' && (
+                <label className="policy-check-label">
+                  <input
+                    type="checkbox"
+                    checked={acceptDisclaimer}
+                    onChange={(e) => setAcceptDisclaimer(e.target.checked)}
+                  />
+                  <span>
+                    Entiendo que PuntoSano es una{' '}
+                    <Link to="/politicas?seccion=usuarios" className="link" target="_blank">herramienta informativa</Link>
+                    {' '}y no reemplaza diagnósticos ni consejos médicos profesionales
+                  </span>
+                </label>
+              )}
+
+              {rol === 'comercio' && (
+                <>
+                  <label className="policy-check-label">
+                    <input
+                      type="checkbox"
+                      checked={acceptVeracity}
+                      onChange={(e) => setAcceptVeracity(e.target.checked)}
+                    />
+                    <span>
+                      Me comprometo a proporcionar <strong>información veraz y actualizada</strong> sobre mi comercio y sus certificaciones
+                    </span>
+                  </label>
+                  <label className="policy-check-label">
+                    <input
+                      type="checkbox"
+                      checked={acceptReview}
+                      onChange={(e) => setAcceptReview(e.target.checked)}
+                    />
+                    <span>
+                      Acepto que mi registro será{' '}
+                      <Link to="/politicas?seccion=comercios" className="link" target="_blank">revisado y verificado</Link>
+                      {' '}por PuntoSano y podrá ser rechazado si no cumple los requisitos
+                    </span>
+                  </label>
+                </>
+              )}
+            </div>
+
+            <button
+              type="submit"
+              className="btn btn-primary btn-full"
+              disabled={submitting || !policiesAccepted}
+            >
               {submitting ? 'Creando cuenta...' : 'Crear cuenta'}
             </button>
           </form>
