@@ -7,6 +7,7 @@ import {
   signInWithProvider,
   signOut,
   getUserRole,
+  deleteAccount,
 } from '../services/authService'
 
 const AuthContext = createContext()
@@ -44,7 +45,7 @@ export function AuthProvider({ children }) {
 
   return (
     <AuthContext.Provider
-      value={{ currentUser, userRole, loading, signInWithEmail, registerWithEmail, signInWithProvider, signOut }}
+      value={{ currentUser, userRole, loading, signInWithEmail, registerWithEmail, signInWithProvider, signOut, deleteAccount: () => deleteAccount(currentUser) }}
     >
       {children}
     </AuthContext.Provider>

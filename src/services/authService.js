@@ -5,7 +5,7 @@ import {
   updateProfile,
   signOut as firebaseSignOut,
 } from 'firebase/auth'
-import { doc, getDoc, setDoc, updateDoc, serverTimestamp } from 'firebase/firestore'
+import { doc, getDoc, setDoc, updateDoc, serverTimestamp, deleteDoc } from 'firebase/firestore'
 import { auth, db } from '../firebase'
 
 export const signInWithEmail = (email, password) =>
@@ -52,6 +52,11 @@ export const signInWithProvider = async (provider, role = 'user') => {
 }
 
 export const signOut = () => firebaseSignOut(auth)
+
+export const deleteAccount = async (user) => {
+  await deleteDoc(doc(db, 'users', user.uid))
+  await user.delete()
+}
 
 export const getUserRole = async (uid) => {
   const snap = await getDoc(doc(db, 'users', uid))
