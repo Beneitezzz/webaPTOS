@@ -1,5 +1,5 @@
 import {
-  collection, onSnapshot, addDoc, updateDoc,
+  collection, onSnapshot, addDoc, updateDoc, deleteDoc,
   doc, serverTimestamp,
 } from 'firebase/firestore'
 import { db } from '../firebase'
@@ -48,3 +48,6 @@ export const suspendBusiness = (id, reason) =>
   updateDoc(doc(db, 'businesses', id), {
     verified: false, pending: false, status: 'suspendido', suspensionReason: reason,
   })
+
+export const deleteBusiness = (id) =>
+  deleteDoc(doc(db, 'businesses', id))

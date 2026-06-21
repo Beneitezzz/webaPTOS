@@ -8,6 +8,7 @@ import {
   approveBusiness as approveInFirestore,
   rejectBusiness as rejectInFirestore,
   suspendBusiness as suspendInFirestore,
+  deleteBusiness as deleteInFirestore,
 } from '../services/businessService'
 
 const AppContext = createContext()
@@ -78,6 +79,7 @@ export function AppProvider({ children }) {
         approveBusiness: approveInFirestore,
         rejectBusiness: rejectInFirestore,
         suspendBusiness: suspendInFirestore,
+        deleteBusiness: deleteInFirestore,
       }}
     >
       {children}

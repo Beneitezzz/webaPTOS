@@ -1,6 +1,6 @@
-import { useMemo, useEffect } from 'react'
+import { useMemo, useEffect, useState } from 'react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
-import { Store, CheckCircle, XCircle, Clock, PauseCircle } from 'lucide-react'
+import { Store, CheckCircle, XCircle, Clock, PauseCircle, Trash2 } from 'lucide-react'
 import { useApp } from '../../context/AppContext'
 import { useAuth } from '../../context/AuthContext'
 import RestrictionBadge from '../components/RestrictionBadge'
@@ -34,11 +34,14 @@ const STATUS_CONFIG = {
 }
 
 export default function MiComercio() {
-  const { businesses, businessesLoading } = useApp()
+  const { businesses, businessesLoading, deleteBusiness } = useApp()
   const { currentUser, userRole } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
   const successMessage = location.state?.successMessage ?? null
+  const [confirmingDelete, setConfirmingDelete] = useState(false)
+  const [deleteError, setDeleteError] = useState(null)
+  const [deleting, setDeleting] = useState(false)
 
   useEffect(() => {
     if (userRole !== 'comercio' && userRole !== 'admin') {
@@ -155,7 +158,49 @@ export default function MiComercio() {
               Editar y re-enviar
             </Link>
           )}
+          <button
+            className="btn btn-danger btn-sm"
+            style={{ marginLeft: 'auto' }}
+            onClick={() => { setConfirmingDelete(true); setDeleteError(null) }}
+          >
+            <Trash2 size={14} /> Eliminar comercio
+          </button>
         </div>
+
+        {confirmingDelete && (
+          <div className="card" style={{ marginTop: '1rem', borderColor: 'var(--danger, #dc3545)', borderWidth: '1.5px' }}>
+            <p style={{ marginBottom: '0.75rem' }}>
+              ¿Confirmás que querés eliminar <strong>{myBusiness.name}</strong>? Esta acción no se puede deshacer.
+            </p>
+            {deleteError && <p className="form-error" style={{ marginBottom: '0.5rem' }}>{deleteError}</p>}
+            <div style={{ display: 'flex', gap: '0.75rem' }}>
+              <button
+                className="btn btn-danger btn-sm"
+                disabled={deleting}
+                onClick={async () => {
+                  setDeleting(true)
+                  setDeleteError(null)
+                  try {
+                    await deleteBusiness(myBusiness.id)
+                    navigate('/', { replace: true })
+                  } catch {
+                    setDeleteError('Error al eliminar. Intentá de nuevo.')
+                    setDeleting(false)
+                  }
+                }}
+              >
+                {deleting ? 'Eliminando...' : 'Sí, eliminar'}
+              </button>
+              <button
+                className="btn btn-outline btn-sm"
+                disabled={deleting}
+                onClick={() => { setConfirmingDelete(false); setDeleteError(null) }}
+              >
+                Cancelar
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   )
