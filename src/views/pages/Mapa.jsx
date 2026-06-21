@@ -20,6 +20,7 @@ export default function Mapa() {
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const [filtersInitialized, setFiltersInitialized] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
+  const [selectedBusinessId, setSelectedBusinessId] = useState(null)
 
   useEffect(() => {
     if (!profileLoading && !filtersInitialized) {
@@ -160,6 +161,8 @@ export default function Mapa() {
                     business={b}
                     isFavorite={currentUser ? favoriteIds.has(String(b.id)) : undefined}
                     onToggleFavorite={currentUser ? toggleFavorite : undefined}
+                    onSelect={setSelectedBusinessId}
+                    selected={selectedBusinessId === b.id}
                   />
                 ))
               )}
@@ -190,6 +193,7 @@ export default function Mapa() {
           <MapView
             businesses={filtered}
             sidebarOpen={sidebarOpen}
+            selectedBusinessId={selectedBusinessId}
             favoriteIds={currentUser ? favoriteIds : undefined}
             onToggleFavorite={currentUser ? toggleFavorite : undefined}
           />

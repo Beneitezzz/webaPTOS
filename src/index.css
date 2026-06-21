@@ -549,6 +549,7 @@ img { display: block; max-width: 100%; }
 .business-card-info span:not(.open-chip):not(.closed-chip) { display: flex; align-items: center; gap: 5px; font-size: 0.78rem; color: var(--text-muted); }
 .business-card-tags { display: flex; flex-wrap: wrap; gap: 4px; }
 .business-verified { display: flex; align-items: center; gap: 4px; font-size: 0.75rem; color: #198754; font-weight: 600; }
+.business-card.selected { border-color: var(--green-primary); box-shadow: 0 0 0 2px var(--green-primary); }
 
 /* ─── Page header ─── */
 .page-header {

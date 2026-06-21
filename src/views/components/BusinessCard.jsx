@@ -5,12 +5,16 @@ import RestrictionBadge from './RestrictionBadge'
 import { BUSINESS_TYPE_MAP } from '../../models/mockData'
 import { useOpenStatus } from '../../hooks/useOpenStatus'
 
-export default memo(function BusinessCard({ business, isFavorite, onToggleFavorite }) {
+export default memo(function BusinessCard({ business, isFavorite, onToggleFavorite, onSelect, selected }) {
   const typeInfo = BUSINESS_TYPE_MAP[business.type]
   const openStatus = useOpenStatus(business.openingHours)
 
   return (
-    <div className="business-card">
+    <div
+      className={`business-card${selected ? ' selected' : ''}`}
+      onClick={onSelect ? () => onSelect(business.id) : undefined}
+      style={onSelect ? { cursor: 'pointer' } : undefined}
+    >
       <div className="business-card-header">
         <div>
           <h3 className="business-card-name">{business.name}</h3>

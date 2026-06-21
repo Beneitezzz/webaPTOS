@@ -29,6 +29,22 @@ const PIN_ICONS = Object.fromEntries(
 )
 const DEFAULT_ICON = buildDivIcon('#2d6a4f')
 
+function FlyToSelected({ selectedId, businesses, markerRefs }) {
+  const map = useMap()
+  useEffect(() => {
+    if (!selectedId) return
+    const business = businesses.find((b) => String(b.id) === String(selectedId))
+    if (!business) return
+    map.flyTo([business.lat, business.lng], Math.max(map.getZoom(), 15), { duration: 0.8 })
+    const timer = setTimeout(() => {
+      const marker = markerRefs.current[String(selectedId)]
+      if (marker) marker.openPopup()
+    }, 850)
+    return () => clearTimeout(timer)
+  }, [selectedId, businesses, map, markerRefs])
+  return null
+}
+
 function ResizeWatcher({ trigger }) {
   const map = useMap()
   useEffect(() => {
@@ -87,7 +103,8 @@ function LocateButton() {
   )
 }
 
-export default function MapView({ businesses, sidebarOpen, favoriteIds, onToggleFavorite }) {
+export default function MapView({ businesses, sidebarOpen, selectedBusinessId, favoriteIds, onToggleFavorite }) {
+  const markerRefs = useRef({})
   return (
     <MapContainer
       center={CORDOBA_CENTER}
@@ -102,10 +119,16 @@ export default function MapView({ businesses, sidebarOpen, favoriteIds, onToggle
       <ZoomControl position="topright" />
       <ResizeWatcher trigger={sidebarOpen} />
       <LocateButton />
+      <FlyToSelected selectedId={selectedBusinessId} businesses={businesses} markerRefs={markerRefs} />
       {businesses.map((b) => {
         const typeInfo = BUSINESS_TYPE_MAP[b.type]
         return (
-          <Marker key={b.id} position={[b.lat, b.lng]} icon={PIN_ICONS[b.type] ?? DEFAULT_ICON}>
+          <Marker
+            key={b.id}
+            position={[b.lat, b.lng]}
+            icon={PIN_ICONS[b.type] ?? DEFAULT_ICON}
+            ref={(el) => { if (el) markerRefs.current[String(b.id)] = el }}
+          >
             <Popup>
               <div className="map-popup">
                 <div className="map-popup-header">
