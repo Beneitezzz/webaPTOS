@@ -44,7 +44,7 @@ export const rejectBusiness = (id, reason) =>
     verified: false, pending: false, status: 'rechazado', rejectionReason: reason,
   })
 
-export const suspendBusiness = (id) =>
+export const suspendBusiness = (id, reason) =>
   updateDoc(doc(db, 'businesses', id), {
-    verified: false, pending: false, status: 'suspendido',
+    verified: false, pending: false, status: 'suspendido', suspensionReason: reason,
   })
