@@ -78,7 +78,7 @@ export default function WhatWeDo() {
   }, [])
 
   return (
-    <section className="wwd-section">
+    <section id="que-hace" className="wwd-section">
       <div className="wwd-head">
         <div className="wwd-eyebrow">🌿 La plataforma</div>
         <h2 className="wwd-title">¿Qué hace PuntoSano?</h2>

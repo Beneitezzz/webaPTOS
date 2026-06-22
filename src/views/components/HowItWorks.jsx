@@ -61,7 +61,7 @@ export default function HowItWorks() {
   const chips = ['Celiaquía', 'Diabetes', 'SIBO', 'Sin lactosa']
 
   return (
-    <section className="how-section">
+    <section id="como-funciona" className="how-section">
       <div className="how-head">
         <div className="hiw-eyebrow">🧭 Guía rápida</div>
         <h2>¿Cómo funciona?</h2>

@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo } from 'react'
 import { RESTRICTIONS, BUSINESS_TYPES, mockBusinesses } from '../../models/mockData'
 import { useApp } from '../../context/AppContext'
 import SearchAutocomplete from '../components/SearchAutocomplete'
+import SideNav from '../components/SideNav'
 import TopRatedSection from '../components/TopRatedSection'
 import HowItWorks from '../components/HowItWorks'
 import WhatWeDo from '../components/WhatWeDo'
@@ -56,6 +57,7 @@ export default function Home() {
 
   return (
     <div className="page">
+      <SideNav />
       {/* Hero */}
       <section className="hero">
         <div className="hero-content">
@@ -105,7 +107,7 @@ export default function Home() {
       <HowItWorks />
 
       {/* CTA */}
-      <section className="cta-section">
+      <section id="registro" className="cta-section">
         <div className="cta-inner">
           <h2 className="cta-title">Empezá ahora, es gratis</h2>
           <p className="cta-sub">Configurá tu perfil en menos de un minuto y empezá a explorar.</p>
@@ -151,7 +153,7 @@ export default function Home() {
       </section>
 
       {/* Contacto */}
-      <section className="section contact-section">
+      <section id="contacto" className="section contact-section">
         <div className="container">
           <div className="contact-header">
             <h2>Contactanos</h2>

@@ -182,7 +182,7 @@ export default function TopRatedSection() {
   if (topByType.length === 0) return null
 
   return (
-    <section className="section top-rated-section">
+    <section id="destacados" className="section top-rated-section">
       <div className="container">
         <div className="top-rated-header">
           <span className="top-rated-badge">⭐ LO MÁS VALORADO</span>

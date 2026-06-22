@@ -550,7 +550,7 @@ img { display: block; max-width: 100%; }
 .business-card-info span:not(.open-chip):not(.closed-chip) { display: flex; align-items: center; gap: 5px; font-size: 0.78rem; color: var(--text-muted); }
 .business-card-tags { display: flex; flex-wrap: wrap; gap: 4px; }
 .business-verified { display: flex; align-items: center; gap: 4px; font-size: 0.75rem; color: #198754; font-weight: 600; }
-.business-card.selected { border-color: var(--green-primary); box-shadow: 0 0 0 2px var(--green-primary); }
+.business-card.selected { border-color: var(--primary); box-shadow: 0 0 0 2px var(--primary); }
 
 /* ─── Page header ─── */
 .page-header {
@@ -995,8 +995,44 @@ img { display: block; max-width: 100%; }
 }
 .autocomplete-item:hover,
 .autocomplete-item.active {
-  background: var(--surface); border-left-color: var(--green-primary);
+  background: var(--surface); border-left-color: var(--primary);
 }
+
+/* ── Side nav ── */
+html { scroll-behavior: smooth; }
+section[id] { scroll-margin-top: calc(var(--navbar-h) + 8px); }
+
+.side-nav {
+  position: fixed; right: -1px; top: 50%; transform: translateY(-50%);
+  z-index: 200; display: flex; flex-direction: column; gap: 6px;
+  pointer-events: none; align-items: flex-end;
+}
+.side-nav-item {
+  display: flex; align-items: center; text-decoration: none;
+  cursor: pointer; pointer-events: all; width: 100%;
+  justify-content: flex-end;
+}
+.side-nav-label {
+  font-size: 11.5px; font-weight: 600; color: var(--text-muted);
+  background: rgba(255,255,255,.88); border: 1px solid var(--border);
+  border-right: none; padding: 6px 12px; border-radius: 8px 0 0 8px;
+  white-space: nowrap; opacity: .55;
+  transition: opacity .2s ease, color .2s ease, background .2s ease, box-shadow .2s ease;
+  box-shadow: -3px 0 10px rgba(45,106,79,.06);
+}
+.side-nav-pip {
+  width: 5px; background: var(--border); height: 36px; flex: 0 0 5px;
+  transition: background .18s ease, width .18s ease;
+}
+.side-nav-item:hover .side-nav-label,
+.side-nav-item.active .side-nav-label {
+  opacity: 1; color: var(--primary); background: #fff;
+  box-shadow: -4px 0 14px rgba(45,106,79,.14);
+}
+.side-nav-item.active .side-nav-label { font-weight: 700; }
+.side-nav-item:hover .side-nav-pip,
+.side-nav-item.active .side-nav-pip { background: var(--primary); width: 6px; }
+@media (max-width: 960px) { .side-nav { display: none; } }
 
 /* ── Locate button (overlaid on map) ── */
 .locate-control {
