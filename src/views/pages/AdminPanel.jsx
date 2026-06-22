@@ -1,5 +1,5 @@
 import { useState, useMemo, useCallback } from 'react'
-import { ShieldCheck, ShieldX, Eye, AlertCircle, PauseCircle } from 'lucide-react'
+import { ShieldCheck, ShieldX, Eye, AlertCircle, PauseCircle, Search } from 'lucide-react'
 import { useApp } from '../../context/AppContext'
 import RestrictionBadge from '../components/RestrictionBadge'
 import { BUSINESS_TYPE_MAP, CERTIFICATIONS } from '../../models/mockData'
@@ -16,6 +16,7 @@ export default function AdminPanel() {
   const [suspendReason, setSuspendReason] = useState('')
   const [suspendReasonError, setSuspendReasonError] = useState(false)
   const [toast, setToast] = useState(null)
+  const [approvedSearch, setApprovedSearch] = useState('')
 
   const showToast = useCallback((msg, type = 'success') => {
     setToast({ msg, type })
@@ -31,6 +32,14 @@ export default function AdminPanel() {
     () => businesses.filter((b) => b.verified && !b.pending),
     [businesses]
   )
+
+  const filteredApproved = useMemo(() => {
+    const q = approvedSearch.trim().normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase()
+    if (!q) return approved
+    return approved.filter((b) =>
+      b.name.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().includes(q)
+    )
+  }, [approved, approvedSearch])
 
   return (
     <div className="page">
@@ -273,9 +282,26 @@ export default function AdminPanel() {
         )}
         {approved.length > 0 && (
           <div className="admin-section">
-            <h2>Comercios aprobados ({approved.length})</h2>
+            <div className="admin-approved-header">
+              <h2>Comercios aprobados ({approved.length})</h2>
+              <div className="admin-search-wrap">
+                <Search size={15} className="admin-search-icon" />
+                <input
+                  type="search"
+                  className="form-input admin-search-input"
+                  placeholder="Buscar por nombre..."
+                  value={approvedSearch}
+                  onChange={(e) => setApprovedSearch(e.target.value)}
+                />
+              </div>
+            </div>
+            {filteredApproved.length === 0 && (
+              <p className="text-muted" style={{ padding: '1rem 0' }}>
+                Ningún comercio coincide con "{approvedSearch}".
+              </p>
+            )}
             <div className="approved-list">
-              {approved.map((b) => {
+              {filteredApproved.map((b) => {
                 const typeInfo = BUSINESS_TYPE_MAP[b.type]
                 return (
                   <div key={b.id} className="approved-card card">

@@ -1324,6 +1324,23 @@ section[id] { scroll-margin-top: calc(var(--navbar-h) + 8px); }
 .admin-section {
   margin-top: 36px;
 }
+.admin-approved-header {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 1rem; margin-bottom: 12px; padding-bottom: 6px;
+  border-bottom: 1px solid #e5e7eb; flex-wrap: wrap;
+}
+.admin-approved-header h2 {
+  font-size: 1.1rem; font-weight: 600; color: #6b7280; margin: 0;
+}
+.admin-search-wrap {
+  position: relative; display: flex; align-items: center;
+}
+.admin-search-icon {
+  position: absolute; left: 10px; color: var(--text-muted); pointer-events: none;
+}
+.admin-search-input {
+  padding-left: 32px; width: 220px; font-size: 0.875rem;
+}
 .admin-section > h2 {
   font-size: 1.1rem;
   font-weight: 600;
