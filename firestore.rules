@@ -2,24 +2,35 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Businesses: anyone can read; only admins can write
+    function isAdmin() {
+      return request.auth != null
+        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+
     match /businesses/{businessId} {
       allow read: if true;
-      allow write: if request.auth != null
-        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
 
-      // Reviews: anyone can read; logged-in users can write their own review
+      // Owners can create their own business
+      allow create: if request.auth != null
+        && request.resource.data.ownerId == request.auth.uid;
+
+      // Owners can update their own business; admins can update any
+      allow update: if (request.auth != null && resource.data.ownerId == request.auth.uid)
+        || isAdmin();
+
+      // Only admins can delete
+      allow delete: if isAdmin()
+        || (request.auth != null && resource.data.ownerId == request.auth.uid);
+
       match /reviews/{userId} {
         allow read: if true;
         allow write: if request.auth != null && request.auth.uid == userId;
       }
     }
 
-    // User profiles: only the owner can read/write
     match /users/{userId} {
       allow read, write: if request.auth != null && request.auth.uid == userId;
 
-      // Favorites subcollection
       match /favorites/{businessId} {
         allow read, write: if request.auth != null && request.auth.uid == userId;
       }

@@ -329,29 +329,39 @@ export function useBusinessForm() {
       } else {
         const docRef = await addBusiness(businessData, currentUser?.uid, currentUser?.email)
         businessId = docRef.id
+        // Set editing state immediately so a failed upload can be retried
+        setEditingBusinessId(docRef.id)
       }
 
-      const certUrls = {}
-      for (const [certCode, file] of Object.entries(certFiles)) {
-        certUrls[certCode] = await uploadCertFile(businessId, certCode, file)
-      }
-      if (Object.keys(certUrls).length > 0) {
-        await updateBusiness(businessId, { certDocuments: certUrls })
-      }
+      try {
+        const certUrls = {}
+        for (const [certCode, file] of Object.entries(certFiles)) {
+          certUrls[certCode] = await uploadCertFile(businessId, certCode, file)
+        }
+        if (Object.keys(certUrls).length > 0) {
+          await updateBusiness(businessId, { certDocuments: certUrls })
+        }
 
-      if (menuFile) {
-        const menuUrl = await uploadMenuFile(businessId, menuFile)
-        await updateBusiness(businessId, { menuFileUrl: menuUrl })
-      }
+        if (menuFile) {
+          const menuUrl = await uploadMenuFile(businessId, menuFile)
+          await updateBusiness(businessId, { menuFileUrl: menuUrl })
+        }
 
-      const uploadedPhotoUrls = []
-      for (let i = 0; i < newPhotos.length; i++) {
-        const url = await uploadBusinessPhoto(businessId, newPhotos[i], existingPhotos.length + i)
-        uploadedPhotoUrls.push(url)
-      }
-      const allPhotos = [...existingPhotos, ...uploadedPhotoUrls]
-      if (allPhotos.length > 0) {
-        await updateBusiness(businessId, { photos: allPhotos })
+        const uploadedPhotoUrls = []
+        for (let i = 0; i < newPhotos.length; i++) {
+          const url = await uploadBusinessPhoto(businessId, newPhotos[i], existingPhotos.length + i)
+          uploadedPhotoUrls.push(url)
+        }
+        const allPhotos = [...existingPhotos, ...uploadedPhotoUrls]
+        if (allPhotos.length > 0) {
+          await updateBusiness(businessId, { photos: allPhotos })
+        }
+      } catch (uploadErr) {
+        console.error('Error subiendo archivos:', uploadErr)
+        setErrors({
+          submit: `Tu comercio fue registrado pero los archivos no se pudieron subir. Error: ${uploadErr?.code ?? uploadErr?.message ?? 'desconocido'}. Verificá tu conexión y volvé a intentarlo.`,
+        })
+        return
       }
 
       if (editingApprovedBusiness) {
@@ -366,8 +376,9 @@ export function useBusinessForm() {
       } else {
         setSubmitted(true)
       }
-    } catch {
-      setErrors({ submit: 'Error al enviar el comercio. Intentá de nuevo.' })
+    } catch (err) {
+      console.error('Error al enviar comercio:', err)
+      setErrors({ submit: `Error al enviar el comercio: ${err?.code ?? err?.message ?? 'intentá de nuevo'}.` })
     }
   }
 
