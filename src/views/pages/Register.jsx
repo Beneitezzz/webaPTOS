@@ -4,6 +4,7 @@ import { UserPlus, Store } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
 import { googleProvider, appleProvider, facebookProvider } from '../../firebase'
 import { getAuthError } from '../../utils/authErrors'
+import PolicyModal from '../components/PolicyModal'
 
 const PROTECTED_ROUTES = ['/perfil', '/registro-comercio', '/admin']
 
@@ -21,6 +22,7 @@ export default function Register() {
   const [acceptDisclaimer, setAcceptDisclaimer] = useState(false)
   const [acceptVeracity, setAcceptVeracity] = useState(false)
   const [acceptReview, setAcceptReview] = useState(false)
+  const [policySection, setPolicySection] = useState(null)
 
   const redirect = searchParams.get('redirect') || '/'
   const ALLOWED_ROLES = ['user', 'comercio']
@@ -188,9 +190,9 @@ export default function Register() {
                 />
                 <span>
                   Leí y acepto los{' '}
-                  <Link to="/politicas?seccion=terminos" className="link" target="_blank">Términos y Condiciones</Link>
+                  <button type="button" className="link-btn" onClick={() => setPolicySection('terminos')}>Términos y Condiciones</button>
                   {' '}y la{' '}
-                  <Link to="/politicas?seccion=privacidad" className="link" target="_blank">Política de Privacidad</Link>
+                  <button type="button" className="link-btn" onClick={() => setPolicySection('privacidad')}>Política de Privacidad</button>
                   {' '}de PuntoSano
                 </span>
               </label>
@@ -204,7 +206,7 @@ export default function Register() {
                   />
                   <span>
                     Entiendo que PuntoSano es una{' '}
-                    <Link to="/politicas?seccion=usuarios" className="link" target="_blank">herramienta informativa</Link>
+                    <button type="button" className="link-btn" onClick={() => setPolicySection('usuarios')}>herramienta informativa</button>
                     {' '}y no reemplaza diagnósticos ni consejos médicos profesionales
                   </span>
                 </label>
@@ -230,7 +232,7 @@ export default function Register() {
                     />
                     <span>
                       Acepto que mi registro será{' '}
-                      <Link to="/politicas?seccion=comercios" className="link" target="_blank">revisado y verificado</Link>
+                      <button type="button" className="link-btn" onClick={() => setPolicySection('comercios')}>revisado y verificado</button>
                       {' '}por PuntoSano y podrá ser rechazado si no cumple los requisitos
                     </span>
                   </label>
@@ -264,6 +266,9 @@ export default function Register() {
           )}
         </div>
       </div>
+      {policySection && (
+        <PolicyModal section={policySection} onClose={() => setPolicySection(null)} />
+      )}
     </div>
   )
 }
