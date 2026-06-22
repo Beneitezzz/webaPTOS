@@ -34,7 +34,7 @@ const INITIAL_FORM = {
   socialLinks: [''],
 }
 
-export function useBusinessForm() {
+export function useBusinessForm(businessId = null) {
   const { addBusiness, businesses, businessesLoading } = useApp()
   const { currentUser } = useAuth()
   const navigate = useNavigate()
@@ -53,6 +53,7 @@ export function useBusinessForm() {
   const [editingSuspendedBusiness, setEditingSuspendedBusiness] = useState(false)
   const [initialCertifications, setInitialCertifications] = useState([])
   const [errors, setErrors] = useState({})
+  const [submitting, setSubmitting] = useState(false)
   const [coords, setCoords] = useState(null)
   const [geocoding, setGeocoding] = useState(false)
   const [geocodeError, setGeocodeError] = useState('')
@@ -117,14 +118,10 @@ export function useBusinessForm() {
   }, [form.address])
 
   useEffect(() => {
-    if (businessesLoading || !currentUser || initializedRef.current) return
-    initializedRef.current = true
-    const existing = businesses.find((b) => b.ownerId === currentUser.uid)
+    if (!businessId || businessesLoading || initializedRef.current) return
+    const existing = businesses.find((b) => b.id === businessId)
     if (!existing) return
-    if (existing.status !== 'rechazado' && existing.status !== 'aprobado' && existing.status !== 'suspendido') {
-      navigate('/mi-comercio', { replace: true })
-      return
-    }
+    initializedRef.current = true
     /* eslint-disable react-hooks/set-state-in-effect */
     if (existing.status === 'aprobado') {
       setEditingApprovedBusiness(true)
@@ -154,7 +151,7 @@ export function useBusinessForm() {
     setGeocodeId((n) => n + 1)
     setGeocodeError('')
     /* eslint-enable react-hooks/set-state-in-effect */
-  }, [businesses, businessesLoading, currentUser, navigate])
+  }, [businessId, businesses, businessesLoading])
 
   const handleChange = (field, value) => {
     setForm((prev) => ({ ...prev, [field]: value }))
@@ -289,6 +286,7 @@ export function useBusinessForm() {
       setErrors(errs)
       return
     }
+    setSubmitting(true)
     try {
       const businessData = {
         ...form,
@@ -361,6 +359,7 @@ export function useBusinessForm() {
         setErrors({
           submit: `Tu comercio fue registrado pero los archivos no se pudieron subir. Error: ${uploadErr?.code ?? uploadErr?.message ?? 'desconocido'}. Verificá tu conexión y volvé a intentarlo.`,
         })
+        setSubmitting(false)
         return
       }
 
@@ -379,6 +378,7 @@ export function useBusinessForm() {
     } catch (err) {
       console.error('Error al enviar comercio:', err)
       setErrors({ submit: `Error al enviar el comercio: ${err?.code ?? err?.message ?? 'intentá de nuevo'}.` })
+      setSubmitting(false)
     }
   }
 
@@ -435,6 +435,7 @@ export function useBusinessForm() {
     editingSuspendedBusiness,
     certsChanged,
     submitted,
+    submitting,
     errors,
     coords,
     setCoords,

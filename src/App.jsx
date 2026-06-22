@@ -33,6 +33,7 @@ export default function App() {
               <Route path="/politicas" element={<Politicas />} />
               <Route path="/perfil" element={<PrivateRoute><Perfil /></PrivateRoute>} />
               <Route path="/registro-comercio" element={<PrivateRoute><RegistroComercio /></PrivateRoute>} />
+              <Route path="/registro-comercio/:id" element={<PrivateRoute><RegistroComercio /></PrivateRoute>} />
               <Route path="/mi-comercio" element={<PrivateRoute><MiComercio /></PrivateRoute>} />
               <Route path="/admin" element={<AdminRoute><AdminPanel /></AdminRoute>} />
             </Routes>

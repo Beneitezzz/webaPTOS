@@ -1,6 +1,7 @@
 import { CheckCircle, Store } from 'lucide-react'
 import { MapContainer, TileLayer, Marker } from 'react-leaflet'
 import L from 'leaflet'
+import { useParams } from 'react-router-dom'
 import { RESTRICTIONS, BUSINESS_TYPES, CERTIFICATIONS } from '../../models/mockData'
 import { useBusinessForm } from '../../hooks/useBusinessForm'
 
@@ -36,18 +37,19 @@ function DraggableMarker({ coords, onMove }) {
 }
 
 export default function RegistroComercio() {
+  const { id: businessId } = useParams()
   const {
     form, certFiles, menuFile, existingMenuFileUrl, setExistingMenuFileUrl,
     menuFileError, newPhotos, existingPhotos, photoError,
     handleAddPhotos, removeNewPhoto, removeExistingPhoto,
-    editingBusinessId, submitted, errors, coords,
+    editingBusinessId, submitted, submitting, errors, coords,
     geocoding, geocodeError, geocodeId,
     editingApprovedBusiness, editingSuspendedBusiness, certsChanged,
     handleChange, handleMarkerMove, handleMenuFile, handleCertFile,
     addSocialLink, updateSocialLink, removeSocialLink,
     updateHourField, toggleSecondShift, toggleTag, toggleCert,
     handleSubmit, onSuccessReset,
-  } = useBusinessForm()
+  } = useBusinessForm(businessId)
 
   if (submitted) {
     let successTitle, successMessage
@@ -449,9 +451,11 @@ export default function RegistroComercio() {
           </div>
 
           {errors.submit && <div className="auth-error">{errors.submit}</div>}
-          <button type="submit" className="btn btn-primary btn-full" disabled={geocoding}>
+          <button type="submit" className="btn btn-primary btn-full" disabled={geocoding || submitting}>
             {geocoding
               ? 'Verificando ubicación...'
+              : submitting
+              ? 'Enviando...'
               : editingApprovedBusiness
               ? certsChanged
                 ? 'Guardar y enviar a revisión'
