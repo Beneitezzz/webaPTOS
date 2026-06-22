@@ -68,7 +68,7 @@ export default function RegistroComercio() {
       successTitle = '¡Re-envío exitoso!'
       successMessage = 'Tu comercio fue re-enviado y está nuevamente en revisión. Te avisaremos cuando haya novedades.'
     } else {
-      successTitle = '¡Registro enviado!'
+      successTitle = '¡Envío exitoso!'
       successMessage = 'Tu comercio fue enviado para revisión. Una vez aprobado por un administrador, aparecerá en el mapa.'
     }
 
@@ -78,12 +78,6 @@ export default function RegistroComercio() {
           <CheckCircle size={64} className="success-icon" />
           <h1>{successTitle}</h1>
           <p>{successMessage}</p>
-          {!editingApprovedBusiness && !editingSuspendedBusiness && (
-            <p className="text-muted" style={{ fontSize: '0.875rem' }}>
-              ¿Sos administrador?{' '}
-              <a href="/admin" className="link">Ir al panel de administración</a> para aprobar el comercio.
-            </p>
-          )}
           {!editingApprovedBusiness && !editingSuspendedBusiness && (
             <button className="btn btn-primary" onClick={onSuccessReset}>
               Registrar otro comercio
