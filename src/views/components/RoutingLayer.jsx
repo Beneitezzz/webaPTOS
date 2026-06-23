@@ -12,6 +12,8 @@ function formatDistance(meters) {
     : `${(meters / 1000).toFixed(1)} km`
 }
 
+const ROUTE_PATH_OPTIONS = { color: '#2563eb', weight: 4, opacity: 0.8 }
+
 export default function RoutingLayer({ userPosition, destination }) {
   const [route, setRoute] = useState(null)
 
@@ -47,7 +49,7 @@ export default function RoutingLayer({ userPosition, destination }) {
   return (
     <Polyline
       positions={route.positions}
-      pathOptions={{ color: '#2563eb', weight: 4, opacity: 0.8 }}
+      pathOptions={ROUTE_PATH_OPTIONS}
     >
       <Tooltip sticky>
         <span className="route-info-label">
