@@ -21,13 +21,13 @@ const STATUS_CONFIG = {
   },
   rechazado: {
     label: 'Comercio rechazado',
-    description: null,
+    description: 'Podés corregir los datos de tu comercio y re-enviar la solicitud para que sea revisada nuevamente.',
     Icon: XCircle,
     modifier: 'rejected',
   },
   suspendido: {
     label: 'Comercio suspendido',
-    description: 'Tu comercio no aparece en el mapa. Contactá con el equipo de PuntoSano para más información.',
+    description: 'Podés corregir los datos de tu comercio y re-enviar la solicitud para que sea revisada nuevamente.',
     Icon: PauseCircle,
     modifier: 'suspended',
   },
@@ -49,11 +49,13 @@ function BusinessCard({ business, onDelete }) {
         <Icon size={20} />
         <div>
           <strong>{config.label}</strong>
-          <p>
-            {status === 'rechazado' && business.rejectionReason
-              ? business.rejectionReason
-              : config.description}
-          </p>
+          {status === 'rechazado' && business.rejectionReason && (
+            <p><strong>Motivo:</strong> {business.rejectionReason}</p>
+          )}
+          {status === 'suspendido' && business.suspensionReason && (
+            <p><strong>Motivo:</strong> {business.suspensionReason}</p>
+          )}
+          {config.description && <p>{config.description}</p>}
         </div>
       </div>
 

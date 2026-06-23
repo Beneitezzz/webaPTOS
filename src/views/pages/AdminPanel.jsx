@@ -24,7 +24,13 @@ export default function AdminPanel() {
   }, [])
 
   const pending = useMemo(
-    () => businesses.filter((b) => b.pending && !b.verified),
+    () => businesses
+      .filter((b) => b.pending && !b.verified)
+      .sort((a, b) => {
+        const ta = a.createdAt?.toMillis?.() ?? 0
+        const tb = b.createdAt?.toMillis?.() ?? 0
+        return ta - tb
+      }),
     [businesses]
   )
 
