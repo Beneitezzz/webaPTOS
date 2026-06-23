@@ -1,4 +1,4 @@
-import { useRef, useEffect } from 'react'
+import { useRef, useEffect, useMemo } from 'react'
 import { MapContainer, TileLayer, Marker, Popup, useMap, ZoomControl } from 'react-leaflet'
 import { Link } from 'react-router-dom'
 import { Locate, Square } from 'lucide-react'
@@ -86,12 +86,12 @@ export default function MapView({
 }) {
   const markerRefs = useRef({})
 
-  const selectedBusiness = selectedBusinessId
-    ? businesses.find((b) => String(b.id) === String(selectedBusinessId))
-    : null
-  const destination = selectedBusiness
-    ? { lat: selectedBusiness.lat, lng: selectedBusiness.lng }
-    : null
+  const destination = useMemo(() => {
+    const b = selectedBusinessId
+      ? businesses.find((b) => String(b.id) === String(selectedBusinessId))
+      : null
+    return b ? { lat: b.lat, lng: b.lng } : null
+  }, [selectedBusinessId, businesses])
 
   return (
     <MapContainer

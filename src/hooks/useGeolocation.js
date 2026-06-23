@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from 'react'
+import { useState, useRef, useCallback, useEffect } from 'react'
 
 export function useGeolocation() {
   const [position, setPosition] = useState(null)
@@ -43,6 +43,14 @@ export function useGeolocation() {
       },
       { enableHighAccuracy: true, timeout: 15000 },
     )
+  }, [])
+
+  useEffect(() => {
+    return () => {
+      if (watchIdRef.current !== null) {
+        navigator.geolocation.clearWatch(watchIdRef.current)
+      }
+    }
   }, [])
 
   return { position, accuracy, active, error, start, stop }
