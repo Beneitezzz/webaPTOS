@@ -94,6 +94,7 @@ export default function MapView({
   }, [selectedBusinessId, businesses])
 
   return (
+    <div style={{ position: 'relative', height: '100%', width: '100%' }}>
     <MapContainer
       center={CORDOBA_CENTER}
       zoom={13}
@@ -106,12 +107,6 @@ export default function MapView({
       />
       <ZoomControl position="topright" />
       <ResizeWatcher trigger={sidebarOpen} />
-      <LocateButton
-        active={trackingActive}
-        onStart={onStartTracking}
-        onStop={onStopTracking}
-        error={trackingError}
-      />
       <UserLocationLayer position={userPosition} accuracy={userAccuracy} />
       {trackingActive && (
         <RoutingLayer userPosition={userPosition} destination={destination} />
@@ -169,5 +164,12 @@ export default function MapView({
         )
       })}
     </MapContainer>
+    <LocateButton
+      active={trackingActive}
+      onStart={onStartTracking}
+      onStop={onStopTracking}
+      error={trackingError}
+    />
+    </div>
   )
 }
