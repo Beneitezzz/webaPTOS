@@ -511,6 +511,26 @@ img { display: block; max-width: 100%; }
 }
 .toggle-switch.on { background: var(--primary); }
 .toggle-switch.on::after { transform: translateX(16px); }
+.sidebar-sort { padding: 0.5rem 1rem; border-bottom: 1px solid var(--border); }
+.sidebar-sort select {
+  width: 100%; padding: 6px 10px;
+  border: 1px solid var(--border); border-radius: var(--radius-sm);
+  font-family: inherit; font-size: 0.82rem; color: var(--text); background: #fff;
+  cursor: pointer;
+}
+.sidebar-sort select:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.radius-filter { display: flex; align-items: center; gap: 10px; }
+.radius-filter input[type="range"] { flex: 1; accent-color: var(--primary); }
+.radius-filter span { font-size: 0.82rem; font-weight: 600; color: var(--primary); min-width: 42px; text-align: right; }
+
+.distance-badge {
+  display: inline-flex; align-items: center; gap: 3px;
+  font-size: 0.72rem; font-weight: 600;
+  color: var(--primary); background: var(--primary-lighter);
+  padding: 2px 7px; border-radius: 10px;
+}
+
 .sidebar-results-count {
   padding: 8px 1rem; font-size: 0.82rem; color: var(--text-muted);
   border-bottom: 1px solid var(--border); background: var(--bg);
