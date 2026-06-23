@@ -1111,6 +1111,16 @@ section[id] { scroll-margin-top: calc(var(--navbar-h) + 8px); }
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
+.route-info-label { font-size: 0.82rem; font-weight: 600; color: var(--text); }
+
+.popup-nav-links { display: flex; gap: 6px; margin-top: 6px; }
+.popup-nav-links a {
+  font-size: 0.75rem; font-weight: 600; color: var(--primary);
+  padding: 3px 8px; background: var(--primary-lighter);
+  border-radius: 4px; white-space: nowrap;
+}
+.popup-nav-links a:hover { background: var(--accent); color: #fff; }
+
 /* ── Open / Closed chips ── */
 .open-chip {
   display: inline-flex;
