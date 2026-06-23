@@ -1,5 +1,6 @@
+import { useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import { MapPin, Clock, Phone, MessageCircle, ArrowLeft, ShieldCheck, Globe } from 'lucide-react'
+import { MapPin, Clock, Phone, MessageCircle, ArrowLeft, ShieldCheck, Globe, X, ChevronLeft, ChevronRight } from 'lucide-react'
 import { useApp } from '../../context/AppContext'
 import { useAuth } from '../../context/AuthContext'
 import { useFavorites } from '../../hooks/useFavorites'
@@ -21,6 +22,20 @@ export default function DetalleComercio() {
     mockBusinesses.find((b) => String(b.id) === id)
 
   const openStatus = useOpenStatus(business?.openingHours)
+
+  const [lightboxIndex, setLightboxIndex] = useState(null)
+  const [menuOpen, setMenuOpen] = useState(false)
+
+  const photos = business?.photos ?? []
+  const closeLightbox = () => setLightboxIndex(null)
+  const prevPhoto = () => setLightboxIndex((i) => (i - 1 + photos.length) % photos.length)
+  const nextPhoto = () => setLightboxIndex((i) => (i + 1) % photos.length)
+
+  const handleLightboxKey = (e) => {
+    if (e.key === 'Escape') closeLightbox()
+    if (e.key === 'ArrowLeft') prevPhoto()
+    if (e.key === 'ArrowRight') nextPhoto()
+  }
 
   if (businessesLoading) return (
     <div className="page page-centered">
@@ -176,14 +191,19 @@ export default function DetalleComercio() {
         </div>
 
         {/* Fotos */}
-        {business.photos?.length > 0 && (
+        {photos.length > 0 && (
           <div className="card">
             <h2>Fotos del comercio</h2>
             <div className="detail-photos-grid">
-              {business.photos.map((url, i) => (
-                <a key={i} href={url} target="_blank" rel="noopener noreferrer" className="detail-photo-link">
+              {photos.map((url, i) => (
+                <button
+                  key={i}
+                  className="detail-photo-link"
+                  onClick={() => setLightboxIndex(i)}
+                  aria-label={`Ver foto ${i + 1}`}
+                >
                   <img src={url} alt={`${business.name} foto ${i + 1}`} className="detail-photo-img" />
-                </a>
+                </button>
               ))}
             </div>
           </div>
@@ -193,14 +213,9 @@ export default function DetalleComercio() {
         {business.menuFileUrl && (
           <div className="card">
             <h2>Carta / Menú</h2>
-            <a
-              href={business.menuFileUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn btn-outline"
-            >
+            <button className="btn btn-outline" onClick={() => setMenuOpen(true)}>
               📄 Ver carta del menú
-            </a>
+            </button>
           </div>
         )}
 
@@ -213,6 +228,67 @@ export default function DetalleComercio() {
           consultá directamente con el establecimiento.
         </div>
       </div>
+
+      {/* ── Lightbox fotos ── */}
+      {lightboxIndex !== null && (
+        <div
+          className="lightbox-overlay"
+          onClick={closeLightbox}
+          onKeyDown={handleLightboxKey}
+          tabIndex={-1}
+        >
+          <button className="lightbox-close" onClick={closeLightbox} aria-label="Cerrar">
+            <X size={22} />
+          </button>
+
+          {photos.length > 1 && (
+            <button
+              className="lightbox-arrow lightbox-arrow--prev"
+              onClick={(e) => { e.stopPropagation(); prevPhoto() }}
+              aria-label="Foto anterior"
+            >
+              <ChevronLeft size={28} />
+            </button>
+          )}
+
+          <div className="lightbox-img-wrap" onClick={(e) => e.stopPropagation()}>
+            <img
+              src={photos[lightboxIndex]}
+              alt={`${business.name} foto ${lightboxIndex + 1}`}
+              className="lightbox-img"
+            />
+            {photos.length > 1 && (
+              <div className="lightbox-counter">{lightboxIndex + 1} / {photos.length}</div>
+            )}
+          </div>
+
+          {photos.length > 1 && (
+            <button
+              className="lightbox-arrow lightbox-arrow--next"
+              onClick={(e) => { e.stopPropagation(); nextPhoto() }}
+              aria-label="Foto siguiente"
+            >
+              <ChevronRight size={28} />
+            </button>
+          )}
+        </div>
+      )}
+
+      {/* ── Modal menú ── */}
+      {menuOpen && (
+        <div className="lightbox-overlay" onClick={() => setMenuOpen(false)}>
+          <button className="lightbox-close" onClick={() => setMenuOpen(false)} aria-label="Cerrar">
+            <X size={22} />
+          </button>
+          <div className="menu-modal-wrap" onClick={(e) => e.stopPropagation()}>
+            <iframe
+              src={business.menuFileUrl}
+              title="Carta / Menú"
+              className="menu-modal-iframe"
+            />
+          </div>
+        </div>
+      )}
     </div>
   )
 }
