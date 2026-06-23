@@ -126,6 +126,29 @@ export default function DetalleComercio() {
                 )
               })}
             </div>
+            {business.lat != null && business.lng != null && (
+              <div style={{ marginTop: '1rem' }}>
+                <h3 style={{ fontSize: '0.9rem', fontWeight: 700, marginBottom: '0.5rem' }}>Cómo llegar</h3>
+                <div className="contact-buttons">
+                  <a
+                    href={`https://www.google.com/maps/dir/?api=1&destination=${business.lat},${business.lng}&travelmode=walking`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn-gmaps"
+                  >
+                    Google Maps
+                  </a>
+                  <a
+                    href={`https://waze.com/ul?ll=${business.lat},${business.lng}&navigate=yes`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn-waze"
+                  >
+                    Waze
+                  </a>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Restrictions */}

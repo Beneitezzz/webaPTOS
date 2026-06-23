@@ -5,7 +5,7 @@ import RestrictionBadge from './RestrictionBadge'
 import { BUSINESS_TYPE_MAP } from '../../models/mockData'
 import { useOpenStatus } from '../../hooks/useOpenStatus'
 
-export default memo(function BusinessCard({ business, isFavorite, onToggleFavorite, onSelect, selected }) {
+export default memo(function BusinessCard({ business, isFavorite, onToggleFavorite, onSelect, selected, distance }) {
   const typeInfo = BUSINESS_TYPE_MAP[business.type]
   const openStatus = useOpenStatus(business.openingHours)
 
@@ -43,6 +43,11 @@ export default memo(function BusinessCard({ business, isFavorite, onToggleFavori
 
       <div className="business-card-info">
         <span><MapPin size={13} /> {business.address}</span>
+        {distance != null && (
+          <span className="distance-badge">
+            {distance < 1 ? `${Math.round(distance * 1000)} m` : `${distance.toFixed(1)} km`}
+          </span>
+        )}
         {openStatus !== null && (
           <div className={openStatus ? 'open-chip' : 'closed-chip'}>
             {openStatus ? 'Abierto ahora' : 'Cerrado'}

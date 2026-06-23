@@ -1,9 +1,11 @@
-import { useRef, useState, useEffect } from 'react'
+import { useRef, useEffect, useMemo } from 'react'
 import { MapContainer, TileLayer, Marker, Popup, useMap, ZoomControl } from 'react-leaflet'
 import { Link } from 'react-router-dom'
-import { Locate } from 'lucide-react'
+import { Locate, Square } from 'lucide-react'
 import L from 'leaflet'
 import { BUSINESS_TYPE_MAP } from '../../models/mockData'
+import UserLocationLayer from './UserLocationLayer'
+import RoutingLayer from './RoutingLayer'
 
 const CORDOBA_CENTER = [-31.4201, -64.1888]
 
@@ -54,58 +56,45 @@ function ResizeWatcher({ trigger }) {
   return null
 }
 
-function LocateButton() {
-  const map = useMap()
-  const markerRef = useRef(null)
-  const [locating, setLocating] = useState(false)
-  const [error, setError] = useState('')
-
-  const handleLocate = () => {
-    if (!navigator.geolocation) {
-      setError('Tu navegador no soporta geolocalización')
-      return
-    }
-    setLocating(true)
-    setError('')
-    navigator.geolocation.getCurrentPosition(
-      ({ coords }) => {
-        if (markerRef.current) markerRef.current.remove()
-        markerRef.current = L.circleMarker([coords.latitude, coords.longitude], {
-          radius: 9,
-          fillColor: '#2563eb',
-          color: '#fff',
-          weight: 2,
-          fillOpacity: 1,
-        }).addTo(map)
-        map.flyTo([coords.latitude, coords.longitude], 15)
-        setLocating(false)
-      },
-      () => {
-        setError('No se pudo obtener tu ubicación')
-        setLocating(false)
-      },
-      { timeout: 10000 },
-    )
-  }
-
+function LocateButton({ active, onStart, onStop, error }) {
   return (
     <div className="locate-control">
       <button
-        className="locate-btn"
-        onClick={handleLocate}
-        disabled={locating}
-        title="Centrar en mi ubicación"
+        className={`locate-btn${active ? ' locate-btn--active' : ''}`}
+        onClick={active ? onStop : onStart}
+        title={active ? 'Detener seguimiento' : 'Activar seguimiento de ubicación'}
       >
-        <Locate size={18} />
+        {active ? <Square size={16} /> : <Locate size={18} />}
       </button>
       {error && <div className="locate-error">{error}</div>}
     </div>
   )
 }
 
-export default function MapView({ businesses, sidebarOpen, selectedBusinessId, favoriteIds, onToggleFavorite }) {
+export default function MapView({
+  businesses,
+  sidebarOpen,
+  selectedBusinessId,
+  favoriteIds,
+  onToggleFavorite,
+  userPosition,
+  userAccuracy,
+  trackingActive,
+  trackingError,
+  onStartTracking,
+  onStopTracking,
+}) {
   const markerRefs = useRef({})
+
+  const destination = useMemo(() => {
+    const b = selectedBusinessId
+      ? businesses.find((b) => String(b.id) === String(selectedBusinessId))
+      : null
+    return b ? { lat: b.lat, lng: b.lng } : null
+  }, [selectedBusinessId, businesses])
+
   return (
+    <div style={{ position: 'relative', height: '100%', width: '100%' }}>
     <MapContainer
       center={CORDOBA_CENTER}
       zoom={13}
@@ -118,7 +107,10 @@ export default function MapView({ businesses, sidebarOpen, selectedBusinessId, f
       />
       <ZoomControl position="topright" />
       <ResizeWatcher trigger={sidebarOpen} />
-      <LocateButton />
+      <UserLocationLayer position={userPosition} accuracy={userAccuracy} />
+      {trackingActive && (
+        <RoutingLayer userPosition={userPosition} destination={destination} />
+      )}
       <FlyToSelected selectedId={selectedBusinessId} businesses={businesses} markerRefs={markerRefs} />
       {businesses.map((b) => {
         const typeInfo = BUSINESS_TYPE_MAP[b.type]
@@ -148,11 +140,36 @@ export default function MapView({ businesses, sidebarOpen, selectedBusinessId, f
                 </span>
                 <p>{b.address}</p>
                 <Link to={`/comercio/${b.id}`}>Ver detalles →</Link>
+                {trackingActive && userPosition && (
+                  <div className="popup-nav-links">
+                    <a
+                      href={`https://www.google.com/maps/dir/?api=1&origin=${userPosition.lat},${userPosition.lng}&destination=${b.lat},${b.lng}&travelmode=walking`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      Google Maps
+                    </a>
+                    <a
+                      href={`https://waze.com/ul?ll=${b.lat},${b.lng}&navigate=yes`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      Waze
+                    </a>
+                  </div>
+                )}
               </div>
             </Popup>
           </Marker>
         )
       })}
     </MapContainer>
+    <LocateButton
+      active={trackingActive}
+      onStart={onStartTracking}
+      onStop={onStopTracking}
+      error={trackingError}
+    />
+    </div>
   )
 }
