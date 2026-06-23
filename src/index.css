@@ -518,7 +518,7 @@ img { display: block; max-width: 100%; }
   font-family: inherit; font-size: 0.82rem; color: var(--text); background: #fff;
   cursor: pointer;
 }
-.sidebar-sort select:disabled { opacity: 0.5; cursor: not-allowed; }
+.sidebar-sort select:disabled { color: var(--text-muted); background: var(--bg); cursor: not-allowed; }
 
 .radius-filter { display: flex; align-items: center; gap: 10px; }
 .radius-filter input[type="range"] { flex: 1; accent-color: var(--primary); }
