@@ -196,7 +196,7 @@ export default function Home() {
           <p className="footer-links">
             <Link to="/politicas">Políticas y Privacidad</Link>
           </p>
-          <p className="footer-copy">© 2025 PuntoSano · Proyecto académico — Universidad Siglo 21</p>
+          <p className="footer-copy">© 2026 PuntoSano · Proyecto académico — Universidad Siglo 21</p>
         </div>
       </footer>
     </div>
