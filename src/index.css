@@ -1692,8 +1692,8 @@ section[id] { scroll-margin-top: calc(var(--navbar-h) + 8px); }
 .top-rated-business-card:hover .top-rated-image { filter: brightness(0.92); }
 
 .top-rated-image {
-  position: relative; border-radius: var(--radius-sm);
-  height: 150px; display: flex; align-items: center; justify-content: center;
+  position: relative; border-radius: 16px;
+  height: 260px; display: flex; align-items: center; justify-content: center;
   margin-bottom: 0.75rem; overflow: hidden;
   transition: filter 0.15s;
 }
