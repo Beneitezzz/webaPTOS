@@ -1098,6 +1098,8 @@ section[id] { scroll-margin-top: calc(var(--navbar-h) + 8px); }
 }
 .locate-btn:hover { background: #f3f4f6; }
 .locate-btn:disabled { opacity: 0.55; cursor: not-allowed; }
+.locate-btn--active { background: #2563eb; color: #fff; border-color: #2563eb; }
+.locate-btn--active:hover { background: #1d4ed8; }
 .locate-error {
   background: white;
   border: 1px solid #e63946;
