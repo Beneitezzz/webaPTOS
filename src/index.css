@@ -668,6 +668,20 @@ img { display: block; max-width: 100%; }
 .info-list li { display: flex; align-items: flex-start; gap: 8px; font-size: 0.875rem; color: var(--text-muted); }
 .info-list li svg { color: var(--primary); flex-shrink: 0; margin-top: 2px; }
 .contact-buttons { display: flex; gap: 8px; flex-wrap: wrap; }
+.btn-gmaps {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 8px 16px; border-radius: var(--radius-sm);
+  font-size: 0.875rem; font-weight: 600;
+  background: #4285f4; color: #fff; border: none;
+}
+.btn-gmaps:hover { background: #3367d6; }
+.btn-waze {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 8px 16px; border-radius: var(--radius-sm);
+  font-size: 0.875rem; font-weight: 600;
+  background: #33ccff; color: #1a1a1a; border: none;
+}
+.btn-waze:hover { background: #00b8e6; }
 .tags-list { display: flex; flex-wrap: wrap; gap: 6px; }
 .certifications-list { display: flex; flex-direction: column; gap: 8px; }
 .certification-item { display: flex; align-items: flex-start; gap: 8px; font-size: 0.85rem; }
