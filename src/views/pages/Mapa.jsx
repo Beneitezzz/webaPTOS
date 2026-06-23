@@ -10,11 +10,13 @@ import { useAuth } from '../../context/AuthContext'
 import { useFavorites } from '../../hooks/useFavorites'
 import { toggleItem } from '../../utils/array'
 import { isOpenNow } from '../../utils/hours'
+import { useGeolocation } from '../../hooks/useGeolocation'
 
 export default function Mapa() {
   const { userProfile, businesses, businessesLoading, businessesError, profileLoading } = useApp()
   const { currentUser } = useAuth()
   const { favoriteIds, toggleFavorite } = useFavorites()
+  const { position: userPosition, accuracy: userAccuracy, active: trackingActive, error: trackingError, start: startTracking, stop: stopTracking } = useGeolocation()
 
   const [selectedRestrictions, setSelectedRestrictions] = useState([])
   const [selectedTypes, setSelectedTypes] = useState([])
@@ -211,6 +213,12 @@ export default function Mapa() {
             selectedBusinessId={selectedBusinessId}
             favoriteIds={currentUser ? favoriteIds : undefined}
             onToggleFavorite={currentUser ? toggleFavorite : undefined}
+            userPosition={userPosition}
+            userAccuracy={userAccuracy}
+            trackingActive={trackingActive}
+            trackingError={trackingError}
+            onStartTracking={startTracking}
+            onStopTracking={stopTracking}
           />
         )}
       </div>
