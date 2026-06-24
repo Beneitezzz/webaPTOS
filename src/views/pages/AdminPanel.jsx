@@ -255,17 +255,20 @@ export default function AdminPanel() {
                                 setActionError(null)
                                 try {
                                   await rejectBusiness(b.id, rejectReason.trim())
+                                } catch {
+                                  setActionError('Error al rechazar. Intentá de nuevo.')
+                                  return
+                                }
+                                setRejectingId(null)
+                                setRejectReason('')
+                                showToast(`Rechazo de "${b.name}" enviado correctamente.`)
+                                try {
                                   await sendRejectionEmail({
                                     businessName: b.name,
                                     ownerEmail: b.ownerEmail ?? null,
                                     reason: rejectReason.trim(),
                                   })
-                                  setRejectingId(null)
-                                  setRejectReason('')
-                                  showToast(`Rechazo de "${b.name}" enviado correctamente.`)
-                                } catch {
-                                  setActionError('Error al rechazar. Intentá de nuevo.')
-                                }
+                                } catch { /* email es best-effort */ }
                               }}
                             >
                               Confirmar rechazo
@@ -367,18 +370,21 @@ export default function AdminPanel() {
                                 setActionError(null)
                                 try {
                                   await suspendBusiness(b.id, suspendReason.trim())
+                                } catch {
+                                  setActionError('Error al suspender. Intentá de nuevo.')
+                                  return
+                                }
+                                setSuspendingId(null)
+                                setSuspendReason('')
+                                setSuspendReasonError(false)
+                                showToast(`Suspensión de "${b.name}" aplicada correctamente.`)
+                                try {
                                   await sendSuspensionEmail({
                                     businessName: b.name,
                                     ownerEmail: b.ownerEmail ?? null,
                                     reason: suspendReason.trim(),
                                   })
-                                  setSuspendingId(null)
-                                  setSuspendReason('')
-                                  setSuspendReasonError(false)
-                                  showToast(`Suspensión de "${b.name}" aplicada correctamente.`)
-                                } catch {
-                                  setActionError('Error al suspender. Intentá de nuevo.')
-                                }
+                                } catch { /* email es best-effort */ }
                               }}
                             >
                               Confirmar suspensión

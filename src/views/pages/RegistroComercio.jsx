@@ -1,7 +1,7 @@
 import { CheckCircle, Store } from 'lucide-react'
 import { MapContainer, TileLayer, Marker } from 'react-leaflet'
 import L from 'leaflet'
-import { useParams } from 'react-router-dom'
+import { useParams, Link } from 'react-router-dom'
 import { RESTRICTIONS, BUSINESS_TYPES, CERTIFICATIONS } from '../../models/mockData'
 import { useBusinessForm } from '../../hooks/useBusinessForm'
 
@@ -62,8 +62,8 @@ export default function RegistroComercio() {
         successMessage = 'Tu ficha fue actualizada y los cambios ya son visibles en el mapa.'
       }
     } else if (editingSuspendedBusiness) {
-      successTitle = '¡Cambios enviados!'
-      successMessage = 'Tu comercio fue re-enviado y está en revisión. Te avisaremos cuando sea aprobado y vuelva a aparecer en el mapa.'
+      successTitle = '¡Re-envío exitoso!'
+      successMessage = 'Tu comercio fue re-enviado y está nuevamente en revisión. Te avisaremos cuando sea aprobado y vuelva a aparecer en el mapa.'
     } else if (isResubmission) {
       successTitle = '¡Re-envío exitoso!'
       successMessage = 'Tu comercio fue re-enviado y está nuevamente en revisión. Te avisaremos cuando haya novedades.'
@@ -78,6 +78,11 @@ export default function RegistroComercio() {
           <CheckCircle size={64} className="success-icon" />
           <h1>{successTitle}</h1>
           <p>{successMessage}</p>
+          {editingSuspendedBusiness && (
+            <Link to="/mi-comercio" className="btn btn-primary">
+              Ver mis comercios
+            </Link>
+          )}
           {!editingApprovedBusiness && !editingSuspendedBusiness && (
             <button className="btn btn-primary" onClick={onSuccessReset}>
               Registrar otro comercio

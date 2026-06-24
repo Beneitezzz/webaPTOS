@@ -373,9 +373,7 @@ export function useBusinessForm(businessId = null) {
           : 'Tu ficha fue actualizada. Los cambios ya son visibles en el mapa.'
         navigate('/mi-comercio', { state: { successMessage: msg } })
       } else if (editingSuspendedBusiness) {
-        navigate('/mi-comercio', {
-          state: { successMessage: 'Tu comercio fue enviado a revisión. Te avisaremos cuando sea aprobado.' },
-        })
+        setSubmitted(true)
       } else {
         setSubmitted(true)
       }
