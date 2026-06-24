@@ -336,28 +336,20 @@ export function useBusinessForm(businessId = null) {
       }
 
       try {
-        const certUrls = {}
-        for (const [certCode, file] of Object.entries(certFiles)) {
-          certUrls[certCode] = await uploadCertFile(businessId, certCode, file)
-        }
-        if (Object.keys(certUrls).length > 0) {
-          await updateBusiness(businessId, { certDocuments: certUrls })
-        }
-
-        if (menuFile) {
-          const menuUrl = await uploadMenuFile(businessId, menuFile)
-          await updateBusiness(businessId, { menuFileUrl: menuUrl })
-        }
-
-        const uploadedPhotoUrls = []
-        for (let i = 0; i < newPhotos.length; i++) {
-          const url = await uploadBusinessPhoto(businessId, newPhotos[i], existingPhotos.length + i)
-          uploadedPhotoUrls.push(url)
-        }
+        const certEntries = Object.entries(certFiles)
+        const results = await Promise.all([
+          Promise.all(certEntries.map(async ([code, file]) => [code, await uploadCertFile(businessId, code, file)])),
+          menuFile ? uploadMenuFile(businessId, menuFile) : Promise.resolve(null),
+          ...newPhotos.map((photo, i) => uploadBusinessPhoto(businessId, photo, existingPhotos.length + i)),
+        ])
+        const [certPairs, menuUrl, ...uploadedPhotoUrls] = results
+        const certUrls = Object.fromEntries(certPairs)
         const allPhotos = [...existingPhotos, ...uploadedPhotoUrls]
-        if (allPhotos.length > 0) {
-          await updateBusiness(businessId, { photos: allPhotos })
-        }
+        await Promise.all([
+          certEntries.length > 0 && updateBusiness(businessId, { certDocuments: certUrls }),
+          menuUrl && updateBusiness(businessId, { menuFileUrl: menuUrl }),
+          allPhotos.length > 0 && updateBusiness(businessId, { photos: allPhotos }),
+        ].filter(Boolean))
       } catch (uploadErr) {
         console.error('Error subiendo archivos:', uploadErr)
         setErrors({
