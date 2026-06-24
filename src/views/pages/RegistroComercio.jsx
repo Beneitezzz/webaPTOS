@@ -42,7 +42,7 @@ export default function RegistroComercio() {
     form, certFiles, menuFile, existingMenuFileUrl, setExistingMenuFileUrl,
     menuFileError, newPhotos, existingPhotos, photoError,
     handleAddPhotos, removeNewPhoto, removeExistingPhoto,
-    editingBusinessId, submitted, submitting, errors, coords,
+    editingBusinessId, isResubmission, submitted, submitting, errors, coords,
     geocoding, geocodeError, geocodeId,
     editingApprovedBusiness, editingSuspendedBusiness, certsChanged,
     handleChange, handleMarkerMove, handleMenuFile, handleCertFile,
@@ -64,7 +64,7 @@ export default function RegistroComercio() {
     } else if (editingSuspendedBusiness) {
       successTitle = '¡Cambios enviados!'
       successMessage = 'Tu comercio fue re-enviado y está en revisión. Te avisaremos cuando sea aprobado y vuelva a aparecer en el mapa.'
-    } else if (editingBusinessId) {
+    } else if (isResubmission) {
       successTitle = '¡Re-envío exitoso!'
       successMessage = 'Tu comercio fue re-enviado y está nuevamente en revisión. Te avisaremos cuando haya novedades.'
     } else {

@@ -48,6 +48,7 @@ export function useBusinessForm(businessId = null) {
   const [existingPhotos, setExistingPhotos] = useState([])
   const [photoError, setPhotoError] = useState('')
   const [editingBusinessId, setEditingBusinessId] = useState(null)
+  const [isResubmission, setIsResubmission] = useState(false)
   const [submitted, setSubmitted] = useState(false)
   const [editingApprovedBusiness, setEditingApprovedBusiness] = useState(false)
   const [editingSuspendedBusiness, setEditingSuspendedBusiness] = useState(false)
@@ -129,6 +130,9 @@ export function useBusinessForm(businessId = null) {
     }
     if (existing.status === 'suspendido') {
       setEditingSuspendedBusiness(true)
+    }
+    if (existing.status === 'rechazado') {
+      setIsResubmission(true)
     }
     setEditingBusinessId(existing.id)
     skipNextGeocodeRef.current = true
@@ -431,6 +435,7 @@ export function useBusinessForm(businessId = null) {
     removeNewPhoto,
     removeExistingPhoto,
     editingBusinessId,
+    isResubmission,
     editingApprovedBusiness,
     editingSuspendedBusiness,
     certsChanged,
