@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Link, useNavigate, useSearchParams, Navigate } from 'react-router-dom'
 import { UserPlus, Store } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
-import { googleProvider, appleProvider, facebookProvider } from '../../firebase'
+import { googleProvider, facebookProvider } from '../../firebase'
 import { getAuthError } from '../../utils/authErrors'
 import PolicyModal from '../components/PolicyModal'
 
@@ -106,15 +106,7 @@ export default function Register() {
               <span className="oauth-icon">G</span>
               Registrarse con Google
             </button>
-            <button
-              type="button"
-              className={`oauth-btn${!policiesAccepted ? ' oauth-btn-disabled' : ''}`}
-              onClick={() => handleProvider(appleProvider)}
-            >
-              <span className="oauth-icon"></span>
-              Registrarse con Apple
-            </button>
-            <button
+<button
               type="button"
               className={`oauth-btn${!policiesAccepted ? ' oauth-btn-disabled' : ''}`}
               onClick={() => handleProvider(facebookProvider)}
