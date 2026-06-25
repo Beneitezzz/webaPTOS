@@ -90,9 +90,7 @@ export default function Politicas() {
             </ul>
           </section>
 
-          <div className="politica-back">
-            <Link to="/register/tipo" className="btn btn-outline">Volver al registro</Link>
-          </div>
+
         </div>
       </div>
     </div>
