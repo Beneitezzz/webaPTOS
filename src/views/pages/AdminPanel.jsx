@@ -17,6 +17,7 @@ export default function AdminPanel() {
   const [suspendReasonError, setSuspendReasonError] = useState(false)
   const [toast, setToast] = useState(null)
   const [approvedSearch, setApprovedSearch] = useState('')
+  const [expandedApproved, setExpandedApproved] = useState(null)
 
   const showToast = useCallback((msg, type = 'success') => {
     setToast({ msg, type })
@@ -312,8 +313,9 @@ export default function AdminPanel() {
             <div className="approved-list">
               {filteredApproved.map((b) => {
                 const typeInfo = BUSINESS_TYPE_MAP[b.type]
+                const isDetailOpen = expandedApproved === b.id
                 return (
-                  <div key={b.id} className="approved-card card">
+                  <div key={b.id} className={`approved-card card ${isDetailOpen ? 'expanded' : ''}`}>
                     <div className="approved-card-header">
                       <div>
                         <h3>{b.name}</h3>
@@ -324,23 +326,129 @@ export default function AdminPanel() {
                           {typeInfo?.label}
                         </span>
                       </div>
-                      <button
-                        className="btn btn-outline btn-sm"
-                        onClick={() => {
-                          if (suspendingId === b.id) {
-                            setSuspendingId(null)
-                            setSuspendReason('')
-                            setSuspendReasonError(false)
-                          } else {
-                            setSuspendingId(b.id)
-                            setSuspendReason('')
-                            setSuspendReasonError(false)
-                          }
-                        }}
-                      >
-                        <PauseCircle size={14} /> {suspendingId === b.id ? 'Cancelar' : 'Suspender'}
-                      </button>
+                      <div className="pending-actions">
+                        <button
+                          className="btn btn-outline btn-sm"
+                          onClick={() => setExpandedApproved(isDetailOpen ? null : b.id)}
+                        >
+                          <Eye size={14} /> {isDetailOpen ? 'Cerrar' : 'Ver detalles'}
+                        </button>
+                        <button
+                          className="btn btn-outline btn-sm"
+                          onClick={() => {
+                            if (suspendingId === b.id) {
+                              setSuspendingId(null)
+                              setSuspendReason('')
+                              setSuspendReasonError(false)
+                            } else {
+                              setSuspendingId(b.id)
+                              setSuspendReason('')
+                              setSuspendReasonError(false)
+                            }
+                          }}
+                        >
+                          <PauseCircle size={14} /> {suspendingId === b.id ? 'Cancelar' : 'Suspender'}
+                        </button>
+                      </div>
                     </div>
+
+                    {isDetailOpen && (
+                      <div className="pending-detail">
+                        <div className="pending-info-grid">
+                          <div><strong>Dirección:</strong> {b.address}</div>
+                          <div><strong>Teléfono:</strong> {b.phone}</div>
+                          <div><strong>Horario:</strong> {b.openingHours ? (formatOpeningHours(b.openingHours) || '—') : (b.hours || '—')}</div>
+                        </div>
+
+                        {b.description && (
+                          <p className="pending-description">{b.description}</p>
+                        )}
+
+                        {b.socialLinks?.filter(Boolean).length > 0 && (
+                          <div className="pending-section">
+                            <strong>Links:</strong>
+                            <div style={{ marginTop: '6px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                              {b.socialLinks.filter(Boolean).map((url, i) => (
+                                <a key={i} href={url} target="_blank" rel="noopener noreferrer" className="cert-doc-link" style={{ wordBreak: 'break-all' }}>
+                                  🔗 {url}
+                                </a>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        <div className="pending-section">
+                          <strong>Restricciones declaradas:</strong>
+                          <div className="tags-list" style={{ marginTop: '8px' }}>
+                            {b.tags?.map((tag) => (
+                              <RestrictionBadge key={tag} tagId={tag} size="sm" />
+                            ))}
+                          </div>
+                        </div>
+
+                        <div className="pending-section">
+                          <strong>Certificaciones:</strong>
+                          <div className="certs-declared">
+                            {b.certifications?.map((cert) => (
+                              <div key={cert} className="cert-declared-item">
+                                <ShieldCheck size={13} />
+                                <span><strong>{cert}</strong> — {CERTIFICATIONS[cert]}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+
+                        {b.certDocuments && Object.keys(b.certDocuments).length > 0 && (
+                          <div className="pending-section">
+                            <strong>Documentos de certificaciones:</strong>
+                            <div className="cert-docs-list">
+                              {Object.entries(b.certDocuments).map(([cert, url]) => (
+                                /\.(jpg|jpeg|png|webp)/i.test(url) ? (
+                                  <a key={cert} href={url} target="_blank" rel="noopener noreferrer" title={`Ver ${cert}`}>
+                                    <img src={url} alt={cert} className="admin-photo-thumb" />
+                                  </a>
+                                ) : (
+                                  <a key={cert} href={url} target="_blank" rel="noopener noreferrer" className="cert-doc-link">
+                                    📄 Ver {cert}
+                                  </a>
+                                )
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {b.menuFileUrl && (
+                          <div className="pending-section">
+                            <strong>Carta / menú:</strong>
+                            <div style={{ marginTop: '6px' }}>
+                              {/\.(jpg|jpeg|png|webp)/i.test(b.menuFileUrl) ? (
+                                <a href={b.menuFileUrl} target="_blank" rel="noopener noreferrer">
+                                  <img src={b.menuFileUrl} alt="Menú" className="admin-photo-thumb" style={{ width: 'auto', maxWidth: '200px', height: '120px' }} />
+                                </a>
+                              ) : (
+                                <a href={b.menuFileUrl} target="_blank" rel="noopener noreferrer" className="cert-doc-link">
+                                  📄 Ver carta / menú
+                                </a>
+                              )}
+                            </div>
+                          </div>
+                        )}
+
+                        {b.photos && b.photos.length > 0 && (
+                          <div className="pending-section">
+                            <strong>Fotos del local:</strong>
+                            <div className="admin-photos-grid">
+                              {b.photos.map((url, i) => (
+                                <a key={i} href={url} target="_blank" rel="noopener noreferrer">
+                                  <img src={url} alt={`Foto ${i + 1}`} className="admin-photo-thumb" />
+                                </a>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
+
                     {suspendingId === b.id && (
                       <div className="suspend-confirm">
                         <p>
