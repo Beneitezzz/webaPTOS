@@ -14,10 +14,9 @@ export const BUSINESS_TYPES = [
 
 export const CERTIFICATIONS = {
   RNPA: 'Registro Nacional de Productos Alimenticios',
-  ALG: 'Alimentos Libres de Gluten (ANMAT)',
-  RME: 'Registro Municipal de Establecimientos',
-  POES: 'Procedimientos Operativos Estandarizados',
-  ACA: 'Análisis de Control de Alimentos',
+  BPM: 'Buenas Prácticas de Manufactura',
+  COA: 'Certificado de Análisis',
+  CMA: 'Carnet de Manipulador de Alimentos',
 }
 
 export const mockBusinesses = [
@@ -44,9 +43,9 @@ export const mockBusinesses = [
     status: 'aprobado',
     ownerEmail: null,
     description:
-      'Restaurante especializado 100% libre de gluten. Todos nuestros platos son preparados en ambientes separados y contamos con certificación ALG-ANMAT.',
+      'Restaurante especializado 100% libre de gluten. Todos nuestros platos son preparados en ambientes separados con certificación RNPA y BPM.',
     tags: ['sin-tacc'],
-    certifications: ['ALG', 'RNPA', 'RME'],
+    certifications: ['RNPA', 'BPM', 'CMA'],
     verified: true,
     rating: 4.8,
     menu: [
@@ -82,7 +81,7 @@ export const mockBusinesses = [
     description:
       'Dietética con amplia variedad de productos para celiaquía, diabetes e intolerancia a la lactosa. Asesoramiento nutricional.',
     tags: ['sin-tacc', 'apto-diabeticos', 'sin-lactosa'],
-    certifications: ['RNPA', 'RME'],
+    certifications: ['RNPA', 'CMA'],
     verified: true,
     rating: 4.6,
     menu: [
@@ -119,7 +118,7 @@ export const mockBusinesses = [
     description:
       'Café con opciones para todos los perfiles dietéticos. Bebidas vegetales, repostería sin gluten y opciones bajas en azúcar.',
     tags: ['sin-tacc', 'sin-lactosa', 'apto-sibo'],
-    certifications: ['RME', 'ALG'],
+    certifications: ['CMA', 'BPM'],
     verified: true,
     rating: 4.5,
     menu: [
@@ -155,7 +154,7 @@ export const mockBusinesses = [
     description:
       'Supermercado especializado en productos saludables. Amplia sección sin TACC, sección diabéticos y productos sin lactosa.',
     tags: ['sin-tacc', 'apto-diabeticos', 'sin-lactosa', 'apto-sibo'],
-    certifications: ['RNPA', 'RME'],
+    certifications: ['RNPA', 'CMA'],
     verified: true,
     rating: 4.3,
     menu: [
@@ -191,7 +190,7 @@ export const mockBusinesses = [
     description:
       'Propuesta gastronómica 100% vegana y libre de gluten. Especialistas en cocina para personas con restricciones múltiples.',
     tags: ['sin-tacc', 'sin-lactosa', 'apto-sibo'],
-    certifications: ['ALG', 'RNPA', 'RME'],
+    certifications: ['RNPA', 'BPM', 'CMA'],
     verified: true,
     rating: 4.7,
     menu: [
@@ -227,7 +226,7 @@ export const mockBusinesses = [
     description:
       'Panadería artesanal especializada en productos sin gluten. Pan fresco diario, facturas y repostería sin TACC.',
     tags: ['sin-tacc'],
-    certifications: ['ALG', 'RME', 'RNPA'],
+    certifications: ['BPM', 'CMA', 'RNPA'],
     verified: true,
     rating: 4.9,
     menu: [
@@ -263,7 +262,7 @@ export const mockBusinesses = [
     description:
       'Restaurante con menú diseñado para diabéticos. Todos los platos con índice glucémico controlado y sin azúcares añadidos.',
     tags: ['apto-diabeticos', 'sin-lactosa'],
-    certifications: ['RNPA', 'RME'],
+    certifications: ['RNPA', 'CMA'],
     verified: true,
     rating: 4.4,
     menu: [
@@ -299,7 +298,7 @@ export const mockBusinesses = [
     description:
       'Centro de nutrición especializado en SIBO y patologías digestivas. Suplementos, probióticos y asesoramiento personalizado.',
     tags: ['apto-sibo', 'sin-tacc', 'sin-lactosa'],
-    certifications: ['RNPA', 'RME'],
+    certifications: ['RNPA', 'CMA'],
     verified: true,
     rating: 4.6,
     menu: [
@@ -369,7 +368,7 @@ export const mockBusinesses = [
     description:
       'Despensa de productos naturales y orgánicos con amplia sección para alergias e intolerancias.',
     tags: ['sin-tacc', 'sin-lactosa', 'apto-diabeticos'],
-    certifications: ['RNPA', 'RME'],
+    certifications: ['RNPA', 'CMA'],
     verified: false,
     rating: null,
     menu: [],
