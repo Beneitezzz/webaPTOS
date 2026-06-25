@@ -275,7 +275,8 @@ export function useBusinessForm(businessId = null) {
     if (!form.phone.trim()) errs.phone = 'El teléfono es requerido'
     if (form.tags.length === 0) errs.tags = 'Seleccioná al menos una restricción alimentaria'
     if (form.certifications.length === 0) errs.certifications = 'Seleccioná al menos una certificación'
-    if (!menuFile && !existingMenuFileUrl) errs.menu = 'La carta/menú es requerida'
+    const menuRequired = form.type === 'restaurante' || form.type === 'cafe'
+    if (menuRequired && !menuFile && !existingMenuFileUrl) errs.menu = 'La carta/menú es requerida'
     form.socialLinks.forEach((url, i) => {
       if (url.trim() && !isValidUrl(url.trim()))
         errs[`socialLink_${i}`] = 'Ingresá una URL válida (ej: https://instagram.com/milocal)'

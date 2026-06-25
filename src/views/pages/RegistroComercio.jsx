@@ -362,10 +362,21 @@ export default function RegistroComercio() {
           </div>
 
           <div className="form-group">
-            <label className="form-label">Carta / menú *</label>
-            <p className="form-hint" style={{ marginTop: 0, marginBottom: '0.75rem' }}>
-              Subí una foto o PDF de tu carta. Máx. 5 MB.
-            </p>
+            {form.type === 'restaurante' || form.type === 'cafe' ? (
+              <>
+                <label className="form-label">Carta / menú *</label>
+                <p className="form-hint" style={{ marginTop: 0, marginBottom: '0.75rem' }}>
+                  Subí una foto o PDF de tu carta. Máx. 5 MB.
+                </p>
+              </>
+            ) : (
+              <>
+                <label className="form-label">Catálogo <span style={{ fontWeight: 400, color: '#888' }}>(opcional)</span></label>
+                <p className="form-hint" style={{ marginTop: 0, marginBottom: '0.75rem' }}>
+                  Podés subir una foto o PDF con tus productos. Máx. 5 MB.
+                </p>
+              </>
+            )}
             {existingMenuFileUrl && !menuFile && (
               <div className="menu-file-selected">
                 <span>
