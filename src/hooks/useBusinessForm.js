@@ -292,6 +292,11 @@ export function useBusinessForm(businessId = null) {
       return
     }
     setSubmitting(true)
+    // Safety net: if Firebase hangs (e.g. bad network during file upload), unblock the button after 45s
+    const submitTimeout = setTimeout(() => {
+      setSubmitting(false)
+      setErrors({ submit: 'La operación tardó demasiado. Verificá tu conexión e intentá de nuevo.' })
+    }, 45000)
     try {
       const businessData = {
         ...form,
@@ -374,6 +379,8 @@ export function useBusinessForm(businessId = null) {
       console.error('Error al enviar comercio:', err)
       setErrors({ submit: `Error al enviar el comercio: ${err?.code ?? err?.message ?? 'intentá de nuevo'}.` })
       setSubmitting(false)
+    } finally {
+      clearTimeout(submitTimeout)
     }
   }
 
