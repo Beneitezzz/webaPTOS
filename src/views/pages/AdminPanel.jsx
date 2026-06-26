@@ -269,7 +269,7 @@ export default function AdminPanel() {
                                     ownerEmail: b.ownerEmail ?? null,
                                     reason: rejectReason.trim(),
                                   })
-                                } catch { /* email es best-effort */ }
+                                } catch (emailErr) { console.error('[AdminPanel] sendRejectionEmail error:', emailErr) }
                               }}
                             >
                               Confirmar rechazo
@@ -492,7 +492,7 @@ export default function AdminPanel() {
                                     ownerEmail: b.ownerEmail ?? null,
                                     reason: suspendReason.trim(),
                                   })
-                                } catch { /* email es best-effort */ }
+                                } catch (emailErr) { console.error('[AdminPanel] sendSuspensionEmail error:', emailErr) }
                               }}
                             >
                               Confirmar suspensión

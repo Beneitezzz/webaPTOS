@@ -21,11 +21,15 @@ export async function sendApprovalEmail({ businessName, ownerEmail }) {
 // No-ops if env vars not configured or in dev.
 async function sendAdminActionEmail({ businessName, ownerEmail, accion, reason }) {
   if (import.meta.env.DEV) return
-  if (!SERVICE_ID || !PUBLIC_KEY || !TEMPLATE_RECHAZO || !ownerEmail) return
+  if (!SERVICE_ID || !PUBLIC_KEY || !TEMPLATE_RECHAZO) return
+  if (!ownerEmail) {
+    console.warn('[emailService] sendAdminActionEmail: ownerEmail is empty for', businessName)
+    return
+  }
   await emailjs.send(
     SERVICE_ID,
     TEMPLATE_RECHAZO,
-    { business_name: businessName, to_email: ownerEmail, accion, motivo: reason },
+    { business_name: businessName, to_email: ownerEmail, accion, motivo: reason, name: 'MapaApto', email: ownerEmail },
     PUBLIC_KEY,
   )
 }
