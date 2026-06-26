@@ -18,11 +18,19 @@ export default function Register() {
   const [confirm, setConfirm] = useState('')
   const [error, setError] = useState('')
   const [submitting, setSubmitting] = useState(false)
+  const [passwordTouched, setPasswordTouched] = useState(false)
   const [acceptTerms, setAcceptTerms] = useState(false)
   const [acceptDisclaimer, setAcceptDisclaimer] = useState(false)
   const [acceptVeracity, setAcceptVeracity] = useState(false)
   const [acceptReview, setAcceptReview] = useState(false)
   const [policySection, setPolicySection] = useState(null)
+
+  const passwordRules = {
+    length: password.length >= 10,
+    number: /\d/.test(password),
+    uppercase: /[A-Z]/.test(password),
+  }
+  const passwordValid = passwordRules.length && passwordRules.number && passwordRules.uppercase
 
   const redirect = searchParams.get('redirect') || '/'
   const ALLOWED_ROLES = ['user', 'comercio']
@@ -44,6 +52,10 @@ export default function Register() {
     e.preventDefault()
     if (!policiesAccepted) {
       setError('Debés aceptar todas las políticas para continuar')
+      return
+    }
+    if (!passwordValid) {
+      setError('La contraseña no cumple los requisitos mínimos')
       return
     }
     if (password !== confirm) {
@@ -150,12 +162,25 @@ export default function Register() {
               <input
                 type="password"
                 className="form-input"
-                placeholder="Mínimo 6 caracteres"
+                placeholder="Mínimo 10 caracteres"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                onBlur={() => setPasswordTouched(true)}
                 required
-                minLength={6}
               />
+              {(passwordTouched || password.length > 0) && (
+                <ul className="password-rules">
+                  <li className={passwordRules.length ? 'rule-ok' : 'rule-fail'}>
+                    {passwordRules.length ? '✓' : '✗'} Mínimo 10 caracteres
+                  </li>
+                  <li className={passwordRules.number ? 'rule-ok' : 'rule-fail'}>
+                    {passwordRules.number ? '✓' : '✗'} Al menos 1 número
+                  </li>
+                  <li className={passwordRules.uppercase ? 'rule-ok' : 'rule-fail'}>
+                    {passwordRules.uppercase ? '✓' : '✗'} Al menos 1 letra mayúscula
+                  </li>
+                </ul>
+              )}
             </div>
 
             <div className="form-group">

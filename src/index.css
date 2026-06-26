@@ -854,6 +854,21 @@ img { display: block; max-width: 100%; }
   margin-bottom: 14px;
 }
 
+.password-rules {
+  list-style: none;
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.password-rules li {
+  font-size: 0.8rem;
+  font-weight: 500;
+  transition: color 0.15s;
+}
+.password-rules .rule-ok { color: #15803d; }
+.password-rules .rule-fail { color: #dc2626; }
+
 .auth-footer {
   text-align: center;
   font-size: 0.875rem;
