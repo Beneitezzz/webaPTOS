@@ -66,7 +66,8 @@ export default function Register() {
     setSubmitting(true)
     try {
       await registerWithEmail(email, password, displayName, rol)
-      navigate(rol === 'comercio' ? '/registro-comercio' : redirect, { replace: true })
+      const next = rol === 'comercio' ? '/registro-comercio' : redirect
+      navigate(`/verificar-email?next=${encodeURIComponent(next)}`, { replace: true })
     } catch (err) {
       const msg = getAuthError(err.code)
       if (msg) setError(msg)

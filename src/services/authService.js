@@ -4,6 +4,7 @@ import {
   signInWithPopup,
   updateProfile,
   signOut as firebaseSignOut,
+  sendEmailVerification,
 } from 'firebase/auth'
 import { doc, getDoc, setDoc, updateDoc, serverTimestamp, deleteDoc } from 'firebase/firestore'
 import { auth, db } from '../firebase'
@@ -26,6 +27,9 @@ export const registerWithEmail = async (email, password, displayName, role = 'us
     await credential.user.delete()
     throw err
   }
+  await sendEmailVerification(credential.user, {
+    url: `${window.location.origin}/verificar-email`,
+  })
   return credential
 }
 
@@ -52,6 +56,9 @@ export const signInWithProvider = async (provider, role = 'user') => {
 }
 
 export const signOut = () => firebaseSignOut(auth)
+
+export const resendVerificationEmail = (user) =>
+  sendEmailVerification(user, { url: `${window.location.origin}/verificar-email` })
 
 export const deleteAccount = async (user) => {
   await deleteDoc(doc(db, 'users', user.uid))

@@ -14,5 +14,8 @@ export default function PrivateRoute({ children }) {
   if (!currentUser)
     return <Navigate to={`/login?redirect=${encodeURIComponent(pathname)}`} replace />
 
+  if (!currentUser.emailVerified)
+    return <Navigate to={`/verificar-email?next=${encodeURIComponent(pathname)}`} replace />
+
   return children
 }

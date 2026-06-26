@@ -15,6 +15,7 @@ import Login from './views/pages/Login'
 import Register from './views/pages/Register'
 import SelectRol from './views/pages/SelectRol'
 import Politicas from './views/pages/Politicas'
+import VerificarEmail from './views/pages/VerificarEmail'
 
 export default function App() {
   return (
@@ -31,6 +32,7 @@ export default function App() {
               <Route path="/register/tipo" element={<SelectRol />} />
               <Route path="/register" element={<Register />} />
               <Route path="/politicas" element={<Politicas />} />
+              <Route path="/verificar-email" element={<VerificarEmail />} />
               <Route path="/perfil" element={<PrivateRoute><Perfil /></PrivateRoute>} />
               <Route path="/registro-comercio" element={<PrivateRoute><RegistroComercio /></PrivateRoute>} />
               <Route path="/registro-comercio/:id" element={<PrivateRoute><RegistroComercio /></PrivateRoute>} />

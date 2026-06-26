@@ -32,7 +32,11 @@ export default function Login() {
     setError('')
     setSubmitting(true)
     try {
-      await signInWithEmail(email, password)
+      const credential = await signInWithEmail(email, password)
+      if (!credential.user.emailVerified) {
+        navigate(`/verificar-email?next=${encodeURIComponent(redirect)}`, { replace: true })
+        return
+      }
       navigate(redirect, { replace: true })
     } catch (err) {
       const msg = getAuthError(err.code)
