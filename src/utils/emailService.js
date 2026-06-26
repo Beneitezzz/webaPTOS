@@ -27,7 +27,6 @@ async function sendAdminActionEmail({ businessName, ownerEmail, accion, reason }
     console.warn('[emailService] sendAdminActionEmail: ownerEmail is empty for', businessName)
     return
   }
-  console.log('[emailService] sendAdminActionEmail: to=', JSON.stringify(recipientEmail), 'business=', businessName)
   await emailjs.send(
     SERVICE_ID,
     TEMPLATE_RECHAZO,
