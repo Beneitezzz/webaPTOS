@@ -36,7 +36,7 @@ jobs:
       - name: Deploy Firestore & Storage rules
         run: |
           echo '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}' > /tmp/sa.json
-          npx firebase-tools@latest deploy --only firestore:rules,storage --project webaptos
+          npx firebase-tools@latest deploy --only firestore:rules --project webaptos
         env:
           GOOGLE_APPLICATION_CREDENTIALS: /tmp/sa.json
 
