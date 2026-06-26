@@ -33,18 +33,6 @@ jobs:
           VITE_EMAILJS_TEMPLATE_RECHAZO: ${{ secrets.VITE_EMAILJS_TEMPLATE_RECHAZO }}
         run: npm run build
 
-      - name: Show service account email
-        env:
-          GOOGLE_APPLICATION_CREDENTIALS_JSON: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
-        run: echo "$GOOGLE_APPLICATION_CREDENTIALS_JSON" | python3 -c "import sys,json; print(json.load(sys.stdin)['client_email'])"
-
-      - name: Deploy Firestore rules
-        env:
-          GOOGLE_APPLICATION_CREDENTIALS_JSON: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
-        run: |
-          echo "$GOOGLE_APPLICATION_CREDENTIALS_JSON" > /tmp/sa.json
-          GOOGLE_APPLICATION_CREDENTIALS=/tmp/sa.json npx firebase-tools@latest deploy --only firestore:rules --project webaptos
-
       - name: Deploy to Firebase Hosting
         uses: FirebaseExtended/action-hosting-deploy@v0
         with:
