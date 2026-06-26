@@ -25,7 +25,11 @@ service cloud.firestore {
 
     // rating is recomputed by any authenticated user after a review write/delete
     function onlyRatingField() {
-      return request.resource.data.diff(resource.data).affectedKeys().hasOnly(['rating']);
+      return request.resource.data.diff(resource.data).affectedKeys().hasOnly(['rating'])
+        && (request.resource.data.rating == null
+            || (request.resource.data.rating is number
+                && request.resource.data.rating >= 0
+                && request.resource.data.rating <= 5));
     }
 
     match /businesses/{businessId} {
