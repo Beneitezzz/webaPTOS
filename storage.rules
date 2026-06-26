@@ -1,17 +1,44 @@
 rules_version = '2';
 service firebase.storage {
   match /b/{bucket}/o {
-    match /certificados/{businessId}/{allPaths=**} {
-      allow read: if true;
-      allow write: if request.auth != null;
+
+    function isOwner(businessId) {
+      return request.auth != null
+        && firestore.get(/databases/(default)/documents/businesses/$(businessId)).data.ownerId
+           == request.auth.uid;
     }
-    match /menus/{businessId}/{allPaths=**} {
-      allow read: if true;
-      allow write: if request.auth != null;
+
+    function isValidImage() {
+      return request.resource.contentType.matches('image/(jpeg|png|webp)')
+        && request.resource.size <= 5 * 1024 * 1024;
     }
-    match /fotos/{businessId}/{allPaths=**} {
+
+    function isValidMenu() {
+      return request.resource.contentType.matches('image/(jpeg|png)|application/pdf')
+        && request.resource.size <= 5 * 1024 * 1024;
+    }
+
+    function isValidCert() {
+      return request.resource.contentType.matches('image/(jpeg|png)|application/pdf')
+        && request.resource.size <= 10 * 1024 * 1024;
+    }
+
+    match /fotos/{businessId}/{fileName} {
       allow read: if true;
-      allow write: if request.auth != null;
+      allow write: if isOwner(businessId) && isValidImage();
+      allow delete: if isOwner(businessId);
+    }
+
+    match /menus/{businessId}/{fileName} {
+      allow read: if true;
+      allow write: if isOwner(businessId) && isValidMenu();
+      allow delete: if isOwner(businessId);
+    }
+
+    match /certificados/{businessId}/{fileName} {
+      allow read: if true;
+      allow write: if isOwner(businessId) && isValidCert();
+      allow delete: if isOwner(businessId);
     }
   }
 }
