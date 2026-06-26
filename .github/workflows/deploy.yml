@@ -33,12 +33,8 @@ jobs:
           VITE_EMAILJS_TEMPLATE_RECHAZO: ${{ secrets.VITE_EMAILJS_TEMPLATE_RECHAZO }}
         run: npm run build
 
-      - name: Deploy Firestore & Storage rules
-        run: |
-          echo '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}' > /tmp/sa.json
-          npx firebase-tools@latest deploy --only firestore:rules --project webaptos
-        env:
-          GOOGLE_APPLICATION_CREDENTIALS: /tmp/sa.json
+      - name: Deploy Firestore rules
+        run: npx firebase-tools@latest deploy --only firestore:rules --project webaptos --token "${{ secrets.FIREBASE_TOKEN }}"
 
       - name: Deploy to Firebase Hosting
         uses: FirebaseExtended/action-hosting-deploy@v0
