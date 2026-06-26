@@ -29,7 +29,7 @@ async function sendAdminActionEmail({ businessName, ownerEmail, accion, reason }
   await emailjs.send(
     SERVICE_ID,
     TEMPLATE_RECHAZO,
-    { business_name: businessName, to_email: ownerEmail, accion, motivo: reason, name: 'MapaApto', email: ownerEmail },
+    { business_name: businessName, to_email: ownerEmail, accion, motivo: reason },
     PUBLIC_KEY,
   )
 }
