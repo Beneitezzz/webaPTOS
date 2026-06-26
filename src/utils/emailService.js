@@ -22,14 +22,16 @@ export async function sendApprovalEmail({ businessName, ownerEmail }) {
 async function sendAdminActionEmail({ businessName, ownerEmail, accion, reason }) {
   if (import.meta.env.DEV) return
   if (!SERVICE_ID || !PUBLIC_KEY || !TEMPLATE_RECHAZO) return
-  if (!ownerEmail) {
+  const recipientEmail = (ownerEmail ?? '').trim()
+  if (!recipientEmail) {
     console.warn('[emailService] sendAdminActionEmail: ownerEmail is empty for', businessName)
     return
   }
+  console.log('[emailService] sendAdminActionEmail: to=', JSON.stringify(recipientEmail), 'business=', businessName)
   await emailjs.send(
     SERVICE_ID,
     TEMPLATE_RECHAZO,
-    { business_name: businessName, to_email: ownerEmail, accion, motivo: reason },
+    { business_name: businessName, to_email: recipientEmail, accion, motivo: reason },
     PUBLIC_KEY,
   )
 }
