@@ -273,20 +273,38 @@ export default function DetalleComercio() {
       )}
 
       {/* ── Modal menú ── */}
-      {menuOpen && (
-        <div className="lightbox-overlay" onClick={() => setMenuOpen(false)}>
-          <button className="lightbox-close" onClick={() => setMenuOpen(false)} aria-label="Cerrar">
-            <X size={22} />
-          </button>
-          <div className="menu-modal-wrap" onClick={(e) => e.stopPropagation()}>
-            <iframe
-              src={business.menuFileUrl}
-              title="Carta / Menú"
-              className="menu-modal-iframe"
-            />
+      {menuOpen && (() => {
+        const url = business.menuFileUrl
+        const isImage = /\.(jpg|jpeg|png|webp)/i.test(url)
+        const isPdf = /\.pdf/i.test(url)
+        const isExternal = !url.includes('firebasestorage.googleapis.com')
+        return (
+          <div className="lightbox-overlay" onClick={() => setMenuOpen(false)}>
+            <button className="lightbox-close" onClick={() => setMenuOpen(false)} aria-label="Cerrar">
+              <X size={22} />
+            </button>
+            <div className="menu-modal-wrap" onClick={(e) => e.stopPropagation()}>
+              {isImage && !isExternal ? (
+                <img src={url} alt="Carta / Menú" className="menu-modal-img" />
+              ) : isPdf && !isExternal ? (
+                <>
+                  <iframe src={url} title="Carta / Menú" className="menu-modal-iframe" />
+                  <a href={url} target="_blank" rel="noopener noreferrer" className="menu-modal-open-link">
+                    Abrir en nueva pestaña ↗
+                  </a>
+                </>
+              ) : (
+                <div className="menu-modal-external">
+                  <p>El menú está disponible en un enlace externo.</p>
+                  <a href={url} target="_blank" rel="noopener noreferrer" className="btn btn-primary">
+                    Ver carta / menú ↗
+                  </a>
+                </div>
+              )}
+            </div>
           </div>
-        </div>
-      )}
+        )
+      })()}
     </div>
   )
 }
