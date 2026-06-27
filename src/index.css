@@ -744,13 +744,20 @@ img { display: block; max-width: 100%; }
 .admin-photo-thumb { width: 80px; height: 60px; object-fit: cover; border-radius: var(--radius-sm); border: 1px solid var(--border); display: block; transition: opacity 0.15s; }
 .admin-photo-thumb:hover { opacity: 0.85; }
 .cert-files-section { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
-.cert-file-row { display: flex; flex-direction: column; gap: 3px; }
+.cert-file-row {
+  display: flex; flex-direction: column; gap: 3px;
+  padding: 8px 10px; border-radius: var(--radius-sm);
+  border: 1px solid var(--border); background: var(--bg);
+}
+.cert-file-row--error { border-color: var(--danger); background: #fff5f5; }
 .cert-file-label {
   display: flex; flex-direction: column; gap: 4px;
   font-size: 0.82rem; color: var(--text-muted);
 }
 .cert-file-label input[type="file"] { font-size: 0.8rem; }
 .cert-file-name { font-size: 0.78rem; color: #198754; }
+.cert-file-existing { font-size: 0.78rem; color: #198754; }
+.cert-file-error { font-size: 0.775rem; color: var(--danger); font-weight: 500; }
 .verify-note {
   display: flex; align-items: center; gap: 6px; font-size: 0.78rem;
   color: #856404; background: #fff3cd; border-radius: var(--radius-sm);

@@ -41,6 +41,7 @@ export function useBusinessForm(businessId = null) {
 
   const [form, setForm] = useState(INITIAL_FORM)
   const [certFiles, setCertFiles] = useState({})
+  const [existingCertDocuments, setExistingCertDocuments] = useState({})
   const [menuFile, setMenuFile] = useState(null)
   const [existingMenuFileUrl, setExistingMenuFileUrl] = useState(null)
   const [menuFileError, setMenuFileError] = useState('')
@@ -160,6 +161,7 @@ export function useBusinessForm(businessId = null) {
       }
     }
     setMenuFileError('')
+    if (existing.certDocuments) setExistingCertDocuments(existing.certDocuments)
     if (existing.photos?.length) setExistingPhotos(existing.photos)
     setPhotoError('')
     if (existing.lat && existing.lng) setCoords({ lat: existing.lat, lng: existing.lng })
@@ -291,6 +293,11 @@ export function useBusinessForm(businessId = null) {
     if (!form.phone.trim()) errs.phone = 'El teléfono es requerido'
     if (form.tags.length === 0) errs.tags = 'Seleccioná al menos una restricción alimentaria'
     if (form.certifications.length === 0) errs.certifications = 'Seleccioná al menos una certificación'
+    form.certifications.forEach((cert) => {
+      if (!certFiles[cert] && !existingCertDocuments[cert]) {
+        errs[`certFile_${cert}`] = 'Adjuntá el documento'
+      }
+    })
     const menuRequired = form.type === 'restaurante' || form.type === 'cafe'
     if (menuRequired) {
       if (menuMode === 'file' && !menuFile && !existingMenuFileUrl) {
@@ -397,8 +404,10 @@ export function useBusinessForm(businessId = null) {
           : 'Tu ficha fue actualizada. Los cambios ya son visibles en el mapa.'
         navigate('/mi-comercio', { state: { successMessage: msg } })
       } else if (editingSuspendedBusiness) {
+        setSubmitting(false)
         setSubmitted(true)
       } else {
+        setSubmitting(false)
         setSubmitted(true)
       }
     } catch (err) {
@@ -416,6 +425,7 @@ export function useBusinessForm(businessId = null) {
     setGeocodeError('')
     setGeocoding(false)
     setSubmitted(false)
+    setSubmitting(false)
     setMenuFile(null)
     setMenuFileError('')
     setExistingMenuFileUrl(null)
@@ -451,6 +461,7 @@ export function useBusinessForm(businessId = null) {
   return {
     form,
     certFiles,
+    existingCertDocuments,
     menuFile,
     existingMenuFileUrl,
     setExistingMenuFileUrl,

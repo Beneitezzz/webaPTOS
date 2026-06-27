@@ -39,7 +39,7 @@ function DraggableMarker({ coords, onMove }) {
 export default function RegistroComercio() {
   const { id: businessId } = useParams()
   const {
-    form, certFiles, menuFile, existingMenuFileUrl, setExistingMenuFileUrl,
+    form, certFiles, existingCertDocuments, menuFile, existingMenuFileUrl, setExistingMenuFileUrl,
     menuFileError, menuMode, setMenuMode, menuLink, setMenuLink, menuLinkError, handleMenuLink,
     newPhotos, existingPhotos, photoError,
     handleAddPhotos, removeNewPhoto, removeExistingPhoto,
@@ -343,21 +343,40 @@ export default function RegistroComercio() {
             </div>
             {form.certifications.length > 0 && (
               <div className="cert-files-section">
-                {form.certifications.map((cert) => (
-                  <div key={cert} className="cert-file-row">
-                    <label className="cert-file-label">
-                      <span>{cert} — {CERTIFICATIONS[cert]}</span>
-                      <input
-                        type="file"
-                        accept=".pdf,.jpg,.jpeg,.png"
-                        onChange={(e) => handleCertFile(cert, e.target.files[0] ?? null)}
-                      />
-                    </label>
-                    {certFiles[cert] && (
-                      <span className="cert-file-name">{certFiles[cert].name}</span>
-                    )}
-                  </div>
-                ))}
+                <p className="form-hint" style={{ marginTop: 0, marginBottom: '0.5rem' }}>
+                  Adjuntá el documento de cada certificación seleccionada (PDF, JPG o PNG).
+                </p>
+                {form.certifications.map((cert) => {
+                  const hasNew = !!certFiles[cert]
+                  const hasExisting = !!existingCertDocuments[cert]
+                  const hasError = !!errors[`certFile_${cert}`]
+                  return (
+                    <div key={cert} className={`cert-file-row${hasError ? ' cert-file-row--error' : ''}`}>
+                      <label className="cert-file-label">
+                        <span>{cert} — {CERTIFICATIONS[cert]}</span>
+                        <input
+                          type="file"
+                          accept=".pdf,.jpg,.jpeg,.png"
+                          onChange={(e) => handleCertFile(cert, e.target.files[0] ?? null)}
+                        />
+                      </label>
+                      {hasNew && (
+                        <span className="cert-file-name">📄 {certFiles[cert].name}</span>
+                      )}
+                      {!hasNew && hasExisting && (
+                        <span className="cert-file-existing">
+                          ✓ Documento cargado ·{' '}
+                          <a href={existingCertDocuments[cert]} target="_blank" rel="noopener noreferrer" className="link">
+                            ver
+                          </a>
+                        </span>
+                      )}
+                      {hasError && (
+                        <span className="cert-file-error">Adjuntá el documento</span>
+                      )}
+                    </div>
+                  )
+                })}
               </div>
             )}
           </div>
