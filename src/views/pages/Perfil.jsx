@@ -107,8 +107,6 @@ export default function Perfil() {
   const [saved, setSaved] = useState(false)
   const [saveError, setSaveError] = useState('')
 
-  const [notifNew, setNotifNew] = useState(true)
-  const [notifNews, setNotifNews] = useState(false)
 
   const { favoriteIds, toggleFavorite, loading: favLoading } = useFavorites()
   const favoriteBusinesses = businesses.filter((b) => favoriteIds.has(String(b.id)))
@@ -286,39 +284,6 @@ export default function Perfil() {
             </>
           )}
         </form>
-
-        {/* ── Notificaciones ── */}
-        <div className="perfil-card">
-          <div className="card-title">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-              <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9Z"/>
-              <path d="M13.7 21a2 2 0 0 1-3.4 0"/>
-            </svg>
-            Notificaciones
-          </div>
-          <p className="card-desc">Elegí cómo querés que te avisemos. Podés cambiarlo cuando quieras.</p>
-
-          <div className="notif-row">
-            <div className="notif-label">
-              <strong>Nuevos comercios aptos</strong>
-              <span>Te avisamos cuando abre un local que cumple tu perfil cerca tuyo</span>
-            </div>
-            <label className="p-switch">
-              <input type="checkbox" checked={notifNew} onChange={(e) => setNotifNew(e.target.checked)} />
-              <span className="p-slider" />
-            </label>
-          </div>
-          <div className="notif-row">
-            <div className="notif-label">
-              <strong>Novedades de PuntoSano</strong>
-              <span>Noticias, mejoras y novedades de la plataforma</span>
-            </div>
-            <label className="p-switch">
-              <input type="checkbox" checked={notifNews} onChange={(e) => setNotifNews(e.target.checked)} />
-              <span className="p-slider" />
-            </label>
-          </div>
-        </div>
 
         {/* ── Mis favoritos ── */}
         <div className="perfil-card">

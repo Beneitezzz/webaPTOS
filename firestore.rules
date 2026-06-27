@@ -15,12 +15,18 @@ service cloud.firestore {
       return isAuth() && res.data.ownerId == request.auth.uid;
     }
 
-    // Fields a business owner can edit on their own listing
-    function onlyOwnerFields() {
-      return request.resource.data.diff(resource.data).affectedKeys()
-        .hasOnly(['name', 'type', 'address', 'phone', 'description', 'tags',
-                  'certifications', 'socialLinks', 'openingHours',
-                  'photoUrls', 'menuFileUrl', 'certFileUrls', 'lat', 'lng']);
+    // Fields a business owner can edit on their own listing.
+    // Owners may resubmit (set status → pendiente, verified → false, pending → true)
+    // but cannot self-approve or change ownership.
+    function ownerCanUpdate() {
+      return isOwner(resource)
+        && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['ownerId', 'ownerEmail'])
+        && (request.resource.data.status == resource.data.status
+            || request.resource.data.status == 'pendiente')
+        && (request.resource.data.verified == resource.data.verified
+            || request.resource.data.verified == false)
+        && (request.resource.data.pending == resource.data.pending
+            || request.resource.data.pending == true);
     }
 
     // rating is recomputed by any authenticated user after a review write/delete
@@ -39,7 +45,7 @@ service cloud.firestore {
         && request.resource.data.ownerId == request.auth.uid;
 
       allow update: if isAdmin()
-        || (isOwner(resource) && onlyOwnerFields())
+        || ownerCanUpdate()
         || (isAuth() && onlyRatingField());
 
       allow delete: if isAdmin() || isOwner(resource);
