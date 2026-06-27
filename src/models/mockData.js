@@ -13,10 +13,11 @@ export const BUSINESS_TYPES = [
 ]
 
 export const CERTIFICATIONS = {
-  RNPA: 'Registro Nacional de Productos Alimenticios',
-  BPM: 'Buenas Prácticas de Manufactura',
-  COA: 'Certificado de Análisis',
+  RNE: 'Registro Nacional de Establecimientos',
   CMA: 'Carnet de Manipulador de Alimentos',
+  DJPS: 'Declaración Jurada de Proveedores Seguros',
+  RNPA: 'Registro Nacional de Producto Alimenticio',
+  ELISA: 'Enzyme-Linked Immunosorbent Assay (Ensayo por Inmunoabsorción Ligado a Enzimas)',
 }
 
 export const mockBusinesses = [
@@ -43,9 +44,9 @@ export const mockBusinesses = [
     status: 'aprobado',
     ownerEmail: null,
     description:
-      'Restaurante especializado 100% libre de gluten. Todos nuestros platos son preparados en ambientes separados con certificación RNPA y BPM.',
+      'Restaurante especializado 100% libre de gluten. Todos nuestros platos son preparados en ambientes separados con certificación RNPA y RNE.',
     tags: ['sin-tacc'],
-    certifications: ['RNPA', 'BPM', 'CMA'],
+    certifications: ['RNPA', 'RNE', 'CMA'],
     verified: true,
     rating: 4.8,
     menu: [
@@ -118,7 +119,7 @@ export const mockBusinesses = [
     description:
       'Café con opciones para todos los perfiles dietéticos. Bebidas vegetales, repostería sin gluten y opciones bajas en azúcar.',
     tags: ['sin-tacc', 'sin-lactosa', 'apto-sibo'],
-    certifications: ['CMA', 'BPM'],
+    certifications: ['CMA', 'RNE'],
     verified: true,
     rating: 4.5,
     menu: [
@@ -190,7 +191,7 @@ export const mockBusinesses = [
     description:
       'Propuesta gastronómica 100% vegana y libre de gluten. Especialistas en cocina para personas con restricciones múltiples.',
     tags: ['sin-tacc', 'sin-lactosa', 'apto-sibo'],
-    certifications: ['RNPA', 'BPM', 'CMA'],
+    certifications: ['RNPA', 'RNE', 'CMA'],
     verified: true,
     rating: 4.7,
     menu: [
@@ -226,7 +227,7 @@ export const mockBusinesses = [
     description:
       'Panadería artesanal especializada en productos sin gluten. Pan fresco diario, facturas y repostería sin TACC.',
     tags: ['sin-tacc'],
-    certifications: ['BPM', 'CMA', 'RNPA'],
+    certifications: ['RNE', 'CMA', 'RNPA'],
     verified: true,
     rating: 4.9,
     menu: [

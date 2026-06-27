@@ -5,7 +5,7 @@ import { useParams, Link } from 'react-router-dom'
 import { RESTRICTIONS, BUSINESS_TYPES, CERTIFICATIONS } from '../../models/mockData'
 import { useBusinessForm } from '../../hooks/useBusinessForm'
 
-const availableCerts = ['RNPA', 'BPM', 'COA', 'CMA']
+const availableCerts = ['RNE', 'CMA', 'DJPS', 'RNPA', 'ELISA']
 
 const DRAGGABLE_ICON = L.divIcon({
   html: `<img src="data:image/svg+xml,${encodeURIComponent(
