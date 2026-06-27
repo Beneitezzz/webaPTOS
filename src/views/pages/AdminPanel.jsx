@@ -157,6 +157,29 @@ export default function AdminPanel() {
                         <p className="pending-description">{b.description}</p>
                       )}
 
+                      {(b.instagramUrl || b.websiteUrl || b.socialLinks?.filter(Boolean).length > 0) && (
+                        <div className="pending-section">
+                          <strong>Links del comercio:</strong>
+                          <div style={{ marginTop: '6px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                            {b.instagramUrl && (
+                              <a href={b.instagramUrl} target="_blank" rel="noopener noreferrer" className="cert-doc-link">
+                                🔗 {b.instagramUrl}
+                              </a>
+                            )}
+                            {b.websiteUrl && (
+                              <a href={b.websiteUrl} target="_blank" rel="noopener noreferrer" className="cert-doc-link">
+                                🔗 {b.websiteUrl}
+                              </a>
+                            )}
+                            {b.socialLinks?.filter(Boolean).map((url, i) => (
+                              <a key={i} href={url} target="_blank" rel="noopener noreferrer" className="cert-doc-link">
+                                🔗 {url}
+                              </a>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
                       <div className="pending-section">
                         <strong>Restricciones declaradas:</strong>
                         <div className="tags-list" style={{ marginTop: '8px' }}>
