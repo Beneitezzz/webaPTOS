@@ -26,7 +26,7 @@ export default memo(function BusinessCard({ business, isFavorite, onToggleFavori
           {business.rating && (
             <div className="business-rating">
               <Star size={14} fill="#ffc107" color="#ffc107" />
-              <span>{business.rating}</span>
+              <span>{parseFloat(business.rating).toFixed(1)}</span>
             </div>
           )}
           {onToggleFavorite && (
