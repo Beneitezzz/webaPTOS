@@ -162,17 +162,17 @@ export default function AdminPanel() {
                           <strong>Links del comercio:</strong>
                           <div style={{ marginTop: '6px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
                             {b.instagramUrl && (
-                              <a href={b.instagramUrl} target="_blank" rel="noopener noreferrer" className="cert-doc-link">
+                              <a href={b.instagramUrl} target="_blank" rel="noopener noreferrer" className="cert-doc-link" style={{ wordBreak: 'break-all' }}>
                                 🔗 {b.instagramUrl}
                               </a>
                             )}
                             {b.websiteUrl && (
-                              <a href={b.websiteUrl} target="_blank" rel="noopener noreferrer" className="cert-doc-link">
+                              <a href={b.websiteUrl} target="_blank" rel="noopener noreferrer" className="cert-doc-link" style={{ wordBreak: 'break-all' }}>
                                 🔗 {b.websiteUrl}
                               </a>
                             )}
                             {b.socialLinks?.filter(Boolean).map((url, i) => (
-                              <a key={i} href={url} target="_blank" rel="noopener noreferrer" className="cert-doc-link">
+                              <a key={i} href={url} target="_blank" rel="noopener noreferrer" className="cert-doc-link" style={{ wordBreak: 'break-all' }}>
                                 🔗 {url}
                               </a>
                             ))}
