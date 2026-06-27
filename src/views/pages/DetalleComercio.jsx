@@ -6,7 +6,7 @@ import { useAuth } from '../../context/AuthContext'
 import { useFavorites } from '../../hooks/useFavorites'
 import RestrictionBadge from '../components/RestrictionBadge'
 import ReviewsSection from '../components/ReviewsSection'
-import { BUSINESS_TYPE_MAP, CERTIFICATIONS, mockBusinesses } from '../../models/mockData'
+import { BUSINESS_TYPE_MAP, CERTIFICATIONS } from '../../models/mockData'
 import { formatOpeningHours } from '../../utils/hours'
 import { useOpenStatus } from '../../hooks/useOpenStatus'
 
@@ -17,9 +17,7 @@ export default function DetalleComercio() {
   const { currentUser } = useAuth()
   const { favoriteIds, toggleFavorite } = useFavorites()
   const isFav = favoriteIds.has(String(id))
-  const business =
-    businesses.find((b) => String(b.id) === id) ||
-    mockBusinesses.find((b) => String(b.id) === id)
+  const business = businesses.find((b) => String(b.id) === id)
 
   const openStatus = useOpenStatus(business?.openingHours)
 

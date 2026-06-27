@@ -4,7 +4,7 @@ import { Star, ChevronLeft, ChevronRight, Coffee, Utensils, ShoppingBag, Heart }
 import { useApp } from '../../context/AppContext'
 import { useAuth } from '../../context/AuthContext'
 import { useFavorites } from '../../hooks/useFavorites'
-import { BUSINESS_TYPES, RESTRICTION_MAP, mockBusinesses } from '../../models/mockData'
+import { BUSINESS_TYPES, RESTRICTION_MAP } from '../../models/mockData'
 import { useOpenStatus } from '../../hooks/useOpenStatus'
 
 const TYPE_ICONS = {
@@ -167,8 +167,7 @@ export default function TopRatedSection() {
   const { favoriteIds, toggleFavorite } = useFavorites()
 
   const topByType = useMemo(() => {
-    const approvedFromFirebase = businesses.filter((b) => b.verified && !b.pending)
-    const source = approvedFromFirebase.length > 0 ? approvedFromFirebase : mockBusinesses
+    const source = businesses.filter((b) => b.verified && !b.pending)
     return BUSINESS_TYPES.map((type) => ({
       type,
       topBusinesses: source

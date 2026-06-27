@@ -1,7 +1,7 @@
 import { Link, useNavigate } from 'react-router-dom'
 import { Search, ArrowRight, Mail, Phone } from 'lucide-react'
 import { useState, useEffect, useMemo } from 'react'
-import { RESTRICTIONS, BUSINESS_TYPES, mockBusinesses } from '../../models/mockData'
+import { RESTRICTIONS, BUSINESS_TYPES } from '../../models/mockData'
 import { useApp } from '../../context/AppContext'
 import SearchAutocomplete from '../components/SearchAutocomplete'
 import SideNav from '../components/SideNav'
@@ -29,10 +29,7 @@ export default function Home() {
   const { businesses } = useApp()
 
   const searchSuggestions = useMemo(() => {
-    const verified = businesses.filter((b) => b.verified && !b.pending)
-    const names = verified.length > 0
-      ? verified.map((b) => b.name)
-      : mockBusinesses.filter((b) => b.verified && !b.pending).map((b) => b.name)
+    const names = businesses.filter((b) => b.verified && !b.pending).map((b) => b.name)
     const types = BUSINESS_TYPES.map((t) => t.label)
     const restrictions = RESTRICTIONS.map((r) => r.label)
     return [...new Set([...types, ...restrictions, ...names])]

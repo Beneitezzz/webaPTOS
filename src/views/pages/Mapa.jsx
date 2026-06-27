@@ -4,7 +4,7 @@ import { SlidersHorizontal, X } from 'lucide-react'
 import MapView from '../components/MapView'
 import BusinessCard from '../components/BusinessCard'
 import SearchAutocomplete from '../components/SearchAutocomplete'
-import { RESTRICTIONS, BUSINESS_TYPES, BUSINESS_TYPE_MAP, mockBusinesses } from '../../models/mockData'
+import { RESTRICTIONS, BUSINESS_TYPES, BUSINESS_TYPE_MAP } from '../../models/mockData'
 import { useApp } from '../../context/AppContext'
 import { useAuth } from '../../context/AuthContext'
 import { useFavorites } from '../../hooks/useFavorites'
@@ -62,10 +62,7 @@ export default function Mapa() {
   }, [profileLoading, filtersInitialized, userProfile.restrictions])
 
   const verifiedBusinesses = useMemo(() => {
-    const fromFirebase = businesses.filter((b) => b.verified && !b.pending)
-    return fromFirebase.length > 0
-      ? fromFirebase
-      : mockBusinesses.filter((b) => b.verified && !b.pending)
+    return businesses.filter((b) => b.verified && !b.pending)
   }, [businesses])
 
   const distanceMap = useMemo(() => {
