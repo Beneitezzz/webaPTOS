@@ -1,4 +1,4 @@
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage'
+import { ref, uploadBytes, uploadBytesResumable, getDownloadURL } from 'firebase/storage'
 import { storage } from '../firebase'
 
 const compressImage = (file, maxPx = 1920, quality = 0.82) =>
@@ -26,11 +26,20 @@ export const uploadCertFile = async (businessId, certCode, file) => {
   return getDownloadURL(fileRef)
 }
 
-export const uploadMenuFile = async (businessId, file) => {
+export const uploadMenuFile = (businessId, file, onProgress) => {
   const ext = file.name.split('.').pop().toLowerCase()
   const menuRef = ref(storage, `menus/${businessId}/menu.${ext}`)
-  await uploadBytes(menuRef, file)
-  return getDownloadURL(menuRef)
+  const task = uploadBytesResumable(menuRef, file)
+  return new Promise((resolve, reject) => {
+    task.on(
+      'state_changed',
+      (snapshot) => {
+        onProgress?.(Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100))
+      },
+      reject,
+      async () => resolve(await getDownloadURL(task.snapshot.ref)),
+    )
+  })
 }
 
 export const uploadBusinessPhoto = async (businessId, file, index) => {

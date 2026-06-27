@@ -8,7 +8,7 @@ import { toggleItem } from '../utils/array'
 
 const ALLOWED_MENU_TYPES = new Set(['application/pdf', 'image/jpeg', 'image/png'])
 const ALLOWED_PHOTO_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp'])
-const MAX_MENU_SIZE = 5 * 1024 * 1024
+const MAX_MENU_SIZE = 50 * 1024 * 1024
 const MAX_PHOTO_SIZE = 5 * 1024 * 1024
 const MAX_PHOTOS = 5
 
@@ -58,6 +58,7 @@ export function useBusinessForm(businessId = null) {
   const [initialCertifications, setInitialCertifications] = useState([])
   const [errors, setErrors] = useState({})
   const [submitting, setSubmitting] = useState(false)
+  const [menuUploadProgress, setMenuUploadProgress] = useState(null)
   const [coords, setCoords] = useState(null)
   const [geocoding, setGeocoding] = useState(false)
   const [geocodeError, setGeocodeError] = useState('')
@@ -218,7 +219,7 @@ export function useBusinessForm(businessId = null) {
       return
     }
     if (file.size > MAX_MENU_SIZE) {
-      setMenuFileError('El archivo no puede superar los 5 MB')
+      setMenuFileError('El archivo no puede superar los 50 MB')
       return
     }
     setMenuFile(file)
@@ -368,9 +369,10 @@ export function useBusinessForm(businessId = null) {
         const certEntries = Object.entries(certFiles)
         const results = await Promise.all([
           Promise.all(certEntries.map(async ([code, file]) => [code, await uploadCertFile(businessId, code, file)])),
-          menuMode === 'file' && menuFile ? uploadMenuFile(businessId, menuFile) : Promise.resolve(null),
+          menuMode === 'file' && menuFile ? uploadMenuFile(businessId, menuFile, setMenuUploadProgress) : Promise.resolve(null),
           ...newPhotos.map((photo, i) => uploadBusinessPhoto(businessId, photo, existingPhotos.length + i)),
         ])
+        setMenuUploadProgress(null)
         const [certPairs, menuUrl, ...uploadedPhotoUrls] = results
         const certUrls = Object.fromEntries(certPairs)
         const allPhotos = [...existingPhotos, ...uploadedPhotoUrls]
@@ -381,6 +383,7 @@ export function useBusinessForm(businessId = null) {
         ].filter(Boolean))
       } catch (uploadErr) {
         console.error('Error subiendo archivos:', uploadErr)
+        setMenuUploadProgress(null)
         setErrors({
           submit: `Tu comercio fue registrado pero los archivos no se pudieron subir. Error: ${uploadErr?.code ?? uploadErr?.message ?? 'desconocido'}. Verificá tu conexión y volvé a intentarlo.`,
         })
@@ -465,6 +468,7 @@ export function useBusinessForm(businessId = null) {
     certsChanged,
     submitted,
     submitting,
+    menuUploadProgress,
     errors,
     coords,
     setCoords,

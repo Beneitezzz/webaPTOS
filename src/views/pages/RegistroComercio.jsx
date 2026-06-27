@@ -43,7 +43,7 @@ export default function RegistroComercio() {
     menuFileError, menuMode, setMenuMode, menuLink, setMenuLink, menuLinkError, handleMenuLink,
     newPhotos, existingPhotos, photoError,
     handleAddPhotos, removeNewPhoto, removeExistingPhoto,
-    editingBusinessId, isResubmission, submitted, submitting, errors, coords,
+    editingBusinessId, isResubmission, submitted, submitting, menuUploadProgress, errors, coords,
     geocoding, geocodeError, geocodeId,
     editingApprovedBusiness, editingSuspendedBusiness, certsChanged,
     handleChange, handleMarkerMove, handleMenuFile, handleCertFile,
@@ -388,7 +388,7 @@ export default function RegistroComercio() {
             {menuMode === 'file' && (
               <>
                 <p className="form-hint" style={{ marginTop: 0, marginBottom: '0.75rem' }}>
-                  Subí una foto o PDF de tu carta. Máx. 5 MB.
+                  Subí una foto o PDF de tu carta. Máx. 50 MB.
                 </p>
                 {existingMenuFileUrl && !menuFile && (
                   <div className="menu-file-selected">
@@ -405,12 +405,22 @@ export default function RegistroComercio() {
                 )}
                 {!existingMenuFileUrl && (
                   menuFile ? (
-                    <div className="menu-file-selected">
-                      <span>📄 {menuFile.name}</span>
-                      <button type="button" className="btn-remove" onClick={() => handleMenuFile(null)}>
-                        ×
-                      </button>
-                    </div>
+                    <>
+                      <div className="menu-file-selected">
+                        <span>📄 {menuFile.name}</span>
+                        <button type="button" className="btn-remove" onClick={() => handleMenuFile(null)}>
+                          ×
+                        </button>
+                      </div>
+                      {submitting && menuUploadProgress !== null && (
+                        <div className="upload-progress">
+                          <div className="upload-progress-bar-track">
+                            <div className="upload-progress-bar" style={{ width: `${menuUploadProgress}%` }} />
+                          </div>
+                          <span className="upload-progress-label">{menuUploadProgress}%</span>
+                        </div>
+                      )}
+                    </>
                   ) : (
                     <label className="menu-upload-zone">
                       <input
@@ -443,6 +453,7 @@ export default function RegistroComercio() {
                 {menuLinkError && <span className="form-error">{menuLinkError}</span>}
               </>
             )}
+
 
             {errors.menu && <span className="form-error">{errors.menu}</span>}
           </div>

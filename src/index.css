@@ -1682,6 +1682,21 @@ section[id] { scroll-margin-top: calc(var(--navbar-h) + 8px); }
 .menu-mode-btn:hover { background: var(--primary-lighter); color: var(--primary); }
 .menu-mode-btn.active { background: var(--primary-lighter); color: var(--primary); font-weight: 600; }
 
+.upload-progress {
+  margin-top: 8px; margin-bottom: 4px;
+}
+.upload-progress-bar-track {
+  height: 6px; background: var(--border); border-radius: 3px; overflow: hidden;
+}
+.upload-progress-bar {
+  height: 100%; background: var(--primary); border-radius: 3px;
+  transition: width 0.2s ease;
+}
+.upload-progress-label {
+  display: block; text-align: right; margin-top: 2px;
+  font-size: 0.7rem; color: var(--text-muted);
+}
+
 /* ─── Status banner (mi-comercio) ─── */
 .status-banner {
   display: flex; align-items: flex-start; gap: 12px;
