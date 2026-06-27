@@ -168,7 +168,6 @@ export default function RegistroComercio() {
                   key={geocodeId}
                   center={[coords.lat, coords.lng]}
                   zoom={15}
-                  zoomControl={false}
                   scrollWheelZoom={false}
                   style={{ height: '220px' }}
                 >
