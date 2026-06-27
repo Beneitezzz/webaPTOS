@@ -40,7 +40,8 @@ export default function RegistroComercio() {
   const { id: businessId } = useParams()
   const {
     form, certFiles, menuFile, existingMenuFileUrl, setExistingMenuFileUrl,
-    menuFileError, newPhotos, existingPhotos, photoError,
+    menuFileError, menuMode, setMenuMode, menuLink, setMenuLink, menuLinkError, handleMenuLink,
+    newPhotos, existingPhotos, photoError,
     handleAddPhotos, removeNewPhoto, removeExistingPhoto,
     editingBusinessId, isResubmission, submitted, submitting, errors, coords,
     geocoding, geocodeError, geocodeId,
@@ -363,59 +364,86 @@ export default function RegistroComercio() {
 
           <div className="form-group">
             {form.type === 'restaurante' || form.type === 'cafe' ? (
+              <label className="form-label">Carta / menú *</label>
+            ) : (
+              <label className="form-label">Catálogo <span style={{ fontWeight: 400, color: '#888' }}>(opcional)</span></label>
+            )}
+            <div className="menu-mode-toggle">
+              <button
+                type="button"
+                className={`menu-mode-btn${menuMode === 'file' ? ' active' : ''}`}
+                onClick={() => { setMenuMode('file'); setMenuLink('') }}
+              >
+                📎 Subir archivo
+              </button>
+              <button
+                type="button"
+                className={`menu-mode-btn${menuMode === 'link' ? ' active' : ''}`}
+                onClick={() => { setMenuMode('link'); handleMenuFile(null); setExistingMenuFileUrl(null) }}
+              >
+                🔗 Pegar link
+              </button>
+            </div>
+
+            {menuMode === 'file' && (
               <>
-                <label className="form-label">Carta / menú *</label>
                 <p className="form-hint" style={{ marginTop: 0, marginBottom: '0.75rem' }}>
                   Subí una foto o PDF de tu carta. Máx. 5 MB.
                 </p>
+                {existingMenuFileUrl && !menuFile && (
+                  <div className="menu-file-selected">
+                    <span>
+                      📄 Archivo actual:{' '}
+                      <a href={existingMenuFileUrl} target="_blank" rel="noopener noreferrer" className="link">
+                        ver menú
+                      </a>
+                    </span>
+                    <button type="button" className="btn-remove" onClick={() => setExistingMenuFileUrl(null)}>
+                      ×
+                    </button>
+                  </div>
+                )}
+                {!existingMenuFileUrl && (
+                  menuFile ? (
+                    <div className="menu-file-selected">
+                      <span>📄 {menuFile.name}</span>
+                      <button type="button" className="btn-remove" onClick={() => handleMenuFile(null)}>
+                        ×
+                      </button>
+                    </div>
+                  ) : (
+                    <label className="menu-upload-zone">
+                      <input
+                        type="file"
+                        accept=".pdf,.jpg,.jpeg,.png"
+                        style={{ display: 'none' }}
+                        onChange={(e) => handleMenuFile(e.target.files[0] ?? null)}
+                      />
+                      📎 Hacé clic para seleccionar un archivo
+                      <span className="menu-upload-hint">PDF · JPG · PNG</span>
+                    </label>
+                  )
+                )}
+                {menuFileError && <span className="form-error">{menuFileError}</span>}
               </>
-            ) : (
+            )}
+
+            {menuMode === 'link' && (
               <>
-                <label className="form-label">Catálogo <span style={{ fontWeight: 400, color: '#888' }}>(opcional)</span></label>
-                <p className="form-hint" style={{ marginTop: 0, marginBottom: '0.75rem' }}>
-                  Podés subir una foto o PDF con tus productos. Máx. 5 MB.
+                <p className="form-hint" style={{ marginTop: 0, marginBottom: '0.5rem' }}>
+                  Pegá el link de tu carta en línea (Google Drive, tu web, Instagram, etc.)
                 </p>
+                <input
+                  type="url"
+                  className="form-input"
+                  placeholder="https://ejemplo.com/mi-carta"
+                  value={menuLink}
+                  onChange={(e) => handleMenuLink(e.target.value)}
+                />
+                {menuLinkError && <span className="form-error">{menuLinkError}</span>}
               </>
             )}
-            {existingMenuFileUrl && !menuFile && (
-              <div className="menu-file-selected">
-                <span>
-                  📄 Archivo actual:{' '}
-                  <a href={existingMenuFileUrl} target="_blank" rel="noopener noreferrer" className="link">
-                    ver menú
-                  </a>
-                </span>
-                <button type="button" className="btn-remove" onClick={() => setExistingMenuFileUrl(null)}>
-                  ×
-                </button>
-              </div>
-            )}
-            {!existingMenuFileUrl && (
-              menuFile ? (
-                <div className="menu-file-selected">
-                  <span>📄 {menuFile.name}</span>
-                  <button
-                    type="button"
-                    className="btn-remove"
-                    onClick={() => handleMenuFile(null)}
-                  >
-                    ×
-                  </button>
-                </div>
-              ) : (
-                <label className="menu-upload-zone">
-                  <input
-                    type="file"
-                    accept=".pdf,.jpg,.jpeg,.png"
-                    style={{ display: 'none' }}
-                    onChange={(e) => handleMenuFile(e.target.files[0] ?? null)}
-                  />
-                  📎 Hacé clic para seleccionar un archivo
-                  <span className="menu-upload-hint">PDF · JPG · PNG</span>
-                </label>
-              )
-            )}
-            {menuFileError && <span className="form-error">{menuFileError}</span>}
+
             {errors.menu && <span className="form-error">{errors.menu}</span>}
           </div>
 

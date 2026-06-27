@@ -44,6 +44,9 @@ export function useBusinessForm(businessId = null) {
   const [menuFile, setMenuFile] = useState(null)
   const [existingMenuFileUrl, setExistingMenuFileUrl] = useState(null)
   const [menuFileError, setMenuFileError] = useState('')
+  const [menuMode, setMenuMode] = useState('file') // 'file' | 'link'
+  const [menuLink, setMenuLink] = useState('')
+  const [menuLinkError, setMenuLinkError] = useState('')
   const [newPhotos, setNewPhotos] = useState([])
   const [existingPhotos, setExistingPhotos] = useState([])
   const [photoError, setPhotoError] = useState('')
@@ -147,7 +150,14 @@ export function useBusinessForm(businessId = null) {
       certifications: existing.certifications ?? [],
       socialLinks: existing.socialLinks?.length ? existing.socialLinks : [''],
     })
-    if (existing.menuFileUrl) setExistingMenuFileUrl(existing.menuFileUrl)
+    if (existing.menuFileUrl) {
+      if (existing.menuFileUrl.includes('firebasestorage.googleapis.com')) {
+        setExistingMenuFileUrl(existing.menuFileUrl)
+      } else {
+        setMenuMode('link')
+        setMenuLink(existing.menuFileUrl)
+      }
+    }
     setMenuFileError('')
     if (existing.photos?.length) setExistingPhotos(existing.photos)
     setPhotoError('')
@@ -194,6 +204,11 @@ export function useBusinessForm(businessId = null) {
   const removeSocialLink = (i) => {
     setForm((prev) => ({ ...prev, socialLinks: prev.socialLinks.filter((_, idx) => idx !== i) }))
     setErrors((prev) => { const next = { ...prev }; delete next[`socialLink_${i}`]; return next })
+  }
+
+  const handleMenuLink = (value) => {
+    setMenuLink(value)
+    setMenuLinkError('')
   }
 
   const handleMenuFile = (file) => {
@@ -276,7 +291,14 @@ export function useBusinessForm(businessId = null) {
     if (form.tags.length === 0) errs.tags = 'Seleccioná al menos una restricción alimentaria'
     if (form.certifications.length === 0) errs.certifications = 'Seleccioná al menos una certificación'
     const menuRequired = form.type === 'restaurante' || form.type === 'cafe'
-    if (menuRequired && !menuFile && !existingMenuFileUrl) errs.menu = 'La carta/menú es requerida'
+    if (menuRequired) {
+      if (menuMode === 'file' && !menuFile && !existingMenuFileUrl) {
+        errs.menu = 'La carta/menú es requerida'
+      } else if (menuMode === 'link') {
+        if (!menuLink.trim()) errs.menu = 'El link de la carta/menú es requerido'
+        else if (!isValidUrl(menuLink.trim())) errs.menu = 'Ingresá una URL válida (ej: https://mirestaurante.com/menu)'
+      }
+    }
     form.socialLinks.forEach((url, i) => {
       if (url.trim() && !isValidUrl(url.trim()))
         errs[`socialLink_${i}`] = 'Ingresá una URL válida (ej: https://instagram.com/milocal)'
@@ -304,6 +326,7 @@ export function useBusinessForm(businessId = null) {
         lng: coords.lng,
         whatsapp: form.phone.replace(/\D/g, ''),
         socialLinks: form.socialLinks.filter((u) => u.trim()),
+        ...(menuMode === 'link' && menuLink.trim() ? { menuFileUrl: menuLink.trim() } : {}),
       }
 
       let businessId
@@ -345,7 +368,7 @@ export function useBusinessForm(businessId = null) {
         const certEntries = Object.entries(certFiles)
         const results = await Promise.all([
           Promise.all(certEntries.map(async ([code, file]) => [code, await uploadCertFile(businessId, code, file)])),
-          menuFile ? uploadMenuFile(businessId, menuFile) : Promise.resolve(null),
+          menuMode === 'file' && menuFile ? uploadMenuFile(businessId, menuFile) : Promise.resolve(null),
           ...newPhotos.map((photo, i) => uploadBusinessPhoto(businessId, photo, existingPhotos.length + i)),
         ])
         const [certPairs, menuUrl, ...uploadedPhotoUrls] = results
@@ -393,6 +416,9 @@ export function useBusinessForm(businessId = null) {
     setMenuFile(null)
     setMenuFileError('')
     setExistingMenuFileUrl(null)
+    setMenuMode('file')
+    setMenuLink('')
+    setMenuLinkError('')
     setNewPhotos([])
     setExistingPhotos([])
     setPhotoError('')
@@ -447,6 +473,12 @@ export function useBusinessForm(businessId = null) {
     geocodeId,
     handleChange,
     handleMarkerMove,
+    menuMode,
+    setMenuMode,
+    menuLink,
+    setMenuLink,
+    menuLinkError,
+    handleMenuLink,
     handleMenuFile,
     handleCertFile,
     addSocialLink,

@@ -1668,6 +1668,20 @@ section[id] { scroll-margin-top: calc(var(--navbar-h) + 8px); }
   padding: 0.5rem 0.75rem; font-size: 0.875rem;
 }
 
+/* ─── Menu mode toggle ─── */
+.menu-mode-toggle {
+  display: flex; gap: 0; margin-bottom: 0.875rem;
+  border: 1px solid var(--border); border-radius: var(--radius-sm); overflow: hidden;
+}
+.menu-mode-btn {
+  flex: 1; padding: 0.5rem 0.75rem; font-size: 0.8125rem; font-weight: 500;
+  background: var(--bg); color: var(--text-muted); border: none; cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+.menu-mode-btn:first-child { border-right: 1px solid var(--border); }
+.menu-mode-btn:hover { background: var(--primary-lighter); color: var(--primary); }
+.menu-mode-btn.active { background: var(--primary-lighter); color: var(--primary); font-weight: 600; }
+
 /* ─── Status banner (mi-comercio) ─── */
 .status-banner {
   display: flex; align-items: flex-start; gap: 12px;
