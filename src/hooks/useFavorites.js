@@ -23,7 +23,7 @@ export function useFavorites() {
       (ids) => { setFavoriteIds(new Set(ids)); setLoading(false) },
       (err) => { console.error('favorites subscription:', err); setLoading(false) }
     )
-  }, [currentUser])
+  }, [currentUser?.uid])
 
   const toggleFavorite = async (businessId) => {
     if (!currentUser) return

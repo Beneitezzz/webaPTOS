@@ -13,50 +13,89 @@ npm run lint     # Run ESLint
 
 There is no test runner configured in this project.
 
+## Live app
+
+Deployed at https://webaptos.web.app/ via Firebase Hosting.
+
 ## Architecture
 
-**MapaApto** is a single-page React app (Vite + React 19) for Córdoba, Argentina. It lets users find businesses that serve people with dietary restrictions (celiac disease, diabetes, SIBO, lactose intolerance). The UI is entirely in Spanish.
+**MapaApto / PuntoSano** is a single-page React 19 app (Vite) for Córdoba, Argentina. It lets users find businesses that serve people with dietary restrictions (celiac disease, diabetes, SIBO, lactose intolerance). The UI is entirely in Spanish.
 
-### State management
+### Auth & Roles
 
-`AppContext` (`src/context/AppContext.jsx`) is the single source of truth for all runtime state. It initializes businesses from the static mock data and persists the user profile to `localStorage` under the key `mapaApto_profile`. There is no backend — all data lives in memory for the session.
+`AuthContext` (`src/context/AuthContext.jsx`) wraps Firebase Auth via `onAuthStateChanged`. On sign-in it fetches the user's `role` from Firestore (`users/{uid}.role`). The context exposes `currentUser`, `userRole`, and auth actions.
 
-Context exposes:
-- `userProfile` / `updateProfile` — name + array of restriction IDs
-- `businesses` / `addBusiness` / `approveBusiness` / `rejectBusiness` — full business list with pending/verified states
+Supported auth methods:
+- Email/password with email verification (`sendEmailVerification`)
+- Google OAuth (`GoogleAuthProvider`)
+- Apple OAuth (`OAuthProvider('apple.com')`)
+- Facebook OAuth (`FacebookAuthProvider`)
 
-### Data layer
+Roles: `user` (default) and `admin`. Admin access is enforced by `AdminRoute`.
 
-`src/data/mockData.js` is the only data source. It exports:
-- `RESTRICTIONS` — the four dietary restriction definitions (id, label, color)
-- `BUSINESS_TYPES` — the four establishment categories (id, label, color)
-- `CERTIFICATIONS` — mapping of cert codes to full names (RNPA, ALG, RME, POES, ACA)
-- `mockBusinesses` — seed data; businesses with `pending: true` start in the admin queue
+### App state
+
+`AppContext` (`src/context/AppContext.jsx`) subscribes to the Firestore `businesses` collection via `onSnapshot` (real-time). It also loads the logged-in user's profile from Firestore (`users/{uid}`).
+
+Context exposes businesses list, loading/error states, profile, and all business CRUD operations.
+
+### Data layer — Firestore
+
+All data is persisted in Cloud Firestore. No local mock data is used in production.
+
+Collections:
+- `businesses` — all business records with status lifecycle
+- `users` — user profiles and roles
+- `users/{uid}/favorites` — user's favorite businesses (subcollection)
+- `businesses/{id}/reviews` — reviews subcollection (real-time, ordered by date); rating average is recalculated on each write/delete
 
 ### Business lifecycle
 
-1. A business owner submits via `/registro-comercio` → `addBusiness()` adds it to state with `{ verified: false, pending: true }` and a randomized lat/lng near Córdoba center
-2. An admin logs in at `/admin` (demo password: `admin123`) and approves or rejects it
-3. Only `{ verified: true, pending: false }` businesses appear on the map
+Status field values: `pendiente` → `aprobado` / `rechazado` / `suspendido`
+
+1. Business owner submits via `/registro-comercio` → `addBusiness()` creates a Firestore doc with `{ verified: false, pending: true, status: 'pendiente' }`
+2. Admin logs in at `/admin` and approves, rejects, or suspends
+3. On each admin action, EmailJS sends a transactional email to the owner
+4. Only `{ verified: true, status: 'aprobado' }` businesses appear on the map
+
+### Firebase Storage
+
+`storageService.js` handles:
+- Business photos (`fotos/{businessId}/foto_{index}.jpg`) — compressed to max 1920px before upload
+- Certificates (`certificados/{businessId}/{certCode}.{ext}`)
+- Menus (`menus/{businessId}/menu.{ext}`)
+
+### EmailJS
+
+`utils/emailService.js` sends transactional emails via `@emailjs/browser`. Disabled in dev (`import.meta.env.DEV`). Uses two templates configured via env vars:
+- `VITE_EMAILJS_TEMPLATE_APROBACION` — approval notification
+- `VITE_EMAILJS_TEMPLATE_RECHAZO` — rejection or suspension notification (uses an `accion` variable to differentiate)
 
 ### Map
 
-`MapView` (`src/components/MapView.jsx`) uses `react-leaflet` over OpenStreetMap tiles, centered on Córdoba (-31.4201, -64.1888). Each marker uses a custom SVG pin colored by business type. Leaflet's CSS must be imported at the app entry point (`main.jsx`) — this is already done.
+`MapView` (`src/views/components/MapView.jsx`) uses `react-leaflet` over OpenStreetMap tiles, centered on Córdoba (-31.4201, -64.1888). Each marker uses a custom SVG pin colored by business type. Leaflet's CSS must be imported at the app entry point (`main.jsx`) — this is already done.
 
-The `Mapa` page applies two independent filters (restrictions AND types) using `useMemo`. Filter state is pre-seeded from `userProfile.restrictions` if the user has a saved profile.
+The `Mapa` page applies two independent filters (restrictions AND types) using `useMemo`. Filter state is pre-seeded from `userProfile.restrictions`.
 
 ### Routing
 
-All routes are in `App.jsx`. There is no auth guard — the admin panel handles authentication locally with a hardcoded password.
+All routes are in `App.jsx`. Protected routes use `PrivateRoute` (requires login) and `AdminRoute` (requires `role === 'admin'`).
 
-| Route | Page |
-|---|---|
-| `/` | Home landing |
-| `/mapa` | Map + sidebar filters |
-| `/perfil` | User profile editor |
-| `/comercio/:id` | Business detail |
-| `/registro-comercio` | Business registration form |
-| `/admin` | Admin approval panel |
+| Route | Protection | Page |
+|---|---|---|
+| `/` | — | Home landing |
+| `/mapa` | — | Map + sidebar filters |
+| `/comercio/:id` | — | Business detail + reviews |
+| `/login` | — | Login |
+| `/register/tipo` | — | Role selection (user / business owner) |
+| `/register` | — | Registration form |
+| `/politicas` | — | Privacy policy |
+| `/verificar-email` | — | Email verification landing |
+| `/perfil` | PrivateRoute | User profile + dietary restrictions |
+| `/registro-comercio` | PrivateRoute | New business registration form |
+| `/registro-comercio/:id` | PrivateRoute | Edit existing business |
+| `/mi-comercio` | PrivateRoute | Business owner dashboard |
+| `/admin` | AdminRoute | Admin approval panel |
 
 ### Styling
 

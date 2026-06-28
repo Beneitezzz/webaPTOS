@@ -122,7 +122,7 @@ export default function Perfil() {
       (data) => { setMyReviews(data); setReviewsLoading(false) },
       () => setReviewsLoading(false)
     )
-  }, [currentUser])
+  }, [currentUser?.uid])
 
   const [showDelete, setShowDelete] = useState(false)
   const [deleteInput, setDeleteInput] = useState('')
