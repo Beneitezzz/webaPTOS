@@ -76,6 +76,10 @@ service cloud.firestore {
       match /favorites/{businessId} {
         allow read, write: if isAuth() && request.auth.uid == userId;
       }
+
+      match /reviews/{businessId} {
+        allow read, write: if isAuth() && request.auth.uid == userId;
+      }
     }
   }
 }
