@@ -1,5 +1,5 @@
 import {
-  collection, collectionGroup, query, where, orderBy, onSnapshot,
+  collection, collectionGroup, query, where, onSnapshot,
   doc, setDoc, getDocs, updateDoc, deleteDoc, serverTimestamp,
 } from 'firebase/firestore'
 import { db } from '../firebase'
@@ -9,13 +9,13 @@ export const subscribeToUserReviews = (userId, onData, onError) =>
     query(
       collectionGroup(db, 'reviews'),
       where('userId', '==', userId),
-      orderBy('createdAt', 'desc')
     ),
-    (snap) => onData(snap.docs.map((d) => ({
-      id: d.id,
-      businessId: d.ref.parent.parent.id,
-      ...d.data(),
-    }))),
+    (snap) => {
+      const data = snap.docs
+        .map((d) => ({ id: d.id, businessId: d.ref.parent.parent.id, ...d.data() }))
+        .sort((a, b) => (b.createdAt?.seconds ?? 0) - (a.createdAt?.seconds ?? 0))
+      onData(data)
+    },
     onError
   )
 

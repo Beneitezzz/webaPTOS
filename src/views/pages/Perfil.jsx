@@ -120,7 +120,7 @@ export default function Perfil() {
     return subscribeToUserReviews(
       currentUser.uid,
       (data) => { setMyReviews(data); setReviewsLoading(false) },
-      () => setReviewsLoading(false)
+      (err) => { console.error('subscribeToUserReviews error:', err); setReviewsLoading(false) }
     )
   }, [currentUser?.uid])
 
