@@ -9,8 +9,10 @@
  *   5. Borrar serviceAccountKey.json cuando termine
  */
 
-const admin = require('firebase-admin')
-const serviceAccount = require('./serviceAccountKey.json')
+import { readFileSync } from 'fs'
+import admin from 'firebase-admin'
+
+const serviceAccount = JSON.parse(readFileSync('./serviceAccountKey.json', 'utf8'))
 
 admin.initializeApp({ credential: admin.credential.cert(serviceAccount) })
 const db = admin.firestore()
